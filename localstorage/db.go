@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var DB *sql.DB
 
-func init() {
+func InitDB() {
 	var err error
 	DB, err = sql.Open("sqlite3", "./devtime.db")
 
