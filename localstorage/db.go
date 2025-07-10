@@ -98,7 +98,8 @@ func GetAllLogs() []tracker.TimeLog {
 
 	for rows.Next() {
 		var currentLog tracker.TimeLog
-		var startStr, endStr string
+		var startStr string
+		var endStr sql.NullString
 
 		err := rows.Scan(&currentLog.ID, &currentLog.Project, &currentLog.Task, &startStr, &endStr)
 
@@ -108,8 +109,8 @@ func GetAllLogs() []tracker.TimeLog {
 		}
 
 		currentLog.StartTime, _ = time.Parse(time.RFC3339, startStr)
-		if endStr != "" {
-			currentLog.EndTime, _ = time.Parse(time.RFC3339, endStr)
+		if endStr.Valid {
+			currentLog.EndTime, _ = time.Parse(time.RFC3339, endStr.String)
 		}
 
 		logs = append(logs, currentLog)
