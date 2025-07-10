@@ -38,11 +38,45 @@ func InitDB() {
 }
 
 func InsertStart(project string, task string, start time.Time) {
-	stmt, _ := DB.Prepare("INSERT INTO timelogs(project, task, start_time) VALUES (?, ?, ?)")
-	stmt.Exec(project, task, start.Format(time.RFC3339))
+	if DB == nil {
+		log.Fatal("DB is not initialized")
+	}
+
+	stmt, err := DB.Prepare("INSERT INTO timelogs(project, task, start_time) VALUES (?, ?, ?)")
+
+	if err != nil {
+		log.Fatalf("Prepare failed: %v", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(project, task, start.Format(time.RFC3339))
+
+	if err != nil {
+		log.Fatalf("Exec failed: %v", err)
+	}
 }
 
 func InsertStop(end time.Time) {
-	stmt, _ := DB.Prepare("UPDATE timelogs SET end_time = ? WHERE end_time IS NULL ORDER BY id DESC LIMIT 1")
-	stmt.Exec(end.Format(time.RFC3339))
+	if DB == nil {
+		log.Fatal("DB is not initialized")
+	}
+
+	// Step 1: Get latest unclosed time log
+	var id int
+	err := DB.QueryRow("SELECT id FROM timelogs WHERE end_time IS NULL ORDER BY id DESC LIMIT 1").Scan(&id)
+	if err != nil {
+		log.Fatalf("Failed to find unclosed timelog: %v", err)
+	}
+
+	// Step 2: Update that record
+	stmt, err := DB.Prepare("UPDATE timelogs SET end_time = ? WHERE id = ?")
+	if err != nil {
+		log.Fatalf("Prepare failed: %v", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(end.Format(time.RFC3339), id)
+	if err != nil {
+		log.Fatalf("Exec failed: %v", err)
+	}
 }
