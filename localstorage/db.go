@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/madhuwantha/devtime/tracker"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -79,4 +80,40 @@ func InsertStop(end time.Time) {
 	if err != nil {
 		log.Fatalf("Exec failed: %v", err)
 	}
+}
+
+func GetAllLogs() []tracker.TimeLog {
+	if DB == nil {
+		log.Fatal("DB is not initialized")
+	}
+
+	rows, err := DB.Query("SELECT id, project, task, start_time, end_time FROM timelogs ORDER BY start_time DESC")
+
+	if err != nil {
+		log.Fatalf("Query failed: %v", err)
+	}
+	defer rows.Close()
+
+	var logs []tracker.TimeLog
+
+	for rows.Next() {
+		var currentLog tracker.TimeLog
+		var startStr, endStr string
+
+		err := rows.Scan(&currentLog.ID, &currentLog.Project, &currentLog.Task, &startStr, &endStr)
+
+		if err != nil {
+			log.Fatalf("Scan failed: %v", err)
+			continue
+		}
+
+		currentLog.StartTime, _ = time.Parse(time.RFC3339, startStr)
+		if endStr != "" {
+			currentLog.EndTime, _ = time.Parse(time.RFC3339, endStr)
+		}
+
+		logs = append(logs, currentLog)
+	}
+
+	return logs
 }
