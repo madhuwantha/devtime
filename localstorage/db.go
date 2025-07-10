@@ -37,7 +37,7 @@ func InitDB() {
 	}
 }
 
-func InsertStart(project int, task string, start time.Time) {
+func InsertStart(project string, task string, start time.Time) {
 	stmt, _ := DB.Prepare("INSERT INTO timelogs(project, task, start_time) VALUES (?, ?, ?)")
 	stmt.Exec(project, task, start.Format(time.RFC3339))
 }
