@@ -10,7 +10,7 @@ import (
 
 func StartTask(c *gin.Context) {
 
-	var devTimeLog dto.DevTimeLogRequest
+	var devTimeLog dto.DevTimeStartLogRequest
 	if err := c.ShouldBindJSON(&devTimeLog); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -23,4 +23,19 @@ func StartTask(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Task start log inserted successfully!"})
+}
+
+func StopTask(c *gin.Context) {
+	var devTimeLog dto.DevTimeStopLogRequest
+	if err := c.ShouldBindJSON(&devTimeLog); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := models.IncerStop(devTimeLog.UserName)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert stop log", "details": err})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"message": "Task stop log inserted successfully!"})
 }

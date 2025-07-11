@@ -21,7 +21,8 @@ func main() {
 	devtime := r.Group("/api")
 	{
 		devtime.GET("/logs", func(c *gin.Context) {})
-		devtime.POST("/logs", api.StartTask)
+		devtime.POST("/start", api.StartTask)
+		devtime.POST("/stop", api.StopTask)
 
 	}
 

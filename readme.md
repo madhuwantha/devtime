@@ -7,5 +7,5 @@
 ## Run server
 
 ```bash
-go run main-server.go
+go run server/main-server.go
 ```
