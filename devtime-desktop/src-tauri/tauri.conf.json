@@ -12,14 +12,16 @@
   "app": {
     "windows": [
       {
-        "title": "devtime-desktop",
-        "width": 800,
-        "height": 600
+        "label": "main",
+        "title": "DevTime",
+        "width": 500,
+        "height": 800,
+        "visible": true
       }
     ],
     "security": {
       "csp": null
-    }
+    }   
   },
   "bundle": {
     "active": true,
@@ -31,5 +33,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  }
+  }    
 }
