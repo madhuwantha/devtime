@@ -36,6 +36,11 @@ func main() {
 		tasks.POST("/", api.SaveTask)
 	}
 
+	users := r.Group("/api/users")
+	{
+		users.POST("/", api.SaveUserInfo)
+	}
+
 	r.Run()
 
 }
