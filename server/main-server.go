@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/madhuwantha/devtime/server/api"
@@ -15,6 +16,7 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 	r := gin.Default()
+	r.Use(cors.Default()) // All origins allowed by default
 	mongostorage.Connect()
 	mongostorage.SetupGracefulShutdown()
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import MyTask from "./screens/MyTask";
+import MyProjects from "./screens/MyProjects";
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
       </div>
       <div className="p-6">        
         {selectedTab === 0 && <MyTask />}
+        {selectedTab === 1 && <MyProjects />}
       </div>
     </div>
     </main>
