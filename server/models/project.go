@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/madhuwantha/devtime/server/mongostorage"
+	"github.com/madhuwantha/devtime/server/utils"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -27,14 +28,8 @@ func InsertProject(project Project) (string, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	idStr := ""
-	if oid, ok := res.InsertedID.(bson.ObjectID); ok {
-		idStr = oid.Hex()
-	} else if str, ok := res.InsertedID.(string); ok {
-		idStr = str
-	} else {
-		idStr = ""
-	}
+	idStr := utils.GetIdStringFromInsertOneResult(res)
+
 	return idStr, err
 }
 
@@ -100,13 +95,17 @@ func DeleteProject(id string) error {
 	return err
 }
 
-func AddTaskToProject(projectId string, task Task) error {
+func AddTaskToProject(projectId string, taskId string) error {
 	objID, err := bson.ObjectIDFromHex(projectId)
 	if err != nil {
 		log.Fatal(err)
 	}
+	taskObjId, err := bson.ObjectIDFromHex(taskId)
+	if err != nil {
+		log.Fatal(err)
+	}
 	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.PROJECT_COLLECTION)
-	update := bson.D{{Key: "$push", Value: bson.D{{Key: "tasks", Value: task.ID}}}}
+	update := bson.D{{Key: "$push", Value: bson.D{{Key: "tasks", Value: taskObjId}}}}
 	_, err = collection.UpdateByID(context.TODO(), objID, update)
 	if err != nil {
 		log.Fatal(err)

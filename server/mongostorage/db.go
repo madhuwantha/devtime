@@ -19,6 +19,7 @@ const DB = "devtime"
 const COLLECTION = "devtimelogs"
 const PROJECT_COLLECTION = "projects"
 const TASK_COLLECTION = "tasks"
+const USER_COLLECTION = "users"
 
 func Connect() {
 	fmt.Println("Connecting to MongoDB...")

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/madhuwantha/devtime/server/mongostorage"
+	"github.com/madhuwantha/devtime/server/utils"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -22,17 +23,10 @@ func InsertTask(task Task, projectId string) (string, error) {
 		log.Fatal(err)
 		return "", err
 	}
-	var savedtask Task
-	filter := bson.M{"_id": saved.InsertedID}
-	err = collection.FindOne(context.TODO(), filter).Decode(&savedtask)
-	if err != nil {
-		log.Fatal(err)
-		return "", err
-	}
-
-	err = AddTaskToProject(projectId, savedtask)
+	idStr := utils.GetIdStringFromInsertOneResult(saved)
+	err = AddTaskToProject(projectId, idStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return savedtask.ID.String(), err
+	return idStr, err
 }
