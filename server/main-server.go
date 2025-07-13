@@ -26,6 +26,16 @@ func main() {
 
 	}
 
+	prjects := r.Group("/api/projects")
+	{
+		prjects.POST("/", api.SaveProject)
+	}
+
+	tasks := r.Group("/api/projects/:projectId/tasks")
+	{
+		tasks.POST("/", api.SaveTask)
+	}
+
 	r.Run()
 
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 
 type Task = {
  id: number;
@@ -52,7 +52,7 @@ export default function MyTask() {
         Allocated: {task.allocatedTime} | Used: {task.usedTime}
        </div>
       </div>
-      
+
       <button
        className="absolute right-4 top-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm rsor-pointer"
        onClick={(e) => {

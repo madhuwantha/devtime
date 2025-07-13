@@ -26,3 +26,16 @@ For Android development, run:
 
 For iOS development, run:
   npm run tauri ios dev
+
+
+
+
+
+## Build app
+npm run build
+npm run tauri build
+open src-tauri/target/release/bundle/macos/
+
+
+###Optional: Run After Build
+open src-tauri/target/release/bundle/macos/Devtime\ Desktop.app

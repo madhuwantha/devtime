@@ -17,6 +17,8 @@ var mongoClient *mongo.Client
 
 const DB = "devtime"
 const COLLECTION = "devtimelogs"
+const PROJECT_COLLECTION = "projects"
+const TASK_COLLECTION = "tasks"
 
 func Connect() {
 	fmt.Println("Connecting to MongoDB...")
