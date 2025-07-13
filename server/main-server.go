@@ -29,6 +29,8 @@ func main() {
 	prjects := r.Group("/api/projects")
 	{
 		prjects.POST("/", api.SaveProject)
+		prjects.POST("/:projectId/users/:userId/role/:role/add-user", api.AddUserToProject)
+		prjects.GET("/users/:userId", api.GetUserProjects)
 	}
 
 	tasks := r.Group("/api/projects/:projectId/tasks")

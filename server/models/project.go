@@ -5,15 +5,22 @@ import (
 	"log"
 
 	"github.com/madhuwantha/devtime/server/mongostorage"
+	"github.com/madhuwantha/devtime/server/usertypes"
 	"github.com/madhuwantha/devtime/server/utils"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
+
+type ProjectUser struct {
+	UserId bson.ObjectID `json:"UserId,omitempty" bson:"UserId,omitempty"`
+	Role   string        `json:"email"`
+}
 
 type Project struct {
 	ID    bson.ObjectID   `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name  string          `json:"name"`
 	Code  string          `json:"code"`
 	Tasks []bson.ObjectID `json:"tasks" bson:"tasks"` // only store Task IDs
+	Users []ProjectUser   `json:"users" bson:"users"`
 }
 
 func InsertProject(project Project) (string, error) {
@@ -22,6 +29,7 @@ func InsertProject(project Project) (string, error) {
 		Name:  project.Name,
 		Code:  project.Code,
 		Tasks: []bson.ObjectID{},
+		Users: []ProjectUser{},
 	}
 
 	res, err := collection.InsertOne(context.TODO(), _project)
@@ -111,4 +119,52 @@ func AddTaskToProject(projectId string, taskId string) error {
 		log.Fatal(err)
 	}
 	return err
+}
+
+func AddUserToProject(projectId string, userId string, role string) error {
+	objID, err := bson.ObjectIDFromHex(projectId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	userObjID, err := bson.ObjectIDFromHex(userId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.PROJECT_COLLECTION)
+	userRole := role
+	if role == "" {
+		userRole = usertypes.MEMBER
+	}
+	update := bson.D{{Key: "$push", Value: bson.D{{Key: "users", Value: bson.D{{Key: "UserId", Value: userObjID}, {Key: "Role", Value: userRole}}}}}}
+	_, err = collection.UpdateByID(context.TODO(), objID, update)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return err
+}
+
+func GetUserProjects(userId string) ([]Project, error) {
+	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.PROJECT_COLLECTION)
+	objID, err := bson.ObjectIDFromHex(userId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	filter := bson.M{"users.UserId": objID}
+	cursor, err := collection.Find(context.TODO(), filter)
+	log.Println(filter)
+	log.Println(cursor)
+	log.Println(err)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var projects []Project = []Project{}
+	for cursor.Next(context.TODO()) {
+		var project Project
+		err := cursor.Decode(&project)
+		if err != nil {
+			log.Fatal(err)
+		}
+		projects = append(projects, project)
+	}
+	return projects, err
 }
