@@ -45,6 +45,7 @@ func main() {
 	{
 		tasks.POST("/:taskId/users/:userId/role/:role/add-user", api.AddUserToTask)
 		tasks.POST("/:taskId/users/:userId/add-user", api.AddUserToTask)
+		tasks.GET("/users/:userId", api.GetUserTasks)
 	}
 
 	users := r.Group("/api/users")

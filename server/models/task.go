@@ -61,3 +61,19 @@ func AddUserToTask(taskId string, userId string, role string) error {
 	}
 	return err
 }
+
+func GetUserTasks(userId string) ([]Task, error) {
+	userObjID, err := bson.ObjectIDFromHex(userId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.TASK_COLLECTION)
+	filter := bson.M{"users.UserId": userObjID}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var tasks []Task
+	err = cursor.All(context.TODO(), &tasks)
+	return tasks, err
+}

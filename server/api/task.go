@@ -50,3 +50,20 @@ func AddUserToTask(c *gin.Context) {
 
 	c.JSON(200, gin.H{"message": "User added to task successfully!"})
 }
+
+func GetUserTasks(c *gin.Context) {
+	userId := c.Param("userId")
+
+	if userId == "" || userId == "undefined" {
+		c.JSON(400, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	tasks, err := models.GetUserTasks(userId)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to get user tasks", "details": err})
+		return
+	}
+	c.JSON(200, tasks)
+
+}

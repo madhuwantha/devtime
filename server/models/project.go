@@ -151,9 +151,6 @@ func GetUserProjects(userId string) ([]Project, error) {
 	}
 	filter := bson.M{"users.UserId": objID}
 	cursor, err := collection.Find(context.TODO(), filter)
-	log.Println(filter)
-	log.Println(cursor)
-	log.Println(err)
 	if err != nil {
 		log.Fatal(err)
 	}
