@@ -1,37 +1,6 @@
 import  { useEffect, useState } from "react";
 import { useProjectList } from "../hooks/useProjectList";
 
-type Task = {
- id: number;
- name: string;
- allocatedTime: string;
- usedTime: string;
- description: string;
-};
-
-const tasks: Task[] = [
-//  {
-//   id: 1,
-//   name: "Design Homepage",
-//   allocatedTime: "2h",
-//   usedTime: "1h",
-//   description: "Create wireframes and mockups for the homepage.",
-//  },
-//  {
-//   id: 2,
-//   name: "Implement Login",
-//   allocatedTime: "1h",
-//   usedTime: "30m",
-//   description: "Develop login functionality and validation.",
-//  },
-//  {
-//   id: 3,
-//   name: "Write Documentation",
-//   allocatedTime: "1.5h",
-//   usedTime: "45m",
-//   description: "Document the API endpoints and usage.",
-//  },
-];
 
 export default function MyProjects() {
  const [expandedId, setExpandedId] = useState<string | null>(null);
