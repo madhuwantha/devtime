@@ -26,3 +26,27 @@ func SaveTask(c *gin.Context) {
 	c.JSON(201, gin.H{"message": "Task inserted successfully!", "id": id})
 
 }
+
+func AddUserToTask(c *gin.Context) {
+	taskId := c.Param("taskId")
+	userId := c.Param("userId")
+	role := c.Param("role")
+
+	if taskId == "" || taskId == "undefined" {
+		c.JSON(400, gin.H{"error": "Task ID is required"})
+		return
+	}
+
+	if userId == "" || userId == "undefined" {
+		c.JSON(400, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	err := models.AddUserToTask(taskId, userId, role)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to add user to task", "details": err})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "User added to task successfully!"})
+}

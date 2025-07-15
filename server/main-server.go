@@ -32,12 +32,19 @@ func main() {
 	{
 		prjects.POST("/", api.SaveProject)
 		prjects.POST("/:projectId/users/:userId/role/:role/add-user", api.AddUserToProject)
+		prjects.POST("/:projectId/users/:userId/add-user", api.AddUserToProject)
 		prjects.GET("/users/:userId", api.GetUserProjects)
 	}
 
-	tasks := r.Group("/api/projects/:projectId/tasks")
+	projectstasks := r.Group("/api/projects/:projectId/tasks")
 	{
-		tasks.POST("/", api.SaveTask)
+		projectstasks.POST("/", api.SaveTask)
+	}
+
+	tasks := r.Group("/api/tasks")
+	{
+		tasks.POST("/:taskId/users/:userId/role/:role/add-user", api.AddUserToTask)
+		tasks.POST("/:taskId/users/:userId/add-user", api.AddUserToTask)
 	}
 
 	users := r.Group("/api/users")
