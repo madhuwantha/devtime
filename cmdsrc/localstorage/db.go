@@ -30,7 +30,16 @@ func InitDB() {
 		task TEXT,
 		start_time TEXT,
 		end_time TEXT
-	);`
+	);
+
+	CREATE TABLE IF NOT EXISTS projects (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		project_id TEXT,
+		name TEXT,
+		code TEXT
+	);
+	
+	`
 
 	_, err = DB.Exec(createTable)
 	if err != nil {
