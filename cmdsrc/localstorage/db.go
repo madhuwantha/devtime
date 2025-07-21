@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/madhuwantha/devtime/tracker"
+	"github.com/madhuwantha/devtime/cmdsrc/tracker"
 	_ "github.com/mattn/go-sqlite3"
 )
 

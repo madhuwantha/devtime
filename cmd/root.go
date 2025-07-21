@@ -6,7 +6,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/madhuwantha/devtime/localstorage"
+	"github.com/madhuwantha/devtime/cmdsrc/localstorage"
 	"github.com/spf13/cobra"
 )
 
