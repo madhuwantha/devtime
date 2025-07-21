@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	"github.com/madhuwantha/devtime/cmdsrc/syn"
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -18,43 +17,24 @@ var synCmd = &cobra.Command{
 	Long:  `This command is used to sync data between local and server.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Here is the sync command")
-
-		prompt := promptui.Select{
-			Label: "Select What you want to do?",
-			Items: []string{"Server -> Local", "Local -> Server"},
-		}
-
-		_, way, err := prompt.Run()
-
+		direction, err := syn.PromptSyncDirection()
 		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
 			return
 		}
 
-		fmt.Printf("Lets start to sync %q\n", way)
+		datatype, err := syn.PromptSyncDataType()
+		if err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			return
+		}
 
-		if way == "Server -> Local" {
-
-			prompt := promptui.Select{
-				Label: "Select What you want to sync?",
-				Items: []string{"Projects", "Tasks"},
-			}
-			_, datatype, err := prompt.Run()
-			if err != nil {
-				fmt.Printf("Prompt failed %v\n", err)
-				return
-			}
-			fmt.Printf("Lets start to sync %q %v\n", datatype, way)
-
-			switch datatype {
-			case "Projects":
-				syn.SynLocalProjects()
-				fmt.Println("Syncing Projects from Server to Local is completed")
-			case "Tasks":
-			}
-
+		fmt.Printf("Starting sync: %s %s\n", direction, datatype)
+		strategy := syn.GetSyncStrategy(direction, datatype)
+		if strategy != nil {
+			strategy.RunSync()
 		} else {
-
+			fmt.Println("No sync strategy found")
 		}
 	},
 }
