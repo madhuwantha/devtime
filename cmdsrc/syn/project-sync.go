@@ -34,7 +34,7 @@ func GetServerProjects() []models.Project {
 	return projects
 }
 
-func GetAllProject() []tracker.Project {
+func GetLocalProject() []tracker.Project {
 	if localstorage.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
@@ -74,7 +74,7 @@ func InsertLocalProject(project models.Project) {
 
 func SynLocalProjects() {
 	serverProjects := GetServerProjects()
-	localProjects := GetAllProject()
+	localProjects := GetLocalProject()
 
 	for _, serverProject := range serverProjects {
 		found := false

@@ -38,6 +38,12 @@ func InitDB() {
 		name TEXT,
 		code TEXT
 	);
+	CREATE TABLE IF NOT EXISTS tasks (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT,		
+		task_id TEXT,
+		project_id TEXT
+	);
 	
 	`
 
