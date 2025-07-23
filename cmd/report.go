@@ -28,7 +28,7 @@ var reportCmd = &cobra.Command{
 		totalDuration := time.Duration(0)
 
 		for _, log := range logs {
-			fmt.Printf("📌 %s | %s | %s\n", log.StartTime.Format("2006-01-02 15:04"), log.Project, log.Task)
+			fmt.Printf("📌 %s | %s | %s\n", log.StartTime.Format("2006-01-02 15:04"), log.ProjectId, log.TaskId)
 			if !log.EndTime.IsZero() {
 				duration := log.EndTime.Sub(log.StartTime)
 				totalDuration += duration

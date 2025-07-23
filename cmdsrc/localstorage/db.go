@@ -52,9 +52,9 @@ func InitDB() {
 		FOREIGN KEY (task_id) REFERENCES task(task_id)
 	);
 	
-	CREATE UNIQUE INDEX uidx_project_project_id
+	CREATE UNIQUE INDEX IF NOT EXISTS uidx_project_project_id
 		ON project (project_id);
-	CREATE UNIQUE INDEX uidx_task_task_id
+	CREATE UNIQUE INDEX IF NOT EXISTS uidx_task_task_id
 		ON task (task_id);
 
 
@@ -67,19 +67,19 @@ func InitDB() {
 	}
 }
 
-func InsertStart(project string, task string, start time.Time) {
+func InsertStart(project tracker.Project, task tracker.Task, start time.Time) {
 	if DB == nil {
 		log.Fatal("DB is not initialized")
 	}
 
-	stmt, err := DB.Prepare("INSERT INTO timelog(project, task, start_time) VALUES (?, ?, ?)")
+	stmt, err := DB.Prepare("INSERT INTO timelog(project_id, task_id, start_time) VALUES (?, ?, ?)")
 
 	if err != nil {
 		log.Fatalf("Prepare failed: %v", err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(project, task, start.Format(time.RFC3339))
+	_, err = stmt.Exec(project.ProjectId, task.TaskId, start.Format(time.RFC3339))
 
 	if err != nil {
 		log.Fatalf("Exec failed: %v", err)
@@ -116,7 +116,13 @@ func GetAllLogs() []tracker.TimeLog {
 		log.Fatal("DB is not initialized")
 	}
 
-	rows, err := DB.Query("SELECT id, project, task, start_time, end_time FROM timelog ORDER BY start_time DESC")
+	rows, err := DB.Query(`
+		SELECT timelog.id, project.name, task.name, start_time, end_time 
+			FROM timelog
+			INNER JOIN project ON project.project_id = timelog.project_id
+			INNER JOIN task ON task.task_id = timelog.task_id
+			ORDER BY start_time DESC
+	`)
 
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)
@@ -130,7 +136,7 @@ func GetAllLogs() []tracker.TimeLog {
 		var startStr string
 		var endStr sql.NullString
 
-		err := rows.Scan(&currentLog.ID, &currentLog.Project, &currentLog.Task, &startStr, &endStr)
+		err := rows.Scan(&currentLog.ID, &currentLog.ProjectId, &currentLog.TaskId, &startStr, &endStr)
 
 		if err != nil {
 			log.Fatalf("Scan failed: %v", err)

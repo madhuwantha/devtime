@@ -4,8 +4,8 @@ import "time"
 
 type TimeLog struct {
 	ID        int
-	Project   string
-	Task      string
+	ProjectId string
+	TaskId    string
 	StartTime time.Time
 	EndTime   time.Time
 }
