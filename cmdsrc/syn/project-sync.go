@@ -38,7 +38,7 @@ func GetLocalProject() []tracker.Project {
 	if localstorage.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
-	rows, err := localstorage.DB.Query("SELECT id, project_id, name, code FROM projects ORDER BY id DESC")
+	rows, err := localstorage.DB.Query("SELECT id, project_id, name, code FROM project ORDER BY id DESC")
 
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)
@@ -60,7 +60,7 @@ func GetLocalProject() []tracker.Project {
 }
 
 func InsertLocalProject(project models.Project) {
-	stmt, err := localstorage.DB.Prepare("INSERT INTO projects (project_id, name, code) VALUES (?, ?, ?)")
+	stmt, err := localstorage.DB.Prepare("INSERT INTO project (project_id, name, code) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatalf("Prepare failed: %v", err)
 	}

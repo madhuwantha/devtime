@@ -24,27 +24,41 @@ func InitDB() {
 	}
 
 	createTable := `
-	CREATE TABLE IF NOT EXISTS timelogs (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		project TEXT,
-		task TEXT,
-		start_time TEXT,
-		end_time TEXT
-	);
 
-	CREATE TABLE IF NOT EXISTS projects (
+
+	CREATE TABLE IF NOT EXISTS project (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		project_id TEXT,
 		name TEXT,
 		code TEXT
 	);
-	CREATE TABLE IF NOT EXISTS tasks (
+	CREATE TABLE IF NOT EXISTS task (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT,		
 		task_id TEXT,
-		project_id TEXT
+		project_id TEXT,
+
+		FOREIGN KEY (project_id) REFERENCES project(project_id)
+	);
+
+	CREATE TABLE IF NOT EXISTS timelog (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		project_id TEXT,
+		task_id TEXT,
+		start_time TEXT,
+		end_time TEXT,
+
+		FOREIGN KEY (project_id) REFERENCES project(project_id),
+		FOREIGN KEY (task_id) REFERENCES task(task_id)
 	);
 	
+	CREATE UNIQUE INDEX uidx_project_project_id
+		ON project (project_id);
+	CREATE UNIQUE INDEX uidx_task_task_id
+		ON task (task_id);
+
+
+
 	`
 
 	_, err = DB.Exec(createTable)
@@ -58,7 +72,7 @@ func InsertStart(project string, task string, start time.Time) {
 		log.Fatal("DB is not initialized")
 	}
 
-	stmt, err := DB.Prepare("INSERT INTO timelogs(project, task, start_time) VALUES (?, ?, ?)")
+	stmt, err := DB.Prepare("INSERT INTO timelog(project, task, start_time) VALUES (?, ?, ?)")
 
 	if err != nil {
 		log.Fatalf("Prepare failed: %v", err)
@@ -79,13 +93,13 @@ func InsertStop(end time.Time) {
 
 	// Step 1: Get latest unclosed time log
 	var id int
-	err := DB.QueryRow("SELECT id FROM timelogs WHERE end_time IS NULL ORDER BY id DESC LIMIT 1").Scan(&id)
+	err := DB.QueryRow("SELECT id FROM timelog WHERE end_time IS NULL ORDER BY id DESC LIMIT 1").Scan(&id)
 	if err != nil {
 		log.Fatalf("Failed to find unclosed timelog: %v", err)
 	}
 
 	// Step 2: Update that record
-	stmt, err := DB.Prepare("UPDATE timelogs SET end_time = ? WHERE id = ?")
+	stmt, err := DB.Prepare("UPDATE timelog SET end_time = ? WHERE id = ?")
 	if err != nil {
 		log.Fatalf("Prepare failed: %v", err)
 	}
@@ -102,7 +116,7 @@ func GetAllLogs() []tracker.TimeLog {
 		log.Fatal("DB is not initialized")
 	}
 
-	rows, err := DB.Query("SELECT id, project, task, start_time, end_time FROM timelogs ORDER BY start_time DESC")
+	rows, err := DB.Query("SELECT id, project, task, start_time, end_time FROM timelog ORDER BY start_time DESC")
 
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)
