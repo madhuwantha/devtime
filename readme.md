@@ -140,16 +140,6 @@ The `syn` command is used to synchronize data between the local SQLite database 
 ---
 
 
-### 5. `test`
-- **Purpose:** (Development/experimental) Test command for syncing local projects.
-- **How it works:**  
-  - Calls a function to sync local projects (details may be for development/testing).
-- **Usage:**  
-  ```
-  devtime test
-  ```
-
----
 
 ## Additional Details
 
@@ -172,7 +162,6 @@ The `syn` command is used to synchronize data between the local SQLite database 
 | stop      | Stop tracking time                          | Stop time, update log              |
 | report    | Show summary of time logs                   | List logs, show durations          |
 | syn       | Sync data between local and server          | Direction/data type prompts        |
-| test      | Test sync of local projects (dev only)      | Sync local projects                |
 
 ---
 
