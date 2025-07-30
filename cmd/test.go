@@ -22,7 +22,10 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		idle.WatchIdle(10*time.Second, func() {
+
+		ticker := time.NewTicker(1 * time.Second)
+
+		idle.WatchIdle(10*time.Second, ticker, func() {
 			fmt.Println("💤 User inactive for 10 seconds. Triggering action...")
 			// Call your real function here
 		})
