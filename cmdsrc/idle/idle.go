@@ -45,3 +45,13 @@ func WatchIdle1(threshold time.Duration, ticker *time.Ticker, onInactivity func(
 		}
 	}
 }
+
+func RunIdleTracker() {
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+	fmt.Println("Idle watcher started in background")
+
+	WatchIdle1(10*time.Second, ticker, func() {
+		fmt.Println("Inactivity detected. Take action.")
+	})
+}

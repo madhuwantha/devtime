@@ -4,10 +4,6 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-	"time"
-
-	"github.com/madhuwantha/devtime/cmdsrc/idle"
 	"github.com/spf13/cobra"
 )
 
@@ -23,12 +19,13 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		ticker := time.NewTicker(1 * time.Second)
+		// ticker := time.NewTicker(1 * time.Second)
 
-		idle.WatchIdle(10*time.Second, ticker, func() {
-			fmt.Println("💤 User inactive for 10 seconds. Triggering action...")
-			// Call your real function here
-		})
+		// idle.WatchIdle(10*time.Second, ticker, func() {
+		// 	fmt.Println("💤 User inactive for 10 seconds. Triggering action...")
+		// 	// Call your real function here
+		// })
+
 	},
 }
 

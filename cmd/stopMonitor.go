@@ -1,11 +1,12 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -21,20 +22,34 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("stopMonitor called")
+		data, err := os.ReadFile("/tmp/devtime.pid")
+		if err != nil {
+			fmt.Println("No running timer found.")
+			return
+		}
+
+		pid, err := strconv.Atoi(string(data))
+		if err != nil {
+			fmt.Println("Invalid PID in file.")
+			return
+		}
+
+		process, err := os.FindProcess(pid)
+		if err != nil {
+			fmt.Println("Could not find process:", err)
+			return
+		}
+
+		err = process.Kill()
+		if err != nil {
+			fmt.Println("Failed to stop process:", err)
+		} else {
+			fmt.Println("Timer stopped.")
+			os.Remove("/tmp/devtime.pid")
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(stopMonitorCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// stopMonitorCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// stopMonitorCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
