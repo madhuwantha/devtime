@@ -2,7 +2,6 @@ package idle
 
 import (
 	"fmt"
-	"os"
 	"time"
 )
 
@@ -15,25 +14,6 @@ func GetIdleTime() (time.Duration, error) {
 }
 
 func WatchIdle(threshold time.Duration, ticker *time.Ticker, onInactivity func()) {
-	defer ticker.Stop()
-
-	pid := os.Getpid()
-	fmt.Println("My PID is:", pid)
-
-	for range ticker.C {
-		idle, err := GetIdleTime()
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		if idle >= threshold {
-			onInactivity()
-			return
-		}
-	}
-}
-
-func WatchIdle1(threshold time.Duration, ticker *time.Ticker, onInactivity func()) {
 	for range ticker.C {
 		idle, err := GetIdleTime()
 		if err != nil {
@@ -46,12 +26,14 @@ func WatchIdle1(threshold time.Duration, ticker *time.Ticker, onInactivity func(
 	}
 }
 
-func RunIdleTracker() {
+func RunIdleTracker(threshold int16) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 	fmt.Println("Idle watcher started in background")
+	duration := time.Duration(threshold) * time.Second
+	WatchIdle(duration, ticker, IdleHandler)
+}
 
-	WatchIdle1(10*time.Second, ticker, func() {
-		fmt.Println("Inactivity detected. Take action.")
-	})
+func IdleHandler() {
+	fmt.Println("Inactivity detected. Take action.")
 }

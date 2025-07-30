@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var threshold int16
+
 // monitorCmd represents the monitor command
 var monitorCmd = &cobra.Command{
 	Use:   "monitor",
@@ -19,9 +21,12 @@ var monitorCmd = &cobra.Command{
 	Long: `The monitor command launches a background process that tracks user activity and idle time.
 It ensures only one instance runs at a time and manages its own process lifecycle.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		fmt.Printf("%d", threshold)
+
 		// Check if we're already running in background
 		if os.Getenv("DEVTIME_DAEMON") == "1" {
-			idle.RunIdleTracker()
+			idle.RunIdleTracker(threshold)
 			return
 		}
 
@@ -36,7 +41,7 @@ It ensures only one instance runs at a time and manages its own process lifecycl
 			Env:   append(os.Environ(), "DEVTIME_DAEMON=1"),
 		}
 
-		proc, err := os.StartProcess(execPath, []string{execPath, "monitor"}, attr)
+		proc, err := os.StartProcess(execPath, []string{execPath, "monitor", "--threshold", fmt.Sprint(threshold)}, attr)
 		if err != nil {
 			log.Fatal("Failed to start background process:", err)
 		}
@@ -49,5 +54,8 @@ It ensures only one instance runs at a time and manages its own process lifecycl
 }
 
 func init() {
+	monitorCmd.Flags().Int16Var(&threshold, "threshold", 10, "Threshold time fror idle in seconds")
+	monitorCmd.MarkFlagRequired("threshold")
+
 	rootCmd.AddCommand(monitorCmd)
 }
