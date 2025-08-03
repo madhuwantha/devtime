@@ -54,3 +54,16 @@ func (a *App) GetTasks() []entity.Task {
 	}
 	return tasks
 }
+
+type StartTaskResponse struct {
+	Status bool
+	Error  error
+}
+
+func (a *App) StartTask(projectId string, taskId string) StartTaskResponse {
+	status, err := localsrc.StartTask(projectId, taskId)
+	return StartTaskResponse{
+		Status: status,
+		Error:  err,
+	}
+}

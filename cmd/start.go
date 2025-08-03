@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"log"
-	"time"
 
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/logpromt"
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/syn"
@@ -22,13 +21,11 @@ var startCmd = &cobra.Command{
 	Short: "Start tracking time",
 	Long:  `Start tracking time for a project and task.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		now := time.Now()
-		log.Println(now)
-
+		var errr error
 		if projectId != "" && taskId != "" {
 			project := repo.GetProject(projectId)
 			task := repo.GetTask(taskId)
-			localsrc.InsertStart(project, task, now)
+			_, errr = localsrc.StartTask(project.ProjectId, task.TaskId)
 		} else {
 			localProjects := syn.GetLocalProject()
 			project, _, err := logpromt.PromptSyncSelectProject(localProjects)
@@ -42,8 +39,14 @@ var startCmd = &cobra.Command{
 			if err != nil {
 				log.Fatal(err)
 			}
+			_, err = localsrc.StartTask(project.ProjectId, task.TaskId)
+			errr = err
+		}
 
-			localsrc.InsertStart(project, task, now)
+		if errr != nil {
+			log.Println("Failed to start tracking time:", errr)
+		} else {
+			log.Println("Successfully started tracking time for project:", projectId, "and task:", taskId)
 		}
 	},
 }

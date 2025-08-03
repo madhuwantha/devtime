@@ -39,3 +39,22 @@ export namespace entity {
 
 }
 
+export namespace main {
+	
+	export class StartTaskResponse {
+	    Status: boolean;
+	    Error: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new StartTaskResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Status = source["Status"];
+	        this.Error = source["Error"];
+	    }
+	}
+
+}
+

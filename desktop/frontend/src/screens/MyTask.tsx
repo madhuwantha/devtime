@@ -43,7 +43,7 @@ export default function MyTask() {
        className="absolute right-4 top-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm rsor-pointer"
        onClick={(e) => {
         e.stopPropagation();
-        alert(`Started: ${task.Name}`);
+        console.log("Start task clicked", task);
        }}
       >
        Start

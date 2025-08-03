@@ -2,6 +2,7 @@ package localsrc
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"os"
 	"time"
@@ -72,23 +73,27 @@ func InitDB() {
 	}
 }
 
-func InsertStart(project entity.Project, task entity.Task, start time.Time) {
+func InsertStart(projectId string, taskId string, start time.Time) (bool, error) {
 	if DB == nil {
-		log.Fatal("DB is not initialized")
+		log.Println("DB is not initialized")
+		return false, errors.New("DB is not initialized")
 	}
 
 	stmt, err := DB.Prepare("INSERT INTO timelog(project_id, task_id, start_time) VALUES (?, ?, ?)")
 
 	if err != nil {
-		log.Fatalf("Prepare failed: %v", err)
+		log.Printf("Prepare failed: %v \n", err)
+		return false, err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(project.ProjectId, task.TaskId, start.Format(time.RFC3339))
+	_, err = stmt.Exec(projectId, taskId, start.Format(time.RFC3339))
 
 	if err != nil {
 		log.Fatalf("Exec failed: %v", err)
+		return false, err
 	}
+	return true, nil
 }
 
 func InsertStop(end time.Time) {
