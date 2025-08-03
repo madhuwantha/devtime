@@ -3,6 +3,7 @@ package localstorage
 import (
 	"database/sql"
 	"log"
+	"os"
 	"time"
 
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
@@ -13,6 +14,10 @@ var DB *sql.DB
 
 func InitDB() {
 	var err error
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "../../devtime.db"
+	}
 	DB, err = sql.Open("sqlite3", "./devtime.db")
 
 	if err != nil {
