@@ -1,7 +1,7 @@
 package logpromt
 
 import (
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
+	"github.com/madhuwantha/devtime/localstorage/entity"
 	"github.com/manifoldco/promptui"
 )
 

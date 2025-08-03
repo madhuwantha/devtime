@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
+	"github.com/madhuwantha/devtime/localstorage/entity"
 	_ "github.com/mattn/go-sqlite3"
 )
 

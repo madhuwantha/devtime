@@ -3,8 +3,8 @@ package repo
 import (
 	"log"
 
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/localstorage"
+	"github.com/madhuwantha/devtime/localstorage"
+	"github.com/madhuwantha/devtime/localstorage/entity"
 )
 
 func GetTasks() []entity.Task {

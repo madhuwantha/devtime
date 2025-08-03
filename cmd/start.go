@@ -7,10 +7,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/localstorage"
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/logpromt"
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/repo"
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/syn"
+	"github.com/madhuwantha/devtime/localstorage"
+	"github.com/madhuwantha/devtime/localstorage/repo"
 	"github.com/spf13/cobra"
 )
 
