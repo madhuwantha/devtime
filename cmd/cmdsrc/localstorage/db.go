@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -72,7 +72,7 @@ func InitDB() {
 	}
 }
 
-func InsertStart(project tracker.Project, task tracker.Task, start time.Time) {
+func InsertStart(project entity.Project, task entity.Task, start time.Time) {
 	if DB == nil {
 		log.Fatal("DB is not initialized")
 	}
@@ -116,7 +116,7 @@ func InsertStop(end time.Time) {
 	}
 }
 
-func GetAllLogs() []tracker.TimeLog {
+func GetAllLogs() []entity.TimeLog {
 	if DB == nil {
 		log.Fatal("DB is not initialized")
 	}
@@ -134,10 +134,10 @@ func GetAllLogs() []tracker.TimeLog {
 	}
 	defer rows.Close()
 
-	var logs []tracker.TimeLog
+	var logs []entity.TimeLog
 
 	for rows.Next() {
-		var currentLog tracker.TimeLog
+		var currentLog entity.TimeLog
 		var startStr string
 		var endStr sql.NullString
 

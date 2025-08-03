@@ -1,4 +1,4 @@
-package tracker
+package entity
 
 type Project struct {
 	ID        int

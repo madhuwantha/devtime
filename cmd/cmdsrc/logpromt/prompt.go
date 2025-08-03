@@ -1,11 +1,11 @@
 package logpromt
 
 import (
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
 	"github.com/manifoldco/promptui"
 )
 
-func PromptSyncSelectProject(projects []tracker.Project) (tracker.Project, string, error) {
+func PromptSyncSelectProject(projects []entity.Project) (entity.Project, string, error) {
 
 	prompt := promptui.Select{
 		Label: "Select the Project?",
@@ -14,7 +14,7 @@ func PromptSyncSelectProject(projects []tracker.Project) (tracker.Project, strin
 	i, result, err := prompt.Run()
 	return projects[i], result, err
 }
-func PromptSyncSelectTask(tasks []tracker.Task) (tracker.Task, string, error) {
+func PromptSyncSelectTask(tasks []entity.Task) (entity.Task, string, error) {
 
 	prompt := promptui.Select{
 		Label: "Select the task?",

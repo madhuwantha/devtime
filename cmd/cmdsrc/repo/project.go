@@ -3,11 +3,11 @@ package repo
 import (
 	"log"
 
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/localstorage"
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
 )
 
-func GetProjects() []tracker.Project {
+func GetProjects() []entity.Project {
 	if localstorage.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
@@ -18,9 +18,9 @@ func GetProjects() []tracker.Project {
 	}
 	defer rows.Close()
 
-	var projects []tracker.Project
+	var projects []entity.Project
 	for rows.Next() {
-		var project tracker.Project
+		var project entity.Project
 		err := rows.Scan(&project.ID, &project.ProjectId, &project.Name, &project.Code)
 		if err != nil {
 			log.Fatalf("Scan failed: %v", err)
@@ -32,11 +32,11 @@ func GetProjects() []tracker.Project {
 	return projects
 }
 
-func GetProject(projectId string) tracker.Project {
+func GetProject(projectId string) entity.Project {
 	if localstorage.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
-	var project tracker.Project
+	var project entity.Project
 	err := localstorage.DB.QueryRow("SELECT id, project_id, name, code FROM project WHERE project_id = $1", projectId).Scan(&project)
 
 	if err != nil {
@@ -46,7 +46,7 @@ func GetProject(projectId string) tracker.Project {
 	return project
 }
 
-func InsertProject(project tracker.Project) {
+func InsertProject(project entity.Project) {
 	stmt, err := localstorage.DB.Prepare("INSERT INTO project (project_id, name, code) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatalf("Prepare failed: %v", err)

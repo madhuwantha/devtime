@@ -3,11 +3,11 @@ package repo
 import (
 	"log"
 
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/localstorage"
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
 )
 
-func GetTasks() []tracker.Task {
+func GetTasks() []entity.Task {
 	if localstorage.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
@@ -16,9 +16,9 @@ func GetTasks() []tracker.Task {
 		log.Fatalf("Query failed: %v", err)
 	}
 	defer rows.Close()
-	var tasks []tracker.Task
+	var tasks []entity.Task
 	for rows.Next() {
-		var task tracker.Task
+		var task entity.Task
 		err := rows.Scan(&task.ID, &task.Name, &task.TaskId, &task.ProjectId)
 		if err != nil {
 			log.Fatalf("Scan failed: %v", err)
@@ -29,11 +29,11 @@ func GetTasks() []tracker.Task {
 	return tasks
 }
 
-func GetTask(taskId string) tracker.Task {
+func GetTask(taskId string) entity.Task {
 	if localstorage.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
-	var task tracker.Task
+	var task entity.Task
 	err := localstorage.DB.QueryRow("SELECT id, name, task_id, project_id FROM task WHERE task_id = $1", taskId).Scan(&task)
 
 	if err != nil {

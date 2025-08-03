@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/localstorage"
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
 	"github.com/madhuwantha/devtime/server/models"
 )
 
@@ -32,7 +32,7 @@ func GetServerTasks(userId string) []models.Task {
 	return tasks
 }
 
-func GetLocalTasks() []tracker.Task {
+func GetLocalTasks() []entity.Task {
 	if localstorage.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
@@ -41,9 +41,9 @@ func GetLocalTasks() []tracker.Task {
 		log.Fatalf("Query failed: %v", err)
 	}
 	defer rows.Close()
-	var tasks []tracker.Task
+	var tasks []entity.Task
 	for rows.Next() {
-		var task tracker.Task
+		var task entity.Task
 		err := rows.Scan(&task.ID, &task.Name, &task.TaskId, &task.ProjectId)
 		if err != nil {
 			log.Fatalf("Scan failed: %v", err)
@@ -54,7 +54,7 @@ func GetLocalTasks() []tracker.Task {
 	return tasks
 }
 
-func GetLocalProjectTasks(projectId string) []tracker.Task {
+func GetLocalProjectTasks(projectId string) []entity.Task {
 	if localstorage.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
@@ -63,9 +63,9 @@ func GetLocalProjectTasks(projectId string) []tracker.Task {
 		log.Fatalf("Query failed: %v", err)
 	}
 	defer rows.Close()
-	var tasks []tracker.Task
+	var tasks []entity.Task
 	for rows.Next() {
-		var task tracker.Task
+		var task entity.Task
 		err := rows.Scan(&task.ID, &task.Name, &task.TaskId, &task.ProjectId)
 		if err != nil {
 			log.Fatalf("Scan failed: %v", err)

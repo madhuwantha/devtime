@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/entity"
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/repo"
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
 	"github.com/madhuwantha/devtime/server/models"
 )
 
@@ -34,12 +34,12 @@ func GetServerProjects() []models.Project {
 	return projects
 }
 
-func GetLocalProject() []tracker.Project {
+func GetLocalProject() []entity.Project {
 	return repo.GetProjects()
 }
 
 func InsertLocalProject(project models.Project) {
-	var projectDto tracker.Project = tracker.Project{
+	var projectDto entity.Project = entity.Project{
 		ProjectId: project.ID.String(),
 		Name:      project.Name,
 		Code:      project.Code,

@@ -13,7 +13,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "devtime",
-	Short: "Developer time tracker CLI",
+	Short: "Developer time entity CLI",
 	Long:  `A simple tool to track project time with a CLI and local SQLite logs.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:

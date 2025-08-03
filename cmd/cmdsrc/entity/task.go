@@ -1,4 +1,4 @@
-package tracker
+package entity
 
 type Task struct {
 	ID        int
