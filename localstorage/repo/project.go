@@ -21,7 +21,7 @@ func GetProjects() ([]entity.Project, error) {
 	}
 	defer rows.Close()
 
-	var projects []entity.Project = []entity.Project{}
+	var projects []entity.Project
 	for rows.Next() {
 		var project entity.Project
 		err := rows.Scan(&project.ID, &project.ProjectId, &project.Name, &project.Code)

@@ -18,7 +18,7 @@ func InitDB() {
 	if dbPath == "" {
 		dbPath = "../../devtime.db"
 	}
-	DB, err = sql.Open("sqlite3", "./devtime.db")
+	DB, err = sql.Open("sqlite3", dbPath)
 
 	if err != nil {
 		log.Fatal(err)

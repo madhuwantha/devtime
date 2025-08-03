@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 
+	"github.com/joho/godotenv"
+	"github.com/madhuwantha/devtime/localstorage"
 	"github.com/madhuwantha/devtime/localstorage/entity"
 	"github.com/madhuwantha/devtime/localstorage/repo"
 )
@@ -21,7 +24,13 @@ func NewApp() *App {
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 	a.ctx = ctx
+
+	localstorage.InitDB()
 }
 
 // Greet returns a greeting for the given name
@@ -38,10 +47,10 @@ func (a *App) GetProjects() []entity.Project {
 	return projects
 }
 func (a *App) GetTasks() []entity.Task {
-	projects, err := repo.GetTasks()
+	tasks, err := repo.GetTasks()
 	if err != nil {
 		fmt.Println("Error fetching tasks:", err)
 		return []entity.Task{}
 	}
-	return projects
+	return tasks
 }
