@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import MyTask from "./screens/MyTask";
 import MyProjects from "./screens/MyProjects";
+import { invoke } from "@tauri-apps/api/core";
 
 function App() {
 
@@ -11,10 +12,24 @@ function App() {
   function setSelectedTab(idx: number): void {
     setSelectedTabState(idx);
   }
+
+  async function runMyCli() {
+    try {
+      const result = await invoke<string>('run_cli_command', {
+        args: ['test']
+      })
+      console.log('CLI Output:', result)
+    } catch (error) {
+      console.error('CLI Error:', error)
+    }
+  }
+
+
   return (
     <main className="flex flex-col items-center justify-start h-screen">       
     <div className="flex flex-col items-center justify-center w-screen">
       <h1 className="text-3xl font-boldr">Dev Time</h1> 
+      <button onClick={runMyCli} className="bg-green-200 py-1 px-3 round">Test</button>
     </div>
 
     <div className="w-full max-w-xl bg-white rounded-lg shadow-lg">
