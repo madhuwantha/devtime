@@ -15,7 +15,7 @@ import (
 const API_URL = "http://localhost:8080/api"
 
 func GetServerProjects() []models.Project {
-	urlPars := []string{API_URL, "/projects/users/", "6873e2fb6ebc409486ceb87c"}
+	urlPars := []string{API_URL, "/projects/users/", "6887baccee48cf2c844dee92"}
 	url := strings.Join(urlPars, "")
 	resp, err := http.Get(url)
 	if err != nil {
@@ -35,7 +35,12 @@ func GetServerProjects() []models.Project {
 }
 
 func GetLocalProject() []entity.Project {
-	return repo.GetProjects()
+	projects, err := repo.GetProjects()
+	if err != nil {
+		log.Printf("%v", err)
+		return []entity.Project{}
+	}
+	return projects
 }
 
 func InsertLocalProject(project models.Project) {

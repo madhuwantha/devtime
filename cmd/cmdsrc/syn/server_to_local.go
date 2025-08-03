@@ -12,6 +12,6 @@ func (s ServerToLocalProjects) RunSync() {
 type ServerToLocalTasks struct{}
 
 func (s ServerToLocalTasks) RunSync() {
-	SynLocalTasks("6873e2fb6ebc409486ceb87c")
+	SynLocalTasks("6887baccee48cf2c844dee92")
 	fmt.Println("Syncing Tasks from Server to Local is completed")
 }
