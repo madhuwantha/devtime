@@ -4,16 +4,16 @@ import (
 	"errors"
 	"log"
 
-	"github.com/madhuwantha/devtime/localstorage"
-	"github.com/madhuwantha/devtime/localstorage/entity"
+	"github.com/madhuwantha/devtime/localsrc"
+	"github.com/madhuwantha/devtime/localsrc/entity"
 )
 
 func GetTasks() ([]entity.Task, error) {
-	if localstorage.DB == nil {
+	if localsrc.DB == nil {
 		log.Println("DB is not initialized")
 		return nil, errors.New("DB is not initialized")
 	}
-	rows, err := localstorage.DB.Query("SELECT id, name, task_id, project_id FROM task ORDER BY id DESC")
+	rows, err := localsrc.DB.Query("SELECT id, name, task_id, project_id FROM task ORDER BY id DESC")
 	if err != nil {
 		log.Printf("Query failed: %v \n", err)
 		return nil, err
@@ -34,11 +34,11 @@ func GetTasks() ([]entity.Task, error) {
 }
 
 func GetTask(taskId string) entity.Task {
-	if localstorage.DB == nil {
+	if localsrc.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
 	var task entity.Task
-	err := localstorage.DB.QueryRow("SELECT id, name, task_id, project_id FROM task WHERE task_id = $1", taskId).Scan(&task)
+	err := localsrc.DB.QueryRow("SELECT id, name, task_id, project_id FROM task WHERE task_id = $1", taskId).Scan(&task)
 
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)

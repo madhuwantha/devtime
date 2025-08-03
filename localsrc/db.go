@@ -1,4 +1,4 @@
-package localstorage
+package localsrc
 
 import (
 	"database/sql"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/madhuwantha/devtime/localstorage/entity"
+	"github.com/madhuwantha/devtime/localsrc/entity"
 	_ "github.com/mattn/go-sqlite3"
 )
 

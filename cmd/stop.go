@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/madhuwantha/devtime/localstorage"
+	"github.com/madhuwantha/devtime/localsrc"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ var stopCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 		fmt.Println("Stopping tracking time...", now.Format("2006-01-02 15:04:05"))
-		localstorage.InsertStop(now)
+		localsrc.InsertStop(now)
 		fmt.Println("Stopped tracking time at", now.Format("2006-01-02 15:04:05"))
 	},
 }

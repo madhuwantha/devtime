@@ -4,16 +4,16 @@ import (
 	"errors"
 	"log"
 
-	"github.com/madhuwantha/devtime/localstorage"
-	"github.com/madhuwantha/devtime/localstorage/entity"
+	"github.com/madhuwantha/devtime/localsrc"
+	"github.com/madhuwantha/devtime/localsrc/entity"
 )
 
 func GetProjects() ([]entity.Project, error) {
-	if localstorage.DB == nil {
+	if localsrc.DB == nil {
 		log.Printf("DB is not initialized")
 		return nil, errors.New("DB is not initialized")
 	}
-	rows, err := localstorage.DB.Query("SELECT id, project_id, name, code FROM project ORDER BY id DESC")
+	rows, err := localsrc.DB.Query("SELECT id, project_id, name, code FROM project ORDER BY id DESC")
 
 	if err != nil {
 		log.Printf("Query failed: %v", err)
@@ -36,11 +36,11 @@ func GetProjects() ([]entity.Project, error) {
 }
 
 func GetProject(projectId string) entity.Project {
-	if localstorage.DB == nil {
+	if localsrc.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
 	var project entity.Project
-	err := localstorage.DB.QueryRow("SELECT id, project_id, name, code FROM project WHERE project_id = $1", projectId).Scan(&project)
+	err := localsrc.DB.QueryRow("SELECT id, project_id, name, code FROM project WHERE project_id = $1", projectId).Scan(&project)
 
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)
@@ -50,7 +50,7 @@ func GetProject(projectId string) entity.Project {
 }
 
 func InsertProject(project entity.Project) {
-	stmt, err := localstorage.DB.Prepare("INSERT INTO project (project_id, name, code) VALUES (?, ?, ?)")
+	stmt, err := localsrc.DB.Prepare("INSERT INTO project (project_id, name, code) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatalf("Prepare failed: %v", err)
 	}

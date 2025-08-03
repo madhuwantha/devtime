@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/madhuwantha/devtime/localstorage/entity"
-	"github.com/madhuwantha/devtime/localstorage/repo"
+	"github.com/madhuwantha/devtime/localsrc/entity"
+	"github.com/madhuwantha/devtime/localsrc/repo"
 	"github.com/madhuwantha/devtime/server/models"
 )
 

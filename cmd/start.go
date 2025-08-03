@@ -9,8 +9,8 @@ import (
 
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/logpromt"
 	"github.com/madhuwantha/devtime/cmd/cmdsrc/syn"
-	"github.com/madhuwantha/devtime/localstorage"
-	"github.com/madhuwantha/devtime/localstorage/repo"
+	"github.com/madhuwantha/devtime/localsrc"
+	"github.com/madhuwantha/devtime/localsrc/repo"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +28,7 @@ var startCmd = &cobra.Command{
 		if projectId != "" && taskId != "" {
 			project := repo.GetProject(projectId)
 			task := repo.GetTask(taskId)
-			localstorage.InsertStart(project, task, now)
+			localsrc.InsertStart(project, task, now)
 		} else {
 			localProjects := syn.GetLocalProject()
 			project, _, err := logpromt.PromptSyncSelectProject(localProjects)
@@ -43,7 +43,7 @@ var startCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 
-			localstorage.InsertStart(project, task, now)
+			localsrc.InsertStart(project, task, now)
 		}
 	},
 }

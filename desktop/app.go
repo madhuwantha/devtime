@@ -6,9 +6,9 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
-	"github.com/madhuwantha/devtime/localstorage"
-	"github.com/madhuwantha/devtime/localstorage/entity"
-	"github.com/madhuwantha/devtime/localstorage/repo"
+	"github.com/madhuwantha/devtime/localsrc"
+	"github.com/madhuwantha/devtime/localsrc/entity"
+	"github.com/madhuwantha/devtime/localsrc/repo"
 )
 
 // App struct
@@ -30,7 +30,7 @@ func (a *App) startup(ctx context.Context) {
 	}
 	a.ctx = ctx
 
-	localstorage.InitDB()
+	localsrc.InitDB()
 }
 
 // Greet returns a greeting for the given name

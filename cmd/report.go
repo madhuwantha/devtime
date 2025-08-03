@@ -8,7 +8,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/madhuwantha/devtime/localstorage"
+	"github.com/madhuwantha/devtime/localsrc"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ var reportCmd = &cobra.Command{
 	Use:   "report",
 	Short: "Show a summary of your time logs",
 	Run: func(cmd *cobra.Command, args []string) {
-		logs := localstorage.GetAllLogs()
+		logs := localsrc.GetAllLogs()
 
 		if len(logs) == 0 {
 			log.Println("No time logs found")

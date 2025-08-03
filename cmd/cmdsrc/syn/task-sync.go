@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/madhuwantha/devtime/localstorage"
-	"github.com/madhuwantha/devtime/localstorage/entity"
+	"github.com/madhuwantha/devtime/localsrc"
+	"github.com/madhuwantha/devtime/localsrc/entity"
 	"github.com/madhuwantha/devtime/server/models"
 )
 
@@ -33,10 +33,10 @@ func GetServerTasks(userId string) []models.Task {
 }
 
 func GetLocalTasks() []entity.Task {
-	if localstorage.DB == nil {
+	if localsrc.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
-	rows, err := localstorage.DB.Query("SELECT id, name, task_id, project_id FROM task ORDER BY id DESC")
+	rows, err := localsrc.DB.Query("SELECT id, name, task_id, project_id FROM task ORDER BY id DESC")
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)
 	}
@@ -55,10 +55,10 @@ func GetLocalTasks() []entity.Task {
 }
 
 func GetLocalProjectTasks(projectId string) []entity.Task {
-	if localstorage.DB == nil {
+	if localsrc.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
-	rows, err := localstorage.DB.Query("SELECT id, name, task_id, project_id FROM task WHERE project_id = ? ORDER BY id DESC", projectId)
+	rows, err := localsrc.DB.Query("SELECT id, name, task_id, project_id FROM task WHERE project_id = ? ORDER BY id DESC", projectId)
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)
 	}
@@ -76,11 +76,11 @@ func GetLocalProjectTasks(projectId string) []entity.Task {
 }
 
 func InsertLocalTasks(task models.Task) {
-	if localstorage.DB == nil {
+	if localsrc.DB == nil {
 		log.Fatal("DB is not initialized")
 	}
 
-	stmt, err := localstorage.DB.Prepare("INSERT INTO task(name, task_id, project_id) VALUES (?, ?, ?)")
+	stmt, err := localsrc.DB.Prepare("INSERT INTO task(name, task_id, project_id) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatalf("Prepare failed: %v", err)
 	}
