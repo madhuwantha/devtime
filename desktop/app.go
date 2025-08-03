@@ -67,3 +67,11 @@ func (a *App) StartTask(projectId string, taskId string) StartTaskResponse {
 		Error:  err,
 	}
 }
+func (a *App) GetActiveTask() *entity.Task {
+	task, err := repo.GetActiveTask()
+	if err != nil {
+		log.Printf("Error fetching active task: %v", err)
+		return nil
+	}
+	return &task
+}

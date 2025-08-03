@@ -3,6 +3,7 @@ package localsrc
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -11,13 +12,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var ErrDBNotInitialized = errors.New("database is not initialized")
 var DB *sql.DB
 
 func InitDB() {
 	var err error
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
-		dbPath = "../../devtime.db"
+		dbPath = "/Volumes/dIsk_1/PROJECTS/devtime/devtime.db"
 	}
 	DB, err = sql.Open("sqlite3", dbPath)
 
@@ -129,10 +131,14 @@ func GetAllLogs() []entity.TimeLog {
 	rows, err := DB.Query(`
 		SELECT timelog.id, project.name, task.name, start_time, end_time 
 			FROM timelog
-			INNER JOIN project ON project.project_id = timelog.project_id
-			INNER JOIN task ON task.task_id = timelog.task_id
-			ORDER BY start_time DESC
-	`)
+
+			LEFT JOIN project ON project.project_id = timelog.project_id
+	LEFT JOIN task ON task.task_id = timelog.task_id
+	ORDER BY start_time DESC
+	
+			`)
+	fmt.Printf("Querying all logs...\n")
+	fmt.Println(rows)
 
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)
@@ -142,6 +148,8 @@ func GetAllLogs() []entity.TimeLog {
 	var logs []entity.TimeLog
 
 	for rows.Next() {
+		fmt.Println("Processing a row...")
+
 		var currentLog entity.TimeLog
 		var startStr string
 		var endStr sql.NullString

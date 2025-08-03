@@ -3,6 +3,8 @@
 import {entity} from '../models';
 import {main} from '../models';
 
+export function GetActiveTask():Promise<entity.Task>;
+
 export function GetProjects():Promise<Array<entity.Project>>;
 
 export function GetTasks():Promise<Array<entity.Task>>;

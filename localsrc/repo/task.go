@@ -33,16 +33,18 @@ func GetTasks() ([]entity.Task, error) {
 	return tasks, nil
 }
 
-func GetTask(taskId string) entity.Task {
+func GetTask(taskId string) (entity.Task, error) {
 	if localsrc.DB == nil {
-		log.Fatal("DB is not initialized")
+		log.Printf("DB is not initialized")
+		return entity.Task{}, localsrc.ErrDBNotInitialized
 	}
 	var task entity.Task
-	err := localsrc.DB.QueryRow("SELECT id, name, task_id, project_id FROM task WHERE task_id = $1", taskId).Scan(&task)
+	err := localsrc.DB.QueryRow("SELECT id, name, task_id, project_id FROM task WHERE task_id = $1", taskId).Scan(&task.ID, &task.Name, &task.TaskId, &task.ProjectId)
 
 	if err != nil {
-		log.Fatalf("Query failed: %v", err)
+		log.Printf("Query failed: %v", err)
+		return entity.Task{}, err
 	}
 
-	return task
+	return task, nil
 }
