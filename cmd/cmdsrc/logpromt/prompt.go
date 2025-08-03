@@ -1,7 +1,7 @@
 package logpromt
 
 import (
-	"github.com/madhuwantha/devtime/cmdsrc/tracker"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
 	"github.com/manifoldco/promptui"
 )
 

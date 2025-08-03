@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/madhuwantha/devtime/cmdsrc/syn"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/syn"
 	"github.com/spf13/cobra"
 )
 

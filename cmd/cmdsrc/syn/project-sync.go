@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/madhuwantha/devtime/cmdsrc/localstorage"
-	"github.com/madhuwantha/devtime/cmdsrc/tracker"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/repo"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
 	"github.com/madhuwantha/devtime/server/models"
 )
 
@@ -35,41 +35,16 @@ func GetServerProjects() []models.Project {
 }
 
 func GetLocalProject() []tracker.Project {
-	if localstorage.DB == nil {
-		log.Fatal("DB is not initialized")
-	}
-	rows, err := localstorage.DB.Query("SELECT id, project_id, name, code FROM project ORDER BY id DESC")
-
-	if err != nil {
-		log.Fatalf("Query failed: %v", err)
-	}
-	defer rows.Close()
-
-	var projects []tracker.Project
-	for rows.Next() {
-		var project tracker.Project
-		err := rows.Scan(&project.ID, &project.ProjectId, &project.Name, &project.Code)
-		if err != nil {
-			log.Fatalf("Scan failed: %v", err)
-			continue
-		}
-		projects = append(projects, project)
-	}
-
-	return projects
+	return repo.GetProjects()
 }
 
 func InsertLocalProject(project models.Project) {
-	stmt, err := localstorage.DB.Prepare("INSERT INTO project (project_id, name, code) VALUES (?, ?, ?)")
-	if err != nil {
-		log.Fatalf("Prepare failed: %v", err)
+	var projectDto tracker.Project = tracker.Project{
+		ProjectId: project.ID.String(),
+		Name:      project.Name,
+		Code:      project.Code,
 	}
-	defer stmt.Close()
-	_, err = stmt.Exec(project.ID.String(), project.Name, project.Code)
-	if err != nil {
-		log.Fatalf("Exec failed: %v", err)
-	}
-	log.Printf("Project inserted: %s", project.Name)
+	repo.InsertProject(projectDto)
 }
 
 func SynLocalProjects() {

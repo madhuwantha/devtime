@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/madhuwantha/devtime/cmdsrc/idle"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/idle"
 	"github.com/spf13/cobra"
 )
 

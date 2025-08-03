@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/madhuwantha/devtime/cmdsrc/localstorage"
-	"github.com/madhuwantha/devtime/cmdsrc/tracker"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/localstorage"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/tracker"
 	"github.com/madhuwantha/devtime/server/models"
 )
 

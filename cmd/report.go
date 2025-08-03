@@ -8,7 +8,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/madhuwantha/devtime/cmdsrc/localstorage"
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/localstorage"
 	"github.com/spf13/cobra"
 )
 
