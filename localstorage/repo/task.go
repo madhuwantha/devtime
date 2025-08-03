@@ -1,32 +1,36 @@
 package repo
 
 import (
+	"errors"
 	"log"
 
 	"github.com/madhuwantha/devtime/localstorage"
 	"github.com/madhuwantha/devtime/localstorage/entity"
 )
 
-func GetTasks() []entity.Task {
+func GetTasks() ([]entity.Task, error) {
 	if localstorage.DB == nil {
-		log.Fatal("DB is not initialized")
+		log.Println("DB is not initialized")
+		return nil, errors.New("DB is not initialized")
 	}
 	rows, err := localstorage.DB.Query("SELECT id, name, task_id, project_id FROM task ORDER BY id DESC")
 	if err != nil {
-		log.Fatalf("Query failed: %v", err)
+		log.Printf("Query failed: %v \n", err)
+		return nil, err
 	}
 	defer rows.Close()
-	var tasks []entity.Task
+	var tasks []entity.Task = []entity.Task{}
 	for rows.Next() {
 		var task entity.Task
 		err := rows.Scan(&task.ID, &task.Name, &task.TaskId, &task.ProjectId)
 		if err != nil {
-			log.Fatalf("Scan failed: %v", err)
+			log.Printf("Scan failed: %v \n", err)
+			continue
 		}
 		tasks = append(tasks, task)
 	}
 
-	return tasks
+	return tasks, nil
 }
 
 func GetTask(taskId string) entity.Task {

@@ -1,15 +1,20 @@
 import  { useEffect, useState } from "react";
-import { useProjectList } from "../hooks/useProjectList";
+import { GetProjects } from "../../wailsjs/go/main/App";
 
 
 export default function MyProjects() {
  const [expandedId, setExpandedId] = useState<string | null>(null);
 
- const { data } = useProjectList();
+ const [data, setData] = useState<any[]>([]);
 
  useEffect(() => {
-  console.log(data);
- }, [data]);
+  GetProjects().then((projects) => {
+    console.log("Projects fetched:", projects);
+   setData(projects);
+  }).catch((error) => {
+   console.error("Error fetching projects:", error);
+  });
+ }, []);
 
  return (
   <div>

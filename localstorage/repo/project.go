@@ -1,24 +1,27 @@
 package repo
 
 import (
+	"errors"
 	"log"
 
 	"github.com/madhuwantha/devtime/localstorage"
 	"github.com/madhuwantha/devtime/localstorage/entity"
 )
 
-func GetProjects() []entity.Project {
+func GetProjects() ([]entity.Project, error) {
 	if localstorage.DB == nil {
-		log.Fatal("DB is not initialized")
+		log.Printf("DB is not initialized")
+		return nil, errors.New("DB is not initialized")
 	}
 	rows, err := localstorage.DB.Query("SELECT id, project_id, name, code FROM project ORDER BY id DESC")
 
 	if err != nil {
-		log.Fatalf("Query failed: %v", err)
+		log.Printf("Query failed: %v", err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	var projects []entity.Project
+	var projects []entity.Project = []entity.Project{}
 	for rows.Next() {
 		var project entity.Project
 		err := rows.Scan(&project.ID, &project.ProjectId, &project.Name, &project.Code)
@@ -29,7 +32,7 @@ func GetProjects() []entity.Project {
 		projects = append(projects, project)
 	}
 
-	return projects
+	return projects, nil
 }
 
 func GetProject(projectId string) entity.Project {

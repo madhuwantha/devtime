@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/madhuwantha/devtime/localstorage/entity"
+	"github.com/madhuwantha/devtime/localstorage/repo"
 )
 
 // App struct
@@ -24,4 +27,21 @@ func (a *App) startup(ctx context.Context) {
 // Greet returns a greeting for the given name
 func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
+}
+
+func (a *App) GetProjects() []entity.Project {
+	projects, err := repo.GetProjects()
+	if err != nil {
+		fmt.Println("Error fetching projects:", err)
+		return []entity.Project{}
+	}
+	return projects
+}
+func (a *App) GetTasks() []entity.Task {
+	projects, err := repo.GetTasks()
+	if err != nil {
+		fmt.Println("Error fetching tasks:", err)
+		return []entity.Task{}
+	}
+	return projects
 }
