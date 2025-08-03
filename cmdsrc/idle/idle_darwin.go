@@ -1,4 +1,6 @@
-// idle_darwin.go
+//go:build darwin
+// +build darwin
+
 package idle
 
 /*
