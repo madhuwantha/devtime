@@ -23,8 +23,17 @@ var startCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var errr error
 		if projectId != "" && taskId != "" {
-			project := repo.GetProject(projectId)
-			task := repo.GetTask(taskId)
+			project, err := repo.GetProject(projectId)
+			if err != nil {
+				log.Printf("task not found for task id %v", taskId)
+			}
+			task, err := repo.GetTask(taskId)
+			if err != nil {
+				log.Printf("task not found for task id %v", taskId)
+			}
+			if err != nil {
+				log.Fatal("Failed to start tracking time:", errr)
+			}
 			_, errr = localsrc.StartTask(project.ProjectId, task.TaskId)
 		} else {
 			localProjects := syn.GetLocalProject()

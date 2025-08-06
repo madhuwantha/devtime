@@ -35,18 +35,20 @@ func GetProjects() ([]entity.Project, error) {
 	return projects, nil
 }
 
-func GetProject(projectId string) entity.Project {
+func GetProject(projectId string) (entity.Project, error) {
 	if localsrc.DB == nil {
-		log.Fatal("DB is not initialized")
+		log.Printf("DB is not initialized")
+		return entity.Project{}, localsrc.ErrDBNotInitialized
 	}
 	var project entity.Project
 	err := localsrc.DB.QueryRow("SELECT id, project_id, name, code FROM project WHERE project_id = $1", projectId).Scan(&project)
 
 	if err != nil {
-		log.Fatalf("Query failed: %v", err)
+		log.Printf("Query failed: %v", err)
+		return entity.Project{}, err
 	}
 
-	return project
+	return project, nil
 }
 
 func InsertProject(project entity.Project) {
