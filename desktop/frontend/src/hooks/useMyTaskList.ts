@@ -47,5 +47,5 @@ export const useMyTaskList = () => {
   }
 
 
-  return { tasks, activeTask, loading };
+  return { tasks, activeTask, loading, setActiveTask };
 }

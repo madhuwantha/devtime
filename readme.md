@@ -9,6 +9,12 @@
 ```bash
 go run server/main-server.go
 ```
+#### Run desktop server
+
+```bash
+cd desktop
+wails dev
+```
 
 
 ---
