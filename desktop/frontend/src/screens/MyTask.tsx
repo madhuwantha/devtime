@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMyTaskList } from "../hooks/useMyTaskList";
-import { GetTasks, StartTask } from "../../wailsjs/go/main/App";
+import { GetTasks, StartTask, StopTask } from "../../wailsjs/go/main/App";
 import { entity } from "../../wailsjs/go/models";
 
 
@@ -16,6 +16,16 @@ export default function MyTask() {
       })
       .catch((error) => {
         console.error("Error starting task:", error);
+      });
+  }
+
+  const stopTask = () => {
+    StopTask()
+      .then((response) => {
+        console.log("Task stopped successfully:", response);
+      })
+      .catch((error) => {
+        console.error("Error stopping task:", error);
       });
   }
 
@@ -48,7 +58,7 @@ export default function MyTask() {
               className="absolute right-4 top-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm rsor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                startTask(task);
+                stopTask();
               }}
             >
               Stop

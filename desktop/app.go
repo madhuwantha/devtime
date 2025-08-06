@@ -75,3 +75,12 @@ func (a *App) GetActiveTask() *entity.Task {
 	}
 	return &task
 }
+
+func (a *App) StopTask() bool {
+	status, err := localsrc.StopTask()
+	if err != nil {
+		log.Printf("Error stoping active task: %v", err)
+		return false
+	}
+	return status
+}

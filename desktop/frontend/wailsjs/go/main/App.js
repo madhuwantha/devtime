@@ -21,3 +21,7 @@ export function Greet(arg1) {
 export function StartTask(arg1, arg2) {
   return window['go']['main']['App']['StartTask'](arg1, arg2);
 }
+
+export function StopTask() {
+  return window['go']['main']['App']['StopTask']();
+}

@@ -98,29 +98,34 @@ func InsertStart(projectId string, taskId string, start time.Time) (bool, error)
 	return true, nil
 }
 
-func InsertStop(end time.Time) {
+func InsertStop(end time.Time) (bool, error) {
 	if DB == nil {
-		log.Fatal("DB is not initialized")
+		log.Printf("DB is not initialized")
+		return false, ErrDBNotInitialized
 	}
 
 	// Step 1: Get latest unclosed time log
 	var id int
 	err := DB.QueryRow("SELECT id FROM timelog WHERE end_time IS NULL ORDER BY id DESC LIMIT 1").Scan(&id)
 	if err != nil {
-		log.Fatalf("Failed to find unclosed timelog: %v", err)
+		log.Printf("Failed to find unclosed timelog: %v", err)
+		return false, err
 	}
 
 	// Step 2: Update that record
 	stmt, err := DB.Prepare("UPDATE timelog SET end_time = ? WHERE id = ?")
 	if err != nil {
-		log.Fatalf("Prepare failed: %v", err)
+		log.Printf("Prepare failed: %v", err)
+		return false, err
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(end.Format(time.RFC3339), id)
 	if err != nil {
-		log.Fatalf("Exec failed: %v", err)
+		log.Printf("Exec failed: %v", err)
+		return false, err
 	}
+	return true, nil
 }
 
 func GetAllLogs() []entity.TimeLog {

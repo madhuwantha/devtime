@@ -12,3 +12,5 @@ export function GetTasks():Promise<Array<entity.Task>>;
 export function Greet(arg1:string):Promise<string>;
 
 export function StartTask(arg1:string,arg2:string):Promise<main.StartTaskResponse>;
+
+export function StopTask():Promise<boolean>;
