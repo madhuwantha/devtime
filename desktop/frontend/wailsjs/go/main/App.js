@@ -22,6 +22,14 @@ export function StartTask(arg1, arg2) {
   return window['go']['main']['App']['StartTask'](arg1, arg2);
 }
 
+export function StartWork() {
+  return window['go']['main']['App']['StartWork']();
+}
+
 export function StopTask() {
   return window['go']['main']['App']['StopTask']();
+}
+
+export function StopWork() {
+  return window['go']['main']['App']['StopWork']();
 }

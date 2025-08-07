@@ -1,37 +1,27 @@
 import { useState } from 'react';
-import logo from './assets/images/logo-universal.png';
 import './App.css';
-import { Greet } from "../wailsjs/go/main/App";
 import MyProjects from './screens/MyProjects';
 import MyTask from './screens/MyTask';
+import { StartWork, StopWork } from '../wailsjs/go/main/App';
 
 
 function App() {
-
-  const [name, setName] = useState('');
-  const [resultText, setResultText] = useState("Please enter your name below 👇");
-  const updateName = (e: any) => setName(e.target.value);
   const [selectedTab, setSelectedTabState] = useState(0);
 
   function setSelectedTab(idx: number): void {
     setSelectedTabState(idx);
   }
 
-  const updateResultText = (result: string) => setResultText(result);
-
-  function greet() {
-    Greet(name).then(updateResultText);
-  }
+  const startWorking = () => StartWork();
+  const stopWorking = () => StopWork();
 
   return (
     <main className="flex flex-col items-center justify-start h-screen">
       <div className="flex flex-col items-center justify-center w-screen">
         <h1 className="text-3xl font-boldr">Dev Time</h1>
-        <div id="result" className="result">{resultText}</div>
-        <button className="bg-green-200 py-1 px-3 round">Test</button>
-        <div id="input" className="input-box">
-          <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text" />
-          <button className="btn" onClick={greet}>Greet</button>
+        <div className="flex flex-row w-screen justify-between px-10">          
+          <button onClick={startWorking} type="button" className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Start Working</button>
+          <button onClick={stopWorking} type="button" className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Stop Working</button>
         </div>
       </div>
 

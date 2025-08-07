@@ -13,4 +13,8 @@ export function Greet(arg1:string):Promise<string>;
 
 export function StartTask(arg1:string,arg2:string):Promise<main.StartTaskResponse>;
 
+export function StartWork():Promise<boolean>;
+
 export function StopTask():Promise<boolean>;
+
+export function StopWork():Promise<boolean>;

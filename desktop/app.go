@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/madhuwantha/devtime/localsrc"
@@ -80,6 +81,23 @@ func (a *App) StopTask() bool {
 	status, err := localsrc.StopTask()
 	if err != nil {
 		log.Printf("Error stoping active task: %v", err)
+		return false
+	}
+	return status
+}
+
+func (a *App) StartWork() bool {
+	status, err := localsrc.StartWork(time.Now())
+	if err != nil {
+		log.Printf("Error starting work: %v", err)
+		return false
+	}
+	return status
+}
+func (a *App) StopWork() bool {
+	status, err := localsrc.StopWork(time.Now())
+	if err != nil {
+		log.Printf("Error stoping active work: %v", err)
 		return false
 	}
 	return status

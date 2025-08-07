@@ -13,6 +13,9 @@ go run server/main-server.go
 
 ```bash
 cd desktop
+```
+
+```bash
 wails dev
 ```
 
