@@ -67,7 +67,7 @@ func InitDB() {
 	CREATE TABLE IF NOT EXISTS idlelog (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		start_time TEXT,
-		end_time TEXT,				
+		end_time TEXT		
 	);
 	
 	CREATE UNIQUE INDEX IF NOT EXISTS uidx_project_project_id

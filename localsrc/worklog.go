@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func InsertStartWork(start time.Time) (bool, error) {
+func StartWork(start time.Time) (bool, error) {
 	if DB == nil {
 		log.Println("DB is not initialized")
 		return false, errors.New("DB is not initialized")
@@ -29,7 +29,7 @@ func InsertStartWork(start time.Time) (bool, error) {
 	return true, nil
 }
 
-func InsertStopWork(end time.Time) (bool, error) {
+func StopWork(end time.Time) (bool, error) {
 	if DB == nil {
 		log.Printf("DB is not initialized")
 		return false, ErrDBNotInitialized
@@ -59,7 +59,7 @@ func InsertStopWork(end time.Time) (bool, error) {
 	return true, nil
 }
 
-func InsertPauseWork(end time.Time) (bool, error) {
+func PauseWork(end time.Time) (bool, error) {
 	if DB == nil {
 		log.Printf("DB is not initialized")
 		return false, ErrDBNotInitialized
