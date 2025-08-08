@@ -1,27 +1,43 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import MyProjects from './screens/MyProjects';
 import MyTask from './screens/MyTask';
-import { StartWork, StopWork } from '../wailsjs/go/main/App';
+import { IsWorking, StartWork, StopWork } from '../wailsjs/go/main/App';
 
 
 function App() {
   const [selectedTab, setSelectedTabState] = useState(0);
+  const [isWorking, setIsWorkingState] = useState(false);
 
   function setSelectedTab(idx: number): void {
     setSelectedTabState(idx);
   }
 
-  const startWorking = () => StartWork();
-  const stopWorking = () => StopWork();
+  const startWorking = () => {
+    StartWork().then((res) => {
+      setIsWorkingState(res);
+    });
+  }
+  const stopWorking = () => {
+    StopWork().then((res) => {
+      setIsWorkingState(res);
+    });
+  }
+  const checkIsWorking = () => IsWorking();
+
+  useEffect(() => {
+    checkIsWorking().then((res) => {
+      setIsWorkingState(res);
+    });
+  }, []);
 
   return (
     <main className="flex flex-col items-center justify-start h-screen">
       <div className="flex flex-col items-center justify-center w-screen">
         <h1 className="text-3xl font-boldr">Dev Time</h1>
         <div className="flex flex-row w-screen justify-between px-10">          
-          <button onClick={startWorking} type="button" className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Start Working</button>
-          <button onClick={stopWorking} type="button" className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Stop Working</button>
+          <button disabled={isWorking} onClick={startWorking} type="button" className={'mt-2 px-4 py-2 bg-green-500 text-white rounded' + `${isWorking ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer'}`}>Start Working</button>
+          <button disabled={!isWorking} onClick={stopWorking} type="button" className={'mt-2 px-4 py-2 bg-red-500 text-white rounded' + `${!isWorking ? ' opacity-50 cursor-not-allowed' : ' cursor-pointer'}`}>Stop Working</button>
         </div>
       </div>
 

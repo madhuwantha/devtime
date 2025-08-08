@@ -88,3 +88,19 @@ func PauseWork(end time.Time) (bool, error) {
 	}
 	return true, nil
 }
+
+func IsWorking() (bool, error) {
+	if DB == nil {
+		log.Printf("DB is not initialized")
+		return false, ErrDBNotInitialized
+	}
+
+	// Step 1: Get latest unclosed time log
+	var id int
+	err := DB.QueryRow("SELECT id FROM worklog WHERE end_time IS NULL ORDER BY id DESC LIMIT 1").Scan(&id)
+	if err != nil {
+		log.Printf("Failed to find unclosed worklog: %v", err)
+		return false, err
+	}
+	return true, nil
+}

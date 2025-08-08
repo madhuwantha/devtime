@@ -102,3 +102,7 @@ func (a *App) StopWork() bool {
 	}
 	return status
 }
+
+func (a *App) IsWorking() (bool, error) {
+	return localsrc.IsWorking()
+}
