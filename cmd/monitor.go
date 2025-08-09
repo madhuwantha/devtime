@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/madhuwantha/devtime/cmd/cmdsrc/idle"
+	"github.com/madhuwantha/devtime/localsrc/idle"
 	"github.com/spf13/cobra"
 )
 
@@ -31,10 +31,12 @@ It ensures only one instance runs at a time and manages its own process lifecycl
 		}
 
 		// Relaunch self in background
-		execPath, err := os.Executable()
-		if err != nil {
-			log.Fatal("Failed to get executable path:", err)
-		}
+		// execPath, err := os.Executable()
+		// if err != nil {
+		// 	log.Fatal("Failed to get executable path:", err)
+		// }
+
+		execPath := "/Volumes/dIsk_1/PROJECTS/devtime/devtime"
 
 		attr := &os.ProcAttr{
 			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},

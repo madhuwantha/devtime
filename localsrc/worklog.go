@@ -26,6 +26,7 @@ func StartWork(start time.Time) (bool, error) {
 		log.Fatalf("Exec failed: %v", err)
 		return false, err
 	}
+
 	return true, nil
 }
 

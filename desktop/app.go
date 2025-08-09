@@ -92,6 +92,7 @@ func (a *App) StartWork() bool {
 		log.Printf("Error starting work: %v", err)
 		return false
 	}
+	StartMonitor()
 	return status
 }
 func (a *App) StopWork() bool {
@@ -100,9 +101,17 @@ func (a *App) StopWork() bool {
 		log.Printf("Error stoping active work: %v", err)
 		return false
 	}
+	StopMonitor()
 	return status
 }
 
 func (a *App) IsWorking() (bool, error) {
 	return localsrc.IsWorking()
+}
+
+func StartMonitor() {
+
+}
+func StopMonitor() {
+
 }

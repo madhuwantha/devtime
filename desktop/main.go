@@ -12,6 +12,14 @@ import (
 var assets embed.FS
 
 func main() {
+
+	// Detect if we're running a CLI command
+	// if len(os.Args) > 1 {
+	// 	// run cobra CLI directly
+	// 	cmd.Execute()
+	// 	return
+	// }
+
 	// Create an instance of the app structure
 	app := NewApp()
 
