@@ -111,12 +111,12 @@ export default function MyTask() {
       )}
 
       {/* Tasks List */}
-      <div className="space-y-3">
+      <div className="space-y-1">
         {tasks.map((task) => (
           <div
             key={task.TaskId}
             className={`
-              group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer
+              group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden transition-all duration-300 cursor-pointer
               ${expandedId === task.TaskId 
                 ? 'ring-2 ring-cyan-400/50 bg-white/10 shadow-lg shadow-cyan-500/20' 
                 : 'hover:bg-white/10 hover:border-white/20 hover:shadow-lg'
@@ -127,117 +127,88 @@ export default function MyTask() {
               setExpandedId(expandedId === task.TaskId ? null : task.TaskId)
             }
           >
-            {/* Task Header */}
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`
-                    w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold
-                    ${activeTask && activeTask.TaskId === task.TaskId
-                      ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/25'
-                      : expandedId === task.TaskId
-                      ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-500/25'
-                      : 'bg-gradient-to-r from-slate-600 to-slate-700 text-slate-300 group-hover:from-slate-500 group-hover:to-slate-600'
-                    }
-                  `}>
-                    {task.Name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h3 className={`
-                      text-xl font-semibold transition-colors duration-300
-                      ${activeTask && activeTask.TaskId === task.TaskId 
-                        ? 'text-emerald-300' 
-                        : expandedId === task.TaskId 
-                        ? 'text-cyan-300' 
-                        : 'text-slate-100'
-                      }
-                    `}>
-                      {task.Name}
-                    </h3>
-                    <p className="text-slate-400 text-sm">Task ID: {task.TaskId}</p>
-                    <p className="text-slate-400 text-sm">Project ID: {task.ProjectId}</p>
-                  </div>
+            {/* Task Header - Minimal */}
+            <div className="px-2 py-1 flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1 mr-3">
+                <div className={`
+                  w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0
+                  ${activeTask && activeTask.TaskId === task.TaskId
+                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/25'
+                    : expandedId === task.TaskId
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-500/25'
+                    : 'bg-gradient-to-r from-slate-600 to-slate-700 text-slate-300 group-hover:from-slate-500 group-hover:to-slate-600'
+                  }
+                `}>
+                  {task.Name.charAt(0).toUpperCase()}
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  {/* Task Status Indicator */}
-                  {activeTask && activeTask.TaskId === task.TaskId && (
-                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 rounded-full">
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                      <span className="text-emerald-300 text-sm font-medium">Active</span>
-                    </div>
-                  )}
-                  
-                  {/* Action Button */}
-                  {activeTask && activeTask.TaskId === task.TaskId ? (
-                    <button
-                      className="px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg text-sm font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-rose-500/25"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        stopTask();
-                      }}
-                    >
-                      Stop
-                    </button>
-                  ) : (
-                    <button
-                      className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        startTaskHandle(task);
-                      }}
-                    >
-                      Start
-                    </button>
-                  )}
-                  
-                  {/* Expand/Collapse Indicator */}
-                  <div className={`
-                    w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
-                    ${expandedId === task.TaskId 
-                      ? 'bg-cyan-500/20 text-cyan-400 rotate-180' 
-                      : 'bg-slate-600/50 text-slate-400 group-hover:bg-slate-500/50'
-                    }
-                  `}>
-                    <svg className="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
+                <h3 className={`
+                  text-base font-medium transition-colors duration-300 truncate
+                  ${activeTask && activeTask.TaskId === task.TaskId 
+                    ? 'text-emerald-300' 
+                    : expandedId === task.TaskId 
+                    ? 'text-cyan-300' 
+                    : 'text-slate-100'
+                  }
+                `}>
+                  {task.Name}
+                </h3>
               </div>
+              
+              {/* Action Button */}
+              {activeTask && activeTask.TaskId === task.TaskId ? (
+                <button
+                  className="px-3 py-1.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg text-xs font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-rose-500/25 flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    stopTask();
+                  }}
+                >
+                  Stop
+                </button>
+              ) : (
+                <button
+                  className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-xs font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25 flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    startTaskHandle(task);
+                  }}
+                >
+                  Start
+                </button>
+              )}
             </div>
 
             {/* Expanded Content */}
             {expandedId === task.TaskId && (
               <div className="border-t border-white/10 bg-gradient-to-r from-white/5 to-white/10">
-                <div className="p-6 space-y-4">
+                <div className="p-4 space-y-3">
                   {/* Task Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider">Task Information</h4>
-                      <div className="space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <h4 className="text-slate-300 font-medium text-xs uppercase tracking-wider">Task Information</h4>
+                      <div className="space-y-1.5">
                         <div className="flex justify-between">
-                          <span className="text-slate-400">Name:</span>
-                          <span className="text-slate-200 font-medium">{task.Name}</span>
+                          <span className="text-slate-400 text-sm">Name:</span>
+                          <span className="text-slate-200 font-medium text-sm">{task.Name}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-slate-400">Task ID:</span>
-                          <span className="text-slate-200 font-mono text-sm">{task.TaskId}</span>
+                          <span className="text-slate-400 text-sm">Task ID:</span>
+                          <span className="text-slate-200 font-mono text-xs">{task.TaskId}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-slate-400">Project ID:</span>
-                          <span className="text-slate-200 font-mono text-sm">{task.ProjectId}</span>
+                          <span className="text-slate-400 text-sm">Project ID:</span>
+                          <span className="text-slate-200 font-mono text-xs">{task.ProjectId}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
-                      <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider">Quick Actions</h4>
+                    <div className="space-y-2">
+                      <h4 className="text-slate-300 font-medium text-xs uppercase tracking-wider">Quick Actions</h4>
                       <div className="flex gap-2">
-                        <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-sm font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105">
+                        <button className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg text-xs font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105">
                           Edit
                         </button>
-                        <button className="px-4 py-2 bg-gradient-to-r from-slate-600 to-slate-700 text-slate-200 rounded-lg text-sm font-medium hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105">
+                        <button className="px-3 py-1.5 bg-gradient-to-r from-slate-600 to-slate-700 text-slate-200 rounded-lg text-xs font-medium hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105">
                           View Project
                         </button>
                       </div>
@@ -245,23 +216,23 @@ export default function MyTask() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-3 pt-4 border-t border-white/10">
+                  <div className="flex gap-2 pt-3 border-t border-white/10">
                     {activeTask && activeTask.TaskId === task.TaskId ? (
                       <button 
-                        className="flex-1 px-4 py-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-rose-500/25"
+                        className="flex-1 px-3 py-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg text-sm font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-rose-500/25"
                         onClick={() => stopTask()}
                       >
                         Stop Task
                       </button>
                     ) : (
                       <button 
-                        className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25"
+                        className="flex-1 px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25"
                         onClick={() => startTaskHandle(task)}
                       >
                         Start Task
                       </button>
                     )}
-                    <button className="px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-slate-200 rounded-xl font-medium hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105">
+                    <button className="px-4 py-2 bg-gradient-to-r from-slate-600 to-slate-700 text-slate-200 rounded-lg text-sm font-medium hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105">
                       Archive
                     </button>
                   </div>
