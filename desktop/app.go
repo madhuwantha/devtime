@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/madhuwantha/devtime/localsrc"
 	"github.com/madhuwantha/devtime/localsrc/entity"
+	"github.com/madhuwantha/devtime/localsrc/idle"
 	"github.com/madhuwantha/devtime/localsrc/repo"
 )
 
@@ -92,7 +93,7 @@ func (a *App) StartWork() bool {
 		log.Printf("Error starting work: %v", err)
 		return false
 	}
-	StartMonitor()
+	StartMonitor(10)
 	return status
 }
 func (a *App) StopWork() bool {
@@ -109,9 +110,13 @@ func (a *App) IsWorking() (bool, error) {
 	return localsrc.IsWorking()
 }
 
-func StartMonitor() {
-
+func StartMonitor(threshold int) {
+	idle.StartIdleWatcher(threshold)
 }
+
 func StopMonitor() {
-
+	idle.StopIdleWatcher()
 }
+
+//ambikagtennakoon@yahoo.com
+//sunimal.jayathunga@gmail.com
