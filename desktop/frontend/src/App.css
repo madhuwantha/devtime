@@ -59,3 +59,23 @@
     border: none;
     background-color: rgba(255, 255, 255, 1);
 } */
+
+/* Hide all scrollbars completely */
+* {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Ensure smooth scrolling still works */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent horizontal overflow */
+body {
+  overflow-x: hidden;
+}

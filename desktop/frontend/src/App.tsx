@@ -129,7 +129,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 px-6 pb-12 lg:px-12">
+      <main className="relative z-10 px-6 pb-12 lg:px-12 main-content">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
             {/* Tab Navigation */}
