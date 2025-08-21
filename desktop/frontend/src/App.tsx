@@ -215,7 +215,7 @@ function App() {
       </Transition>
 
       {/* Main Content */}
-      <main className={`relative z-10 px-6 pb-12 lg:px-12 main-content ${isTabSelected ? 'pt-4' : ''}`}>
+      <main className={`relative z-10 px-3 pb-12 lg:px-12 main-content ${isTabSelected ? 'pt-1' : ''}`}>
         <div className="max-w-6xl mx-auto">
           <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
             {/* Tab Navigation */}
@@ -224,7 +224,7 @@ function App() {
                 <button
                   key={tab.name}
                   className={`
-                    flex-1 flex flex-col items-center gap-2 py-6 px-4 transition-all duration-300 relative group
+                    flex-1 flex flex-col items-center gap-2 py-2 px-1 transition-all duration-300 relative group
                     ${idx === selectedTab
                       ? "text-cyan-400 bg-gradient-to-r from-cyan-500/10 to-blue-500/10"
                       : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
@@ -232,7 +232,7 @@ function App() {
                   `}
                   onClick={() => setSelectedTab(idx)}
                 >
-                  <span className="text-2xl">{tab.icon}</span>
+                  <span className="text-md">{tab.icon}</span>
                   <span className="text-sm font-medium">{tab.name}</span>
                   
                   {/* Active Indicator */}
@@ -253,7 +253,7 @@ function App() {
             </div>
 
             {/* Tab Content */}
-            <div className="p-8">
+            <div className="p-3">
               {selectedTab === 0 && <MyProjects />}
               {selectedTab === 1 && <MyTask />}
               {selectedTab === 2 && (

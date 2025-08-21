@@ -74,9 +74,9 @@ export default function MyTask() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      {/* <div className="flex items-center justify-between mb-1">
         <div>
           <h2 className="text-2xl font-bold text-slate-100 mb-1">My Tasks</h2>
           <p className="text-slate-400">Manage and track your development tasks</p>
@@ -85,6 +85,10 @@ export default function MyTask() {
           <span className="text-lg">+</span>
           New Task
         </button>
+      </div> */}
+
+      <div className="flex items-center justify-between mb-1">
+        
       </div>
 
       {/* Active Task Banner */}
