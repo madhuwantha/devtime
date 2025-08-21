@@ -4,8 +4,14 @@ import './App.css';
 import MyProjects from './screens/MyProjects';
 import MyTask from './screens/MyTask';
 import { IsWorking, StartWork, StopWork } from '../wailsjs/go/main/App';
+import { EventsOn } from "../wailsjs/runtime/runtime";
+
+
+
 
 function App() {
+  const [time, setTime] = useState("00:00:00");
+
   const [selectedTab, setSelectedTabState] = useState(0);
   const [isWorking, setIsWorkingState] = useState(false);
   const [isTabSelected, setIsTabSelected] = useState(false);
@@ -35,6 +41,11 @@ function App() {
     checkIsWorking().then((res) => {
       setIsWorkingState(res);
     });
+
+    EventsOn("workingTimer:update", (data: string) => {
+      setTime(data);
+    });
+
   }, []);
 
   const tabs = [
@@ -64,6 +75,7 @@ function App() {
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
                     Dev Time
                   </h1>
+                  {time !== "00:00:00" && <h2 className='relative group px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 active:scale-95'>{time}</h2>}
                 </div>
 
                 {/* Work Controls */}

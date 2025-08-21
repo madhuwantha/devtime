@@ -11,16 +11,21 @@ import (
 	"github.com/madhuwantha/devtime/localsrc/entity"
 	"github.com/madhuwantha/devtime/localsrc/idle"
 	"github.com/madhuwantha/devtime/localsrc/repo"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx       context.Context
+	timerChan chan bool
+	isWorking bool
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	return &App{
+		timerChan: make(chan bool),
+	}
 }
 
 // startup is called when the app starts. The context is saved
@@ -94,6 +99,7 @@ func (a *App) StartWork() bool {
 		return false
 	}
 	StartMonitor(10)
+	StartWorkingTimmer(a)
 	return status
 }
 func (a *App) StopWork() bool {
@@ -103,6 +109,7 @@ func (a *App) StopWork() bool {
 		return false
 	}
 	StopMonitor()
+	StopWorkingTimmer(a)
 	return status
 }
 
@@ -118,5 +125,46 @@ func StopMonitor() {
 	idle.StopIdleWatcher()
 }
 
-//ambikagtennakoon@yahoo.com
-//sunimal.jayathunga@gmail.com
+func StartWorkingTimmer(a *App) {
+	if a.isWorking {
+		log.Printf("Already working")
+		return
+	}
+	a.isWorking = true
+
+	a.timerChan = make(chan bool)
+
+	go func() {
+		startTime := time.Now()
+
+		for {
+			select {
+			case <-a.timerChan:
+				log.Printf("Working Timer stopped")
+				return
+			case <-time.After(1 * time.Second):
+				elapsed := time.Since(startTime)
+				formatted := fmt.Sprintf(
+					"%02d:%02d:%02d",
+					int(elapsed.Hours()),
+					int(elapsed.Minutes()),
+					int(elapsed.Seconds()),
+				)
+
+				runtime.EventsEmit(a.ctx, "workingTimer:update", formatted)
+			}
+		}
+	}()
+}
+
+func StopWorkingTimmer(a *App) {
+	if !a.isWorking {
+		log.Printf("Not working")
+		return
+	}
+
+	a.isWorking = false
+	a.timerChan <- true
+	close(a.timerChan)
+	runtime.EventsEmit(a.ctx, "workingTimer:update", "00:00:00")
+}
