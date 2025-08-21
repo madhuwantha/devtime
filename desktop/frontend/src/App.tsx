@@ -24,8 +24,8 @@ function App() {
   }
   
   const stopWorking = () => {
-    StopWork().then((res) => {
-      setIsWorkingState(res);
+    StopWork().then((res) => {      
+      setIsWorkingState(false);
     });
   }
   
@@ -144,7 +144,7 @@ function App() {
                   <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
                     Dev Time
                   </h1>
-                  <p className="text-slate-300 text-lg mt-2">Track your development journey</p>
+                  <p className="text-slate-300 text-lg mt-2">Track your development journey</p>                  
                 </div>
 
                 {/* Work Controls */}
