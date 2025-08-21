@@ -48,8 +48,8 @@ func (a *App) GetProjects() []entity.Project {
 	}
 	return projects
 }
-func (a *App) GetTasks() []entity.Task {
-	tasks, err := repo.GetTasks()
+func (a *App) GetTasks(projectId *string) []entity.Task {
+	tasks, err := repo.GetTasks(projectId)
 	if err != nil {
 		fmt.Println("Error fetching tasks:", err)
 		return []entity.Task{}

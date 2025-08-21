@@ -1,13 +1,27 @@
 import { useEffect, useState } from "react";
 import { useMyTaskList } from "../hooks/useMyTaskList";
-import { GetTasks, StartTask, StopTask } from "../../wailsjs/go/main/App";
+import { StartTask, StopTask, GetProjects } from "../../wailsjs/go/main/App";
 import { entity } from "../../wailsjs/go/models";
 
 export default function MyTask() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [startingTask, setStartingTask] = useState<entity.Task|null>(null);
-  const { tasks, activeTask, setActiveTask } = useMyTaskList();
+  const { tasks, activeTask, setActiveTask, getTasks } = useMyTaskList();
   const [confirmation, setConfirmation] = useState(false);
+  const [projects, setProjects] = useState<entity.Project[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+
+  useEffect(() => {
+    GetProjects()
+      .then((projects) => setProjects(projects))
+      .catch((error) => console.error("Error fetching projects:", error));
+  }, []);
+
+  useEffect(() => {
+    if(selectedProjectId){
+      getTasks(selectedProjectId);
+    }
+  }, [selectedProjectId]);
 
   const startTaskHandle = (task: entity.Task) => {
     setStartingTask(task);
@@ -58,6 +72,10 @@ export default function MyTask() {
     });
   }
 
+  const displayedTasks = selectedProjectId
+    ? tasks.filter((t) => t.ProjectId === selectedProjectId)
+    : tasks;
+
   if (!tasks || tasks.length === 0) {
     return (
       <div className="text-center py-12">
@@ -88,7 +106,28 @@ export default function MyTask() {
       </div> */}
 
       <div className="flex items-center justify-between mb-1">
-        
+        <div className="flex items-center gap-3">
+          <label className="text-slate-300 text-sm">Project</label>
+          <div className="relative">
+            <select
+              value={selectedProjectId}
+              onChange={(e) => setSelectedProjectId(e.target.value)}
+              className="appearance-none px-3 pr-8 py-2 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-sm text-slate-200 rounded-xl text-sm border border-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+            >
+              <option value="">All Projects</option>
+              {projects.map((p) => (
+                <option key={p.ProjectId} value={p.ProjectId}>
+                  {p.Name}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-slate-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Active Task Banner */}
@@ -116,7 +155,7 @@ export default function MyTask() {
 
       {/* Tasks List */}
       <div className="space-y-1">
-        {tasks.map((task) => (
+        {displayedTasks.map((task) => (
           <div
             key={task.TaskId}
             className={`

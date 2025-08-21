@@ -2,18 +2,25 @@ package repo
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/madhuwantha/devtime/localsrc"
 	"github.com/madhuwantha/devtime/localsrc/entity"
 )
 
-func GetTasks() ([]entity.Task, error) {
+func GetTasks(projectId *string) ([]entity.Task, error) {
 	if localsrc.DB == nil {
 		log.Println("DB is not initialized")
 		return nil, errors.New("DB is not initialized")
 	}
-	rows, err := localsrc.DB.Query("SELECT id, name, task_id, project_id FROM task ORDER BY id DESC")
+	query := "SELECT id, name, task_id, project_id FROM task"
+	if projectId != nil {
+		query = fmt.Sprintf("%s WHERE project_id = $1", query)
+	}
+	query = fmt.Sprintf("%s ORDER BY id DESC", query)
+
+	rows, err := localsrc.DB.Query(query, projectId)
 	if err != nil {
 		log.Printf("Query failed: %v \n", err)
 		return nil, err

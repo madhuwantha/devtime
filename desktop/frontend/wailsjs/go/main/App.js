@@ -10,8 +10,8 @@ export function GetProjects() {
   return window['go']['main']['App']['GetProjects']();
 }
 
-export function GetTasks() {
-  return window['go']['main']['App']['GetTasks']();
+export function GetTasks(arg1) {
+  return window['go']['main']['App']['GetTasks'](arg1);
 }
 
 export function Greet(arg1) {

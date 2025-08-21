@@ -7,7 +7,7 @@ export function GetActiveTask():Promise<entity.Task>;
 
 export function GetProjects():Promise<Array<entity.Project>>;
 
-export function GetTasks():Promise<Array<entity.Task>>;
+export function GetTasks(arg1:any):Promise<Array<entity.Task>>;
 
 export function Greet(arg1:string):Promise<string>;
 
