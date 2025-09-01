@@ -13,6 +13,10 @@ export function Greet(arg1:string):Promise<string>;
 
 export function IsWorking():Promise<boolean>;
 
+export function PauseWork():Promise<boolean>;
+
+export function ResumeWork():Promise<boolean>;
+
 export function StartTask(arg1:string,arg2:string):Promise<main.StartTaskResponse>;
 
 export function StartWork():Promise<boolean>;

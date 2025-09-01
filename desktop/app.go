@@ -16,15 +16,19 @@ import (
 
 // App struct
 type App struct {
-	ctx       context.Context
-	timerChan chan bool
-	isWorking bool
+	ctx        context.Context
+	timerChan  chan bool
+	isWorking  bool
+	totalBreak time.Duration
+	startTime  time.Time
+	breakAt    time.Time
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{
-		timerChan: make(chan bool),
+		timerChan:  make(chan bool),
+		totalBreak: time.Duration(0),
 	}
 }
 
@@ -113,6 +117,28 @@ func (a *App) StopWork() bool {
 	return status
 }
 
+func (a *App) PauseWork() bool {
+	status, err := localsrc.StopWork(time.Now())
+	if err != nil {
+		log.Printf("Error pausing active work: %v", err)
+		return false
+	}
+	StopMonitor()
+	// StopWorkingTimmer(a)
+	return status
+}
+
+func (a *App) ResumeWork() bool {
+	status, err := localsrc.StartWork(time.Now())
+	if err != nil {
+		log.Printf("Error resuming work: %v", err)
+		return false
+	}
+	StartMonitor(10)
+	// StartWorkingTimmer(a)
+	return status
+}
+
 func (a *App) IsWorking() (bool, error) {
 	return localsrc.IsWorking()
 }
@@ -136,6 +162,7 @@ func StartWorkingTimmer(a *App) {
 
 	go func() {
 		startTime := time.Now()
+		a.startTime = startTime
 
 		for {
 			select {
@@ -163,6 +190,51 @@ func StopWorkingTimmer(a *App) {
 		return
 	}
 
+	a.totalBreak = time.Duration(0)
+	a.isWorking = false
+	a.timerChan <- true
+	close(a.timerChan)
+	runtime.EventsEmit(a.ctx, "workingTimer:update", "00:00:00")
+}
+
+func ResumeWorkingTimmer(a *App) {
+	if a.isWorking {
+		log.Printf("Already working")
+		return
+	}
+	a.isWorking = true
+
+	a.timerChan = make(chan bool)
+
+	go func() {
+		a.totalBreak += time.Since(a.startTime)
+		for {
+			select {
+			case <-a.timerChan:
+				log.Printf("Working Timer stopped")
+				return
+			case <-time.After(1 * time.Second):
+				elapsed := time.Since(a.startTime) - a.totalBreak
+				formatted := fmt.Sprintf(
+					"%02d:%02d:%02d",
+					int(elapsed.Hours()),
+					int(elapsed.Minutes()),
+					int(elapsed.Seconds()),
+				)
+
+				runtime.EventsEmit(a.ctx, "workingTimer:update", formatted)
+			}
+		}
+	}()
+}
+
+func PauseWorkingTimmer(a *App) {
+	if !a.isWorking {
+		log.Printf("Not working")
+		return
+	}
+
+	a.breakAt = time.Now()
 	a.isWorking = false
 	a.timerChan <- true
 	close(a.timerChan)

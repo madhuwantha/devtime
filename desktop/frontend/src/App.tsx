@@ -3,7 +3,7 @@ import { Transition } from 'react-transition-group';
 import './App.css';
 import MyProjects from './screens/MyProjects';
 import MyTask from './screens/MyTask';
-import { IsWorking, StartWork, StopWork } from '../wailsjs/go/main/App';
+import { IsWorking, PauseWork, ResumeWork, StartWork, StopWork } from '../wailsjs/go/main/App';
 import { EventsOn } from "../wailsjs/runtime/runtime";
 
 
@@ -14,6 +14,7 @@ function App() {
 
   const [selectedTab, setSelectedTabState] = useState(0);
   const [isWorking, setIsWorkingState] = useState(false);
+  const [isPause, setIsPauseState] = useState(false);
   const [isTabSelected, setIsTabSelected] = useState(false);
 
   function setSelectedTab(idx: number): void {
@@ -32,6 +33,18 @@ function App() {
   const stopWorking = () => {
     StopWork().then((res) => {      
       setIsWorkingState(false);
+    });
+  }
+  const pauseWorking = () => {
+    PauseWork().then((res) => {      
+      setIsWorkingState(false);
+      setIsPauseState(true);
+    });
+  }
+    const resumeWorking = () => {
+    ResumeWork().then((res) => {
+      setIsWorkingState(res);
+      setIsPauseState(false);
     });
   }
   
@@ -80,7 +93,7 @@ function App() {
 
                 {/* Work Controls */}
                 <div className="flex items-center gap-3">
-                  <button
+                  {!isWorking && <button
                     disabled={isWorking}
                     onClick={startWorking}
                     className={`
@@ -95,9 +108,43 @@ function App() {
                       <div className={`w-2 h-2 rounded-full ${isWorking ? 'bg-slate-400' : 'bg-white'}`}></div>
                       Start
                     </span>
-                  </button>
+                  </button>}
 
-                  <button
+                  {isWorking && !isPause && <button
+                    disabled={isWorking}
+                    onClick={pauseWorking}
+                    className={`
+                      relative group px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 active:scale-95
+                      ${!isWorking
+                        ? 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-50'
+                        : 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40'
+                      }
+                    `}
+                  >
+                    <span className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${!isWorking ? 'bg-slate-400' : 'bg-white'}`}></div>
+                      Pause
+                    </span>
+                  </button>}
+
+                  {isPause && <button
+                    disabled={isWorking}
+                    onClick={resumeWorking}
+                    className={`
+                      relative group px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 active:scale-95
+                      ${!isWorking
+                        ? 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-50'
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40'
+                      }
+                    `}
+                  >
+                    <span className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${!isWorking ? 'bg-slate-400' : 'bg-white'}`}></div>
+                      Resume
+                    </span>
+                  </button>}
+
+                  {isWorking && !isPause && <button
                     disabled={!isWorking}
                     onClick={stopWorking}
                     className={`
@@ -112,7 +159,7 @@ function App() {
                       <div className={`w-2 h-2 rounded-full ${!isWorking ? 'bg-slate-400' : 'bg-white'}`}></div>
                       Stop
                     </span>
-                  </button>
+                  </button>}
 
                   {/* Expand Header Button */}
                   <button
