@@ -214,7 +214,7 @@ function App() {
 
                 {/* Work Controls */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-                  <button
+                  {!isWorking && !isPause && <button
                     disabled={isWorking}
                     onClick={startWorking}
                     className={`
@@ -232,9 +232,48 @@ function App() {
                     {!isWorking && (
                       <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
                     )}
-                  </button>
+                  </button>}
 
-                  <button
+                  {isWorking && !isPause && <button
+                    onClick={pauseWorking}
+                    className={`
+                      relative group px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95
+                      ${isPause 
+                        ? 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-50' 
+                        : 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40'
+                      }
+                    `}
+                  >
+                    <span className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${isPause ? 'bg-slate-400' : 'bg-white'}`}></div>
+                      Pause
+                    </span>
+                    {!isPause && (
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                    )}
+                  </button>}
+
+                  {isPause && <button                    
+                    onClick={resumeWorking}
+                    className={`
+                      relative group px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95
+                      ${!isPause
+                        ? 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-50'
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40'
+                      }
+                    `}
+                  >
+                    <span className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${!isPause ? 'bg-slate-400' : 'bg-white'}`}></div>
+                      Resume
+                    </span>
+                    {isWorking && (
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-rose-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                    )}
+                  </button>}
+
+
+                  {isWorking && !isPause && <button
                     disabled={!isWorking}
                     onClick={stopWorking}
                     className={`
@@ -252,7 +291,7 @@ function App() {
                     {isWorking && (
                       <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-rose-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
                     )}
-                  </button>
+                  </button>}
                 </div>
 
                 {/* Status Indicator */}
@@ -271,6 +310,7 @@ function App() {
                     <span className="text-sm font-medium">
                       {isWorking ? 'Currently Working' : 'Not Working'}
                     </span>
+                    {time !== "00:00:00" && <h2 className='relative group px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 active:scale-95'>{time}</h2>}
                   </div>
                 </div>
               </div>
