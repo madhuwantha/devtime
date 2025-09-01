@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -19,6 +20,8 @@ type App struct {
 	totalBreak time.Duration
 	startTime  time.Time
 	pauseAt    time.Time
+	taskTimers map[string]*TaskTimer
+	taskMutex  sync.Mutex
 }
 
 // NewApp creates a new App application struct
@@ -26,6 +29,7 @@ func NewApp() *App {
 	return &App{
 		timerChan:  make(chan bool),
 		totalBreak: time.Duration(0),
+		taskTimers: make(map[string]*TaskTimer),
 	}
 }
 
