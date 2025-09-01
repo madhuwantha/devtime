@@ -11,6 +11,8 @@ export function GetTasks(arg1:any):Promise<Array<entity.Task>>;
 
 export function Greet(arg1:string):Promise<string>;
 
+export function IsPausedWorking():Promise<boolean>;
+
 export function IsWorking():Promise<boolean>;
 
 export function PauseWork():Promise<boolean>;

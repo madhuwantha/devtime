@@ -19,9 +19,10 @@ type App struct {
 	ctx        context.Context
 	timerChan  chan bool
 	isWorking  bool
+	isPaused   bool
 	totalBreak time.Duration
 	startTime  time.Time
-	breakAt    time.Time
+	pauseAt    time.Time
 }
 
 // NewApp creates a new App application struct
@@ -118,29 +119,34 @@ func (a *App) StopWork() bool {
 }
 
 func (a *App) PauseWork() bool {
+	log.Printf("Pausing work")
 	status, err := localsrc.StopWork(time.Now())
 	if err != nil {
 		log.Printf("Error pausing active work: %v", err)
 		return false
 	}
 	StopMonitor()
-	// StopWorkingTimmer(a)
+	PauseWorkingTimmer(a)
 	return status
 }
 
 func (a *App) ResumeWork() bool {
+	log.Printf("Resuming work")
 	status, err := localsrc.StartWork(time.Now())
 	if err != nil {
 		log.Printf("Error resuming work: %v", err)
 		return false
 	}
 	StartMonitor(10)
-	// StartWorkingTimmer(a)
+	ResumeWorkingTimmer(a)
 	return status
 }
 
 func (a *App) IsWorking() (bool, error) {
 	return localsrc.IsWorking()
+}
+func (a *App) IsPausedWorking() (bool, error) {
+	return a.isPaused, nil
 }
 
 func StartMonitor(threshold int) {
@@ -203,15 +209,16 @@ func ResumeWorkingTimmer(a *App) {
 		return
 	}
 	a.isWorking = true
+	a.isPaused = false
 
 	a.timerChan = make(chan bool)
 
 	go func() {
-		a.totalBreak += time.Since(a.startTime)
+		a.totalBreak += time.Since(a.pauseAt)
 		for {
 			select {
 			case <-a.timerChan:
-				log.Printf("Working Timer stopped")
+				log.Printf("Working Timer paused")
 				return
 			case <-time.After(1 * time.Second):
 				elapsed := time.Since(a.startTime) - a.totalBreak
@@ -234,9 +241,10 @@ func PauseWorkingTimmer(a *App) {
 		return
 	}
 
-	a.breakAt = time.Now()
+	a.pauseAt = time.Now()
 	a.isWorking = false
+	a.isPaused = true
 	a.timerChan <- true
 	close(a.timerChan)
-	runtime.EventsEmit(a.ctx, "workingTimer:update", "00:00:00")
+	// runtime.EventsEmit(a.ctx, "workingTimer:update", "00:00:00")
 }

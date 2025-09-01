@@ -3,7 +3,7 @@ import { Transition } from 'react-transition-group';
 import './App.css';
 import MyProjects from './screens/MyProjects';
 import MyTask from './screens/MyTask';
-import { IsWorking, PauseWork, ResumeWork, StartWork, StopWork } from '../wailsjs/go/main/App';
+import { IsPausedWorking, IsWorking, PauseWork, ResumeWork, StartWork, StopWork } from '../wailsjs/go/main/App';
 import { EventsOn } from "../wailsjs/runtime/runtime";
 
 
@@ -36,12 +36,15 @@ function App() {
     });
   }
   const pauseWorking = () => {
-    PauseWork().then((res) => {      
+    console.log("pauseWorking clicked");
+    PauseWork().then((res) => {  
+      console.log("res", res);    
       setIsWorkingState(false);
       setIsPauseState(true);
     });
   }
-    const resumeWorking = () => {
+  const resumeWorking = () => {
+    console.log("resumeWorking clicked");
     ResumeWork().then((res) => {
       setIsWorkingState(res);
       setIsPauseState(false);
@@ -49,10 +52,15 @@ function App() {
   }
   
   const checkIsWorking = () => IsWorking();
+  const checkIsPausedWorking = () => IsPausedWorking();
 
   useEffect(() => {
     checkIsWorking().then((res) => {
       setIsWorkingState(res);
+    });
+
+    checkIsPausedWorking().then((res) => {
+      setIsPauseState(res);
     });
 
     EventsOn("workingTimer:update", (data: string) => {
@@ -93,7 +101,7 @@ function App() {
 
                 {/* Work Controls */}
                 <div className="flex items-center gap-3">
-                  {!isWorking && <button
+                  {!isWorking && !isPause && <button
                     disabled={isWorking}
                     onClick={startWorking}
                     className={`
@@ -110,8 +118,7 @@ function App() {
                     </span>
                   </button>}
 
-                  {isWorking && !isPause && <button
-                    disabled={isWorking}
+                  {isWorking && !isPause && <button                    
                     onClick={pauseWorking}
                     className={`
                       relative group px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 active:scale-95
@@ -128,18 +135,17 @@ function App() {
                   </button>}
 
                   {isPause && <button
-                    disabled={isWorking}
                     onClick={resumeWorking}
                     className={`
                       relative group px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 active:scale-95
-                      ${!isWorking
+                      ${!isPause
                         ? 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-50'
                         : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40'
                       }
                     `}
                   >
                     <span className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${!isWorking ? 'bg-slate-400' : 'bg-white'}`}></div>
+                      <div className={`w-2 h-2 rounded-full ${!isPause ? 'bg-slate-400' : 'bg-white'}`}></div>
                       Resume
                     </span>
                   </button>}
