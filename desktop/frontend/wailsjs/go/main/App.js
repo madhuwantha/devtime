@@ -14,10 +14,6 @@ export function GetTasks(arg1) {
   return window['go']['main']['App']['GetTasks'](arg1);
 }
 
-export function Greet(arg1) {
-  return window['go']['main']['App']['Greet'](arg1);
-}
-
 export function IsPausedWorking() {
   return window['go']['main']['App']['IsPausedWorking']();
 }
