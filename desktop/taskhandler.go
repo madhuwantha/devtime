@@ -26,6 +26,7 @@ type TaskTimer struct {
 
 func (a *App) StartTask(projectId string, taskId string) StartTaskResponse {
 	status, err := localsrc.StartTask(projectId, taskId)
+	StartTaskTimer(taskId, projectId, a)
 	return StartTaskResponse{
 		Status: status,
 		Error:  err,
@@ -41,7 +42,8 @@ func (a *App) GetActiveTask() *entity.Task {
 }
 
 func (a *App) StopTask() bool {
-	status, err := localsrc.StopTask()
+	status, taskId, err := localsrc.StopTask()
+	StopTaskTimer(taskId, a)
 	if err != nil {
 		log.Printf("Error stoping active task: %v", err)
 		return false
@@ -97,7 +99,7 @@ func StartTaskTimer(taskId string, projectId string, a *App) {
 
 }
 
-func StopTaskTimer(taskId string, projectId string, a *App) {
+func StopTaskTimer(taskId string, a *App) {
 	log.Printf("Stopping task timer for task ID: %s", taskId)
 
 	a.taskMutex.Lock()
