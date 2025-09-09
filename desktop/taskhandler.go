@@ -146,7 +146,7 @@ func StopTaskTimer(taskId string, a *App) {
 	timer.StopChan <- true
 	close(timer.StopChan)
 	timer.IsRunning = false
-	// runtime.EventsEmit(a.ctx, "tasktimer:update:"+taskId, "00:00:00")
+	runtime.EventsEmit(a.ctx, "tasktimer:update:"+taskId, "00:00:00")
 }
 
 func ResumeTaskTimer(taskId string, a *App) {

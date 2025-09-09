@@ -60,15 +60,6 @@ export default function MyTask() {
             updatedMap.set(task.TaskId, data);
             return updatedMap;
           });
-
-          // let _taskTimeMap = taskTimeMap;
-          // taskTimeMap.set(task.TaskId, data)
-          // console.log("taskTimeMap",taskTimeMap)
-          // setTaskTimeMap(_taskTimeMap);
-          // setTaskTimeMap(previous => {
-          //   previous.set(task.TaskId, data);
-          //   return previous;
-          // });
         });
 
       })
