@@ -13,7 +13,11 @@ export function IsPausedWorking():Promise<boolean>;
 
 export function IsWorking():Promise<boolean>;
 
+export function PauseTask():Promise<boolean>;
+
 export function PauseWork():Promise<boolean>;
+
+export function ResumeTask(arg1:string,arg2:string):Promise<boolean>;
 
 export function ResumeWork():Promise<boolean>;
 

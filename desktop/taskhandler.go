@@ -63,6 +63,28 @@ func (a *App) GetTasks(projectId *string) []entity.Task {
 	return tasks
 }
 
+func (a *App) PauseTask() bool {
+	log.Printf("Pausing task")
+	status, taskId, err := localsrc.StopTask()
+	if err != nil {
+		log.Printf("Error pausing active work: %v", err)
+		return false
+	}
+	PauseTaskTimer(taskId, a)
+	return status
+}
+
+func (a *App) ResumeTask(projectId string, taskId string) bool {
+	log.Printf("Resuming task")
+	status, err := localsrc.StartTask(projectId, taskId)
+	if err != nil {
+		log.Printf("Error resuming work: %v", err)
+		return false
+	}
+	ResumeTaskTimer(taskId, a)
+	return status
+}
+
 func StartTaskTimer(taskId string, projectId string, a *App) {
 	log.Printf("Starting task timer for task ID: %s", taskId)
 

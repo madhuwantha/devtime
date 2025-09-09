@@ -22,8 +22,16 @@ export function IsWorking() {
   return window['go']['main']['App']['IsWorking']();
 }
 
+export function PauseTask() {
+  return window['go']['main']['App']['PauseTask']();
+}
+
 export function PauseWork() {
   return window['go']['main']['App']['PauseWork']();
+}
+
+export function ResumeTask(arg1, arg2) {
+  return window['go']['main']['App']['ResumeTask'](arg1, arg2);
 }
 
 export function ResumeWork() {
