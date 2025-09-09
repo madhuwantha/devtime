@@ -6,12 +6,36 @@ export function GetActiveTask() {
   return window['go']['main']['App']['GetActiveTask']();
 }
 
+export function GetIdleTimeSummary(arg1) {
+  return window['go']['main']['App']['GetIdleTimeSummary'](arg1);
+}
+
+export function GetPeakProductivityHours() {
+  return window['go']['main']['App']['GetPeakProductivityHours']();
+}
+
+export function GetProductivitySummary(arg1) {
+  return window['go']['main']['App']['GetProductivitySummary'](arg1);
+}
+
+export function GetProjectTimeSummary(arg1) {
+  return window['go']['main']['App']['GetProjectTimeSummary'](arg1);
+}
+
 export function GetProjects() {
   return window['go']['main']['App']['GetProjects']();
 }
 
+export function GetTaskTimeSummary(arg1) {
+  return window['go']['main']['App']['GetTaskTimeSummary'](arg1);
+}
+
 export function GetTasks(arg1) {
   return window['go']['main']['App']['GetTasks'](arg1);
+}
+
+export function GetWorkTimeSummary(arg1) {
+  return window['go']['main']['App']['GetWorkTimeSummary'](arg1);
 }
 
 export function IsPausedWorking() {

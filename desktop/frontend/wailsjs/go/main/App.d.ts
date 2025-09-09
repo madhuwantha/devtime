@@ -5,9 +5,21 @@ import {main} from '../models';
 
 export function GetActiveTask():Promise<entity.Task>;
 
+export function GetIdleTimeSummary(arg1:string):Promise<Array<entity.IdleSummary>>;
+
+export function GetPeakProductivityHours():Promise<Array<entity.PeakHourSummary>>;
+
+export function GetProductivitySummary(arg1:string):Promise<Array<entity.ProductivitySummary>>;
+
+export function GetProjectTimeSummary(arg1:string):Promise<Array<entity.ProjectSummary>>;
+
 export function GetProjects():Promise<Array<entity.Project>>;
 
+export function GetTaskTimeSummary(arg1:string):Promise<Array<entity.TaskSummary>>;
+
 export function GetTasks(arg1:any):Promise<Array<entity.Task>>;
+
+export function GetWorkTimeSummary(arg1:string):Promise<Array<entity.WorkSummary>>;
 
 export function IsPausedWorking():Promise<boolean>;
 

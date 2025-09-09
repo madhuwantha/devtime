@@ -5,6 +5,7 @@ import MyProjects from './screens/MyProjects';
 import MyTask from './screens/MyTask';
 import { IsPausedWorking, IsWorking, PauseWork, ResumeWork, StartWork, StopWork } from '../wailsjs/go/main/App';
 import { EventsOn } from "../wailsjs/runtime/runtime";
+import Analytics from './screens/Analytics';
 
 
 
@@ -361,13 +362,14 @@ function App() {
             <div className="p-3">
               {selectedTab === 0 && <MyProjects />}
               {selectedTab === 1 && <MyTask />}
-              {selectedTab === 2 && (
+              {selectedTab === 2 && <Analytics /> }
+              {/* {selectedTab === 2 && (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">👤</div>
                   <h3 className="text-2xl font-semibold text-slate-200 mb-2">Profile</h3>
                   <p className="text-slate-400">Profile settings coming soon...</p>
                 </div>
-              )}
+              )} */}
               {selectedTab === 3 && (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">⚙️</div>
