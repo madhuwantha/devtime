@@ -80,22 +80,28 @@ func StartTaskTimer(taskId string, projectId string, a *App) {
 	}
 	a.taskTimers[taskId] = taskTimer
 
-	go func(taskTimer *TaskTimer) {
-		select {
-		case taskTimer.StopChan <- true:
-			taskTimer.IsRunning = false
-			log.Printf("Task timer for task ID %s stopped", taskTimer.TaskID)
-			return
-		case <-time.After(1 * time.Second):
-			elapsed := time.Since(taskTimer.StartTime)
-			formatted := fmt.Sprintf("%02d:%02d:%02d",
-				int(elapsed.Hours())%24,
-				int(elapsed.Minutes())%60,
-				int(elapsed.Seconds())%60,
-			)
-			runtime.EventsEmit(a.ctx, "tasktimer:update:"+taskTimer.TaskID, formatted)
+	log.Printf("Task timer for task ID %s started", taskId)
+	go func() {
+		startTime := time.Now()
+		a.taskTimers[taskId].StartTime = startTime
+		for {
+			select {
+			case <-a.taskTimers[taskId].StopChan:
+				a.taskTimers[taskId].IsRunning = false
+				log.Printf("Task timer for task ID %s stopped", a.taskTimers[taskId].TaskID)
+				return
+			case <-time.After(1 * time.Second):
+				elapsed := time.Since(a.taskTimers[taskId].StartTime)
+				formatted := fmt.Sprintf("%02d:%02d:%02d",
+					int(elapsed.Hours())%24,
+					int(elapsed.Minutes())%60,
+					int(elapsed.Seconds())%60,
+				)
+				log.Printf("Task timer for task ID %s updated to %s", a.taskTimers[taskId].TaskID, formatted)
+				runtime.EventsEmit(a.ctx, "tasktimer:update:"+a.taskTimers[taskId].TaskID, formatted)
+			}
 		}
-	}(taskTimer)
+	}()
 
 }
 

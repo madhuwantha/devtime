@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { useMyTaskList } from "../hooks/useMyTaskList";
 import { StartTask, StopTask, GetProjects } from "../../wailsjs/go/main/App";
 import { entity } from "../../wailsjs/go/models";
+import { EventsOn } from "../../wailsjs/runtime/runtime";
 
 export default function MyTask() {
+  const [time, setTime] = useState("00:00:01");
+  const [taskTimeMap, setTaskTimeMap] = useState<Map<string, string>>(new Map());
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [startingTask, setStartingTask] = useState<entity.Task|null>(null);
   const { tasks, activeTask, setActiveTask, getTasks } = useMyTaskList();
@@ -40,6 +43,10 @@ export default function MyTask() {
     })
   }
 
+  useEffect(()=> {
+    console.log(taskTimeMap);
+  }, [taskTimeMap])
+
   const start = (task: entity.Task) => {
     StartTask(task.ProjectId, task.TaskId)
       .then((response) => {
@@ -47,11 +54,29 @@ export default function MyTask() {
         setActiveTask(previous => {          
           return previous = task;
         })
+        EventsOn(`tasktimer:update:${task.TaskId}`, (data: string) => {
+          setTaskTimeMap((prev) => {
+            const updatedMap = new Map(prev); // ✅ Create a new Map instance
+            updatedMap.set(task.TaskId, data);
+            return updatedMap;
+          });
+
+          // let _taskTimeMap = taskTimeMap;
+          // taskTimeMap.set(task.TaskId, data)
+          // console.log("taskTimeMap",taskTimeMap)
+          // setTaskTimeMap(_taskTimeMap);
+          // setTaskTimeMap(previous => {
+          //   previous.set(task.TaskId, data);
+          //   return previous;
+          // });
+        });
+
       })
       .catch((error) => {
         console.error("Error starting task:", error);
       }).finally(() => {
         setStartingTask(null);
+        
       })
   }
 
@@ -193,8 +218,9 @@ export default function MyTask() {
                     : 'text-slate-100'
                   }
                 `}>
-                  {task.Name}
+                  {task.Name}                  
                 </h3>
+                {taskTimeMap && taskTimeMap.get(task.TaskId) && <h2 className='relative group px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-105 active:scale-95'>{taskTimeMap.get(task.TaskId)}</h2>}
               </div>
               
               {/* Action Button */}

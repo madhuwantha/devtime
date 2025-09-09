@@ -87,7 +87,6 @@ func StartWorkingTimmer(a *App) {
 					int(elapsed.Minutes()),
 					int(elapsed.Seconds()),
 				)
-
 				runtime.EventsEmit(a.ctx, "workingTimer:update", formatted)
 			}
 		}
