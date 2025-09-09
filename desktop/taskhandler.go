@@ -17,11 +17,14 @@ type StartTaskResponse struct {
 }
 
 type TaskTimer struct {
-	TaskID    string
-	ProjectID string
-	StartTime time.Time
-	StopChan  chan bool
-	IsRunning bool
+	TaskID     string
+	ProjectID  string
+	StartTime  time.Time
+	StopChan   chan bool
+	IsRunning  bool
+	PauseAt    time.Time
+	IsPaused   bool
+	totalBreak time.Duration
 }
 
 func (a *App) StartTask(projectId string, taskId string) StartTaskResponse {
@@ -77,6 +80,7 @@ func StartTaskTimer(taskId string, projectId string, a *App) {
 		StartTime: time.Now(),
 		StopChan:  make(chan bool),
 		IsRunning: true,
+		IsPaused:  false,
 	}
 	a.taskTimers[taskId] = taskTimer
 
@@ -120,5 +124,50 @@ func StopTaskTimer(taskId string, a *App) {
 	timer.StopChan <- true
 	close(timer.StopChan)
 	timer.IsRunning = false
-	runtime.EventsEmit(a.ctx, "tasktimer:update:"+taskId, "00:00:00")
+	// runtime.EventsEmit(a.ctx, "tasktimer:update:"+taskId, "00:00:00")
+}
+
+func ResumeTaskTimer(taskId string, a *App) {
+	if a.taskTimers[taskId].IsRunning {
+		log.Printf("Already doing")
+		return
+	}
+	a.taskTimers[taskId].IsRunning = true
+	a.taskTimers[taskId].IsPaused = false
+
+	a.taskTimers[taskId].StopChan = make(chan bool)
+
+	go func() {
+		a.taskTimers[taskId].totalBreak += time.Since(a.taskTimers[taskId].PauseAt)
+		for {
+			select {
+			case <-a.taskTimers[taskId].StopChan:
+				log.Printf("Working Timer paused")
+				return
+			case <-time.After(1 * time.Second):
+				elapsed := time.Since(a.taskTimers[taskId].StartTime) - a.taskTimers[taskId].totalBreak
+				formatted := fmt.Sprintf(
+					"%02d:%02d:%02d",
+					int(elapsed.Hours()),
+					int(elapsed.Minutes()),
+					int(elapsed.Seconds()),
+				)
+				runtime.EventsEmit(a.ctx, "tasktimer:update:"+a.taskTimers[taskId].TaskID, formatted)
+			}
+		}
+	}()
+}
+
+func PauseTaskTimer(taskId string, a *App) {
+	if !a.taskTimers[taskId].IsRunning {
+		log.Printf("No running task timer found for task ID %s", taskId)
+		return
+	}
+
+	a.taskTimers[taskId].PauseAt = time.Now()
+	a.taskTimers[taskId].IsRunning = false
+	a.taskTimers[taskId].IsPaused = true
+	a.taskTimers[taskId].StopChan <- true
+	close(a.taskTimers[taskId].StopChan)
+	// runtime.EventsEmit(a.ctx, "workingTimer:update", "00:00:00")
 }
