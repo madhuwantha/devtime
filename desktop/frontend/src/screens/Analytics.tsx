@@ -143,7 +143,7 @@ export default function Analytics() {
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={projectSummary}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="ProjectName" stroke="#9ca3af" />
+            <XAxis dataKey="project_name" stroke="#9ca3af" />
             <YAxis stroke="#9ca3af" />
             <Tooltip 
               contentStyle={{
@@ -154,7 +154,7 @@ export default function Analytics() {
               }}
             />
             <Bar 
-              dataKey="HoursSpent" 
+              dataKey="hours_spent" 
               fill="url(#projectGradient)"
               radius={[4, 4, 0, 0]}
             />
@@ -211,7 +211,7 @@ export default function Analytics() {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={productivitySummary}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="Date" stroke="#9ca3af" />
+            <XAxis dataKey="date" stroke="#9ca3af" />
             <YAxis stroke="#9ca3af" />
             <Tooltip 
               contentStyle={{
@@ -224,7 +224,7 @@ export default function Analytics() {
             <Legend />
             <Line 
               type="monotone" 
-              dataKey="ProductivityPercent" 
+              dataKey="productivity_percent" 
               stroke="#a855f7" 
               strokeWidth={3}
               dot={{ fill: '#a855f7', strokeWidth: 2, r: 4 }}
@@ -245,7 +245,7 @@ export default function Analytics() {
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={peakHours}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="Hour" stroke="#9ca3af" />
+            <XAxis dataKey="hour" stroke="#9ca3af" />
             <YAxis stroke="#9ca3af" />
             <Tooltip 
               contentStyle={{
@@ -256,7 +256,7 @@ export default function Analytics() {
               }}
             />
             <Bar 
-              dataKey="HoursSpent" 
+              dataKey="hours_spent" 
               fill="url(#peakGradient)"
               radius={[4, 4, 0, 0]}
             />
