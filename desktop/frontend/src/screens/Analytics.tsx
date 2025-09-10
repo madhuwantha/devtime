@@ -17,6 +17,10 @@ export default function Analytics() {
   const [productivitySummary, setProductivitySummary] = useState<entity.ProductivitySummary[]>([]);
   const [peakHours, setPeakHours] = useState<entity.PeakHourSummary[]>([]);
 
+  useEffect(()=>{
+    console.log("workSummary",workSummary)
+  },[workSummary])
+
   // Fetch all analytics data
   const fetchData = async () => {
     setIsLoading(true);
@@ -90,7 +94,7 @@ export default function Analytics() {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={workSummary}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="Date" stroke="#9ca3af" />
+            <XAxis dataKey="date" stroke="#9ca3af" />
             <YAxis stroke="#9ca3af" />
             <Tooltip 
               contentStyle={{
@@ -103,7 +107,7 @@ export default function Analytics() {
             <Legend />
             <Line 
               type="monotone" 
-              dataKey="TotalHours" 
+              dataKey="total_hours" 
               stroke="#06b6d4" 
               strokeWidth={3}
               dot={{ fill: '#06b6d4', strokeWidth: 2, r: 4 }}
