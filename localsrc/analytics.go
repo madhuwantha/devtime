@@ -19,7 +19,7 @@ func getGroupByClause(groupBy string) string {
 }
 
 // A. Total Work Time
-func GetWorkTimeSummary(groupBy string) ([]entity.WorkSummary, error) {
+func GetWorkTimeSummary(groupBy string, startDate, endDate string) ([]entity.WorkSummary, error) {
 	groupClause := getGroupByClause(groupBy)
 
 	query := fmt.Sprintf(`
@@ -28,11 +28,12 @@ func GetWorkTimeSummary(groupBy string) ([]entity.WorkSummary, error) {
             ROUND(SUM((julianday(end_time) - julianday(start_time)) * 24), 2) AS total_hours
         FROM worklog
         WHERE is_pause = 0
+        AND datetime(start_time) >= datetime(?) AND datetime(start_time) <= datetime(?)
         GROUP BY period
         ORDER BY period DESC;
     `, groupClause)
 
-	rows, err := DB.Query(query)
+	rows, err := DB.Query(query, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %v", err)
 	}
@@ -51,7 +52,7 @@ func GetWorkTimeSummary(groupBy string) ([]entity.WorkSummary, error) {
 }
 
 // B. Total Idle Time
-func GetIdleTimeSummary(groupBy string) ([]entity.IdleSummary, error) {
+func GetIdleTimeSummary(groupBy string, startDate, endDate string) ([]entity.IdleSummary, error) {
 	groupClause := getGroupByClause(groupBy)
 
 	query := fmt.Sprintf(`
@@ -59,11 +60,12 @@ func GetIdleTimeSummary(groupBy string) ([]entity.IdleSummary, error) {
             %s AS period,
             ROUND(SUM((julianday(end_time) - julianday(start_time)) * 24), 2) AS idle_hours
         FROM idlelog
+        WHERE datetime(start_time) >= datetime(?) AND datetime(start_time) <= datetime(?)
         GROUP BY period
         ORDER BY period DESC;
     `, groupClause)
 
-	rows, err := DB.Query(query)
+	rows, err := DB.Query(query, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %v", err)
 	}
@@ -82,7 +84,7 @@ func GetIdleTimeSummary(groupBy string) ([]entity.IdleSummary, error) {
 }
 
 // C. Time Spent per Project
-func GetProjectTimeSummary(groupBy string) ([]entity.ProjectSummary, error) {
+func GetProjectTimeSummary(groupBy string, startDate, endDate string) ([]entity.ProjectSummary, error) {
 	groupClause := getGroupByClause(groupBy)
 
 	query := fmt.Sprintf(`
@@ -92,11 +94,12 @@ func GetProjectTimeSummary(groupBy string) ([]entity.ProjectSummary, error) {
             ROUND(SUM((julianday(t.end_time) - julianday(t.start_time)) * 24), 2) AS hours_spent
         FROM timelog t
         LEFT JOIN project p ON p.project_id = t.project_id
+        WHERE datetime(t.start_time) >= datetime(?) AND datetime(t.start_time) <= datetime(?)
         GROUP BY p.name, period
         ORDER BY period DESC, hours_spent DESC;
     `, groupClause)
 
-	rows, err := DB.Query(query)
+	rows, err := DB.Query(query, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %v", err)
 	}
@@ -115,7 +118,7 @@ func GetProjectTimeSummary(groupBy string) ([]entity.ProjectSummary, error) {
 }
 
 // D. Time Spent per Task
-func GetTaskTimeSummary(groupBy string) ([]entity.TaskSummary, error) {
+func GetTaskTimeSummary(groupBy string, startDate, endDate string) ([]entity.TaskSummary, error) {
 	groupClause := getGroupByClause(groupBy)
 
 	query := fmt.Sprintf(`
@@ -127,11 +130,12 @@ func GetTaskTimeSummary(groupBy string) ([]entity.TaskSummary, error) {
         FROM timelog t
         LEFT JOIN task tk ON tk.task_id = t.task_id
         LEFT JOIN project p ON p.project_id = t.project_id
+        WHERE datetime(t.start_time) >= datetime(?) AND datetime(t.start_time) <= datetime(?)
         GROUP BY tk.name, p.name, period
         ORDER BY period DESC, hours_spent DESC;
     `, groupClause)
 
-	rows, err := DB.Query(query)
+	rows, err := DB.Query(query, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %v", err)
 	}
@@ -150,7 +154,7 @@ func GetTaskTimeSummary(groupBy string) ([]entity.TaskSummary, error) {
 }
 
 // E. Productivity Percentage Per Day
-func GetProductivitySummary(groupBy string) ([]entity.ProductivitySummary, error) {
+func GetProductivitySummary(groupBy string, startDate, endDate string) ([]entity.ProductivitySummary, error) {
 	groupClause := getGroupByClause(groupBy)
 
 	query := fmt.Sprintf(`
@@ -159,12 +163,14 @@ func GetProductivitySummary(groupBy string) ([]entity.ProductivitySummary, error
                    SUM((julianday(end_time) - julianday(start_time)) * 24) AS total_hours
             FROM worklog
             WHERE is_pause = 0
+            AND datetime(start_time) >= datetime(?) AND datetime(start_time) <= datetime(?)
             GROUP BY period
         ),
         idle AS (
             SELECT %s AS period,
                    SUM((julianday(end_time) - julianday(start_time)) * 24) AS idle_hours
             FROM idlelog
+            WHERE datetime(start_time) >= datetime(?) AND datetime(start_time) <= datetime(?)
             GROUP BY period
         )
         SELECT 
@@ -175,7 +181,7 @@ func GetProductivitySummary(groupBy string) ([]entity.ProductivitySummary, error
         ORDER BY work.period DESC;
     `, groupClause, groupClause)
 
-	rows, err := DB.Query(query)
+	rows, err := DB.Query(query, startDate, endDate, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %v", err)
 	}
@@ -194,16 +200,17 @@ func GetProductivitySummary(groupBy string) ([]entity.ProductivitySummary, error
 }
 
 // F. Peak Productivity Hours
-func GetPeakProductivityHours() ([]entity.PeakHourSummary, error) {
+func GetPeakProductivityHours(startDate, endDate string) ([]entity.PeakHourSummary, error) {
 	query := `
         SELECT 
             STRFTIME('%H', start_time) AS hour,
             ROUND(SUM((julianday(end_time) - julianday(start_time)) * 24), 2) AS hours_spent
         FROM timelog
+        WHERE datetime(start_time) >= datetime(?) AND datetime(start_time) <= datetime(?)
         GROUP BY hour
         ORDER BY hours_spent DESC;
     `
-	rows, err := DB.Query(query)
+	rows, err := DB.Query(query, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("query failed: %v", err)
 	}
