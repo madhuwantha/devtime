@@ -26,41 +26,39 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
       onClick={onToggleExpand}
     >
       {/* Project Header */}
-      <div className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className={`
-              w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold
-              ${isExpanded
-                ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-500/25'
-                : 'bg-gradient-to-r from-slate-600 to-slate-700 text-slate-300 group-hover:from-slate-500 group-hover:to-slate-600'
-              }
-            `}>
-              {project.Name.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h3 className={`
-                text-xl font-semibold transition-colors duration-300
-                ${isExpanded ? 'text-cyan-300' : 'text-slate-100'}
-              `}>
-                {project.Name}
-              </h3>
-              <p className="text-slate-400 text-sm">Project ID: {project.ProjectId}</p>
-            </div>
-          </div>
-          
-          {/* Expand/Collapse Indicator */}
+      <div className="px-2 py-1 flex items-center justify-between">
+        <div className="flex items-center gap-3 flex-1 mr-3">
           <div className={`
-            w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
-            ${isExpanded 
-              ? 'bg-cyan-500/20 text-cyan-400 rotate-180' 
-              : 'bg-slate-600/50 text-slate-400 group-hover:bg-slate-500/50'
+            w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0
+            ${isExpanded
+              ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-500/25'
+              : 'bg-gradient-to-r from-slate-600 to-slate-700 text-slate-300 group-hover:from-slate-500 group-hover:to-slate-600'
             }
           `}>
-            <svg className="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            {project.Name.charAt(0).toUpperCase()}
           </div>
+          <div>
+            <h3 className={`
+              text-base font-medium transition-colors duration-300 truncate
+              ${isExpanded ? 'text-cyan-300' : 'text-slate-100'}
+            `}>
+              {project.Name}
+            </h3>
+            <p className="text-slate-400 text-xs">ID: {project.ProjectId}</p>
+          </div>
+        </div>
+        
+        {/* Expand/Collapse Indicator */}
+        <div className={`
+          w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300
+          ${isExpanded 
+            ? 'bg-cyan-500/20 text-cyan-400 rotate-180' 
+            : 'bg-slate-600/50 text-slate-400 group-hover:bg-slate-500/50'
+          }
+        `}>
+          <svg className="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
       </div>
 
@@ -84,7 +82,7 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
                 </div>
               </div>
               
-              <div className="space-y-3">
+              {/* <div className="space-y-3">
                 <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider">Quick Actions</h4>
                 <div className="flex gap-2">
                   <Button variant="primary" size="sm">
@@ -94,18 +92,18 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
                     View Tasks
                   </Button>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 pt-4 border-t border-white/10">
+            {/* <div className="flex gap-3 pt-4 border-t border-white/10">
               <Button variant="success" className="flex-1">
                 Start Working
               </Button>
               <Button variant="secondary" size="sm">
                 Archive
               </Button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}
