@@ -193,3 +193,17 @@ func PauseTaskTimer(taskId string, a *App) {
 	close(a.taskTimers[taskId].StopChan)
 	// runtime.EventsEmit(a.ctx, "workingTimer:update", "00:00:00")
 }
+
+func (a *App) CreateTask(name string, projectId string) error {
+	// Generate a unique task ID
+	taskId := fmt.Sprintf("TASK_%d", time.Now().Unix())
+
+	task := entity.Task{
+		Name:      name,
+		TaskId:    taskId,
+		ProjectId: projectId,
+	}
+
+	repo.InsertTask(task)
+	return nil
+}

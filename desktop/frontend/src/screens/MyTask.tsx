@@ -4,6 +4,11 @@ import { StartTask, StopTask, GetProjects } from "../../wailsjs/go/main/App";
 import { entity } from "../../wailsjs/go/models";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
+// Direct call to Go function for CreateTask
+const CreateTask = (name: string, projectId: string): Promise<void> => {
+  return (window as any).go.main.App.CreateTask(name, projectId);
+};
+
 export default function MyTask() {
   const [time, setTime] = useState("00:00:01");
   const [taskTimeMap, setTaskTimeMap] = useState<Map<string, string>>(new Map());
@@ -13,6 +18,9 @@ export default function MyTask() {
   const [confirmation, setConfirmation] = useState(false);
   const [projects, setProjects] = useState<entity.Project[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [newTaskName, setNewTaskName] = useState("");
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
 
   useEffect(() => {
     GetProjects()
@@ -25,6 +33,25 @@ export default function MyTask() {
       getTasks(selectedProjectId);
     }
   }, [selectedProjectId]);
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTaskName.trim() || !selectedProjectId) {
+      return;
+    }
+
+    setIsCreatingTask(true);
+    try {
+      await CreateTask(newTaskName.trim(), selectedProjectId);
+      setNewTaskName("");
+      setShowAddTask(false);
+      getTasks(selectedProjectId); // Refresh tasks
+    } catch (error) {
+      console.error("Error creating task:", error);
+    } finally {
+      setIsCreatingTask(false);
+    }
+  };
 
   const startTaskHandle = (task: entity.Task) => {
     setStartingTask(task);
@@ -144,7 +171,59 @@ export default function MyTask() {
             </div>
           </div>
         </div>
+        
+        {/* Add Task Button - Only show when project is selected */}
+        {selectedProjectId && (
+          <button
+            onClick={() => setShowAddTask(!showAddTask)}
+            className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25 flex items-center gap-2"
+          >
+            <span className="text-lg">+</span>
+            Add Task
+          </button>
+        )}
       </div>
+
+      {/* Inline Task Creation Form */}
+      {showAddTask && selectedProjectId && (
+        <div className="mb-4 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+          <form onSubmit={handleCreateTask} className="flex items-center gap-3">
+            <input
+              type="text"
+              value={newTaskName}
+              onChange={(e) => setNewTaskName(e.target.value)}
+              placeholder="Enter task name"
+              className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-sm text-slate-200 rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder-slate-500"
+              required
+              autoFocus
+            />
+            <button
+              type="submit"
+              disabled={isCreatingTask || !newTaskName.trim()}
+              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {isCreatingTask ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Adding...
+                </div>
+              ) : (
+                "Add"
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowAddTask(false);
+                setNewTaskName("");
+              }}
+              className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-slate-200 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105"
+            >
+              Cancel
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Active Task Banner */}
       {activeTask && (

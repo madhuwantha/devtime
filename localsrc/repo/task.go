@@ -55,3 +55,20 @@ func GetTask(taskId string) (entity.Task, error) {
 
 	return task, nil
 }
+
+func InsertTask(task entity.Task) {
+	if localsrc.DB == nil {
+		log.Fatal("DB is not initialized")
+	}
+
+	stmt, err := localsrc.DB.Prepare("INSERT INTO task(name, task_id, project_id) VALUES (?, ?, ?)")
+	if err != nil {
+		log.Fatalf("Prepare failed: %v", err)
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(task.Name, task.TaskId, task.ProjectId)
+	if err != nil {
+		log.Fatalf("Exec failed: %v", err)
+	}
+	log.Printf("Inserted task: %v", task.Name)
+}

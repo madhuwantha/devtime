@@ -6,6 +6,10 @@ export function CreateProject(arg1, arg2) {
   return window['go']['main']['App']['CreateProject'](arg1, arg2);
 }
 
+export function CreateTask(arg1, arg2) {
+  return window['go']['main']['App']['CreateTask'](arg1, arg2);
+}
+
 export function GetActiveTask() {
   return window['go']['main']['App']['GetActiveTask']();
 }

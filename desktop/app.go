@@ -59,13 +59,13 @@ func StopMonitor() {
 func CreateProject(name, code string) error {
 	// Generate a unique project ID (you might want to use UUID or another method)
 	projectId := generateProjectId()
-	
+
 	project := entity.Project{
 		Name:      name,
 		Code:      code,
 		ProjectId: projectId,
 	}
-	
+
 	repo.InsertProject(project)
 	return nil
 }
