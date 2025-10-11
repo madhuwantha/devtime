@@ -23,6 +23,14 @@ components/
 │   └── ActiveTaskBanner.tsx # Active task status banner
 ├── project/              # Project-related components
 │   └── ProjectItem.tsx   # Individual project display component
+├── layout/               # Layout and navigation components
+│   ├── Logo.tsx          # App logo with size variants
+│   ├── WorkControls.tsx  # Work start/stop/pause/resume controls
+│   ├── StatusIndicator.tsx # Work status indicator
+│   ├── TabNavigation.tsx # Tab navigation component
+│   ├── Header.tsx        # Main header component (minimized/full)
+│   ├── MainContent.tsx   # Main content area with tab rendering
+│   └── FloatingElements.tsx # Background floating elements
 └── index.ts              # Central export file
 ```
 
@@ -48,12 +56,21 @@ components/
 - **ActiveTaskBanner**: Status banner for currently active task
 - **ProjectItem**: Complete project display with expand/collapse and actions
 
+### Layout Components
+- **Logo**: App logo component with size variants (sm/lg) and optional time display
+- **WorkControls**: Work session controls (start/stop/pause/resume) with size variants
+- **StatusIndicator**: Visual status indicator showing current work state
+- **TabNavigation**: Tab navigation with active states and hover effects
+- **Header**: Main header component supporting both minimized and full layouts
+- **MainContent**: Main content area that handles tab rendering and layout
+- **FloatingElements**: Background decorative floating elements
+
 ## Usage
 
 Import components from the central index file:
 
 ```typescript
-import { Button, Modal, TaskItem } from '../components';
+import { Button, Modal, TaskItem, Header, MainContent } from '../components';
 ```
 
 ## Benefits

@@ -19,3 +19,12 @@ export { ActiveTaskBanner } from './task/ActiveTaskBanner';
 
 // Project Components
 export { ProjectItem } from './project/ProjectItem';
+
+// Layout Components
+export { Logo } from './layout/Logo';
+export { WorkControls } from './layout/WorkControls';
+export { StatusIndicator } from './layout/StatusIndicator';
+export { TabNavigation } from './layout/TabNavigation';
+export { Header } from './layout/Header';
+export { MainContent } from './layout/MainContent';
+export { FloatingElements } from './layout/FloatingElements';

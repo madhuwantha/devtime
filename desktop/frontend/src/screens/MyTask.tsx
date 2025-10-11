@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useMyTaskList } from "../hooks/useMyTaskList";
+import { useMyTaskList } from "../hooks";
 import { StartTask, StopTask, GetProjects } from "../../wailsjs/go/main/App";
 import { entity } from "../../wailsjs/go/models";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
