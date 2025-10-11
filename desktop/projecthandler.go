@@ -17,7 +17,7 @@ func (a *App) GetProjects() []entity.Project {
 }
 
 func (a *App) CreateProject(name string, code string) error {
-	_, err := repo.InsertProject(entity.Project{Name: name, Code: code})
+	_, err := repo.InsertProject(entity.Project{Name: name, Code: code, ProjectId: generateProjectId()})
 	if err != nil {
 		fmt.Println("Error creating project:", err)
 		return err

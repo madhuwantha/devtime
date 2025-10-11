@@ -8,9 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/madhuwantha/devtime/localsrc"
-	"github.com/madhuwantha/devtime/localsrc/entity"
 	"github.com/madhuwantha/devtime/localsrc/idle"
-	"github.com/madhuwantha/devtime/localsrc/repo"
 )
 
 // App struct
@@ -53,21 +51,6 @@ func StartMonitor(threshold int) {
 
 func StopMonitor() {
 	idle.StopIdleWatcher()
-}
-
-// CreateProject creates a new project
-func CreateProject(name, code string) error {
-	// Generate a unique project ID (you might want to use UUID or another method)
-	projectId := generateProjectId()
-
-	project := entity.Project{
-		Name:      name,
-		Code:      code,
-		ProjectId: projectId,
-	}
-
-	repo.InsertProject(project)
-	return nil
 }
 
 // generateProjectId generates a simple project ID
