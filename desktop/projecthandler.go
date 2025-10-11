@@ -15,3 +15,12 @@ func (a *App) GetProjects() []entity.Project {
 	}
 	return projects
 }
+
+func (a *App) CreateProject(name string, code string) error {
+	_, err := repo.InsertProject(entity.Project{Name: name, Code: code})
+	if err != nil {
+		fmt.Println("Error creating project:", err)
+		return err
+	}
+	return nil
+}

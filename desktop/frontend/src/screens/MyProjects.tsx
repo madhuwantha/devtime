@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
-import { GetProjects } from "../../wailsjs/go/main/App";
+import { CreateProject, GetProjects } from "../../wailsjs/go/main/App";
 import { entity } from "../../wailsjs/go/models";
+
+
+
 
 export default function MyProjects() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [data, setData] = useState<entity.Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    code: ""
+  });
+  const [isCreating, setIsCreating] = useState(false);
 
-  useEffect(() => {
+  const fetchProjects = () => {
     setIsLoading(true);
     GetProjects().then((projects) => {
       console.log("Projects fetched:", projects);
@@ -17,7 +26,38 @@ export default function MyProjects() {
       console.error("Error fetching projects:", error);
       setIsLoading(false);
     });
+  };
+
+  useEffect(() => {
+    fetchProjects();
   }, []);
+
+  const handleCreateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.code.trim()) {
+      return;
+    }
+
+    setIsCreating(true);
+    try {      
+      await CreateProject(formData.name.trim(), formData.code.trim());
+      setFormData({ name: "", code: "" });
+      setShowCreateModal(false);
+      fetchProjects(); // Refresh the projects list
+    } catch (error) {
+      console.error("Error creating project:", error);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   if (isLoading) {
     return (
@@ -55,7 +95,10 @@ export default function MyProjects() {
           <h2 className="text-2xl font-bold text-slate-100 mb-1">My Projects</h2>
           <p className="text-slate-400">Manage and track your development projects</p>
         </div>
-        <button className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25 flex items-center gap-2">
+        <button 
+          onClick={() => setShowCreateModal(true)}
+          className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25 flex items-center gap-2"
+        >
           <span className="text-lg">+</span>
           New Project
         </button>
@@ -182,6 +225,92 @@ export default function MyProjects() {
           </div>
         </div>
       </div>
+
+      {/* Create Project Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-800 border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl relative animate-in fade-in-0 zoom-in-95 duration-300">
+            {/* Close button */}
+            <button
+              onClick={() => setShowCreateModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            {/* Modal Content */}
+            <div className="mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center text-white text-2xl mx-auto mb-4">
+                📁
+              </div>
+              <h2 className="text-2xl font-bold text-slate-100 mb-2 text-center">Create New Project</h2>
+              <p className="text-slate-400 text-center">Add a new project to track your development work</p>
+            </div>
+            
+            {/* Form */}
+            <form onSubmit={handleCreateProject} className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-slate-300 text-sm font-medium mb-2">
+                  Project Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter project name"
+                  className="w-full px-4 py-3 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-sm text-slate-200 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder-slate-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="code" className="block text-slate-300 text-sm font-medium mb-2">
+                  Project Code
+                </label>
+                <input
+                  type="text"
+                  id="code"
+                  name="code"
+                  value={formData.code}
+                  onChange={handleInputChange}
+                  placeholder="Enter project code (e.g., DEV, WEB, API)"
+                  className="w-full px-4 py-3 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-sm text-slate-200 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder-slate-500"
+                  required
+                />
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-6 py-3 bg-slate-600 hover:bg-slate-500 text-slate-200 rounded-xl font-medium transition-all duration-300 transform hover:scale-105"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreating || !formData.name.trim() || !formData.code.trim()}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {isCreating ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Creating...
+                    </div>
+                  ) : (
+                    "Create Project"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

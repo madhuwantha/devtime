@@ -51,15 +51,18 @@ func GetProject(projectId string) (entity.Project, error) {
 	return project, nil
 }
 
-func InsertProject(project entity.Project) {
+func InsertProject(project entity.Project) (bool, error) {
 	stmt, err := localsrc.DB.Prepare("INSERT INTO project (project_id, name, code) VALUES (?, ?, ?)")
 	if err != nil {
-		log.Fatalf("Prepare failed: %v", err)
+		log.Printf("Prepare failed: %v", err)
+		return false, err
 	}
 	defer stmt.Close()
 	_, err = stmt.Exec(project.ProjectId, project.Name, project.Code)
 	if err != nil {
-		log.Fatalf("Exec failed: %v", err)
+		log.Printf("Exec failed: %v", err)
+		return false, err
 	}
 	log.Printf("Project inserted: %s", project.Name)
+	return true, nil
 }

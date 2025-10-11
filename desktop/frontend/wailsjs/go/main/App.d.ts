@@ -3,6 +3,8 @@
 import {entity} from '../models';
 import {main} from '../models';
 
+export function CreateProject(arg1:string,arg2:string):Promise<void>;
+
 export function GetActiveTask():Promise<entity.Task>;
 
 export function GetIdleTimeSummary(arg1:string):Promise<Array<entity.IdleSummary>>;
