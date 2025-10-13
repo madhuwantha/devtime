@@ -22,35 +22,34 @@ func main() {
 
 	devtime := r.Group("/api")
 	{
-		devtime.GET("/logs", func(c *gin.Context) {})
+		// Time tracking endpoints
+		devtime.GET("/logs", api.GetLogs)
 		devtime.POST("/start", api.StartTask)
 		devtime.POST("/stop", api.StopTask)
 
-	}
+		// User endpoints
+		devtime.POST("/users", api.SaveUserInfo)
+		devtime.GET("/users/:userId", api.GetUserInfo)
+		devtime.GET("/users/:userId/projects", api.GetUserProjects)
+		devtime.GET("/users/:userId/tasks", api.GetUserTasks)
 
-	prjects := r.Group("/api/projects")
-	{
-		prjects.POST("/", api.SaveProject)
-		prjects.POST("/:projectId/users/:userId/role/:role/add-user", api.AddUserToProject)
-		prjects.POST("/:projectId/users/:userId/add-user", api.AddUserToProject)
-		prjects.GET("/users/:userId", api.GetUserProjects)
-	}
+		// Project endpoints
+		projects := devtime.Group("/projects")
+		{
+			projects.POST("/", api.SaveProject)
+			devtime.GET("/:projectId", api.GetProject)
+			devtime.POST("/:projectId/users", api.AddUserToProject)
+			devtime.GET("/:projectId/users", api.GetProjectUsers)
+		}
 
-	projectstasks := r.Group("/api/projects/:projectId/tasks")
-	{
-		projectstasks.POST("/", api.SaveTask)
-	}
-
-	tasks := r.Group("/api/tasks")
-	{
-		tasks.POST("/:taskId/users/:userId/role/:role/add-user", api.AddUserToTask)
-		tasks.POST("/:taskId/users/:userId/add-user", api.AddUserToTask)
-		tasks.GET("/users/:userId", api.GetUserTasks)
-	}
-
-	users := r.Group("/api/users")
-	{
-		users.POST("/", api.SaveUserInfo)
+		// Task endpoints
+		tasks := devtime.Group("/tasks")
+		{
+			tasks.POST("/", api.SaveTask)
+			tasks.GET("/:taskId", api.GetTask)
+			tasks.POST("/:taskId/users", api.AddUserToTask)
+			tasks.GET("/:taskId/users", api.GetTaskUsers)
+		}
 	}
 
 	r.Run()

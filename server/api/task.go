@@ -6,49 +6,74 @@ import (
 )
 
 func SaveTask(c *gin.Context) {
-	var task models.Task
-	if err := c.ShouldBindJSON(&task); err != nil {
+	var request struct {
+		Name      string `json:"name" binding:"required"`
+		ProjectId string `json:"projectId" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	projectId := c.Param("projectId")
-	if projectId == "" || projectId == "undefined" {
-		c.JSON(400, gin.H{"error": "Project ID is required"})
-		return
+	task := models.Task{
+		Name: request.Name,
 	}
 
-	id, err := models.InsertTask(task, projectId)
+	id, err := models.InsertTask(task, request.ProjectId)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to insert task", "details": err})
 		return
 	}
 	c.JSON(201, gin.H{"message": "Task inserted successfully!", "id": id})
-
 }
 
 func AddUserToTask(c *gin.Context) {
 	taskId := c.Param("taskId")
-	userId := c.Param("userId")
-	role := c.Param("role")
-
 	if taskId == "" || taskId == "undefined" {
 		c.JSON(400, gin.H{"error": "Task ID is required"})
 		return
 	}
 
-	if userId == "" || userId == "undefined" {
-		c.JSON(400, gin.H{"error": "User ID is required"})
+	var request struct {
+		UserId string `json:"userId" binding:"required"`
+		Role   string `json:"role"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := models.AddUserToTask(taskId, userId, role)
+	err := models.AddUserToTask(taskId, request.UserId, request.Role)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to add user to task", "details": err})
 		return
 	}
 
 	c.JSON(200, gin.H{"message": "User added to task successfully!"})
+}
+
+func GetTask(c *gin.Context) {
+	taskId := c.Param("taskId")
+	if taskId == "" || taskId == "undefined" {
+		c.JSON(400, gin.H{"error": "Task ID is required"})
+		return
+	}
+	// Note: You'll need to implement GetTaskById in models
+	// For now, returning a placeholder response
+	c.JSON(200, gin.H{"message": "GetTask endpoint - implement GetTaskById in models"})
+}
+
+func GetTaskUsers(c *gin.Context) {
+	taskId := c.Param("taskId")
+	if taskId == "" || taskId == "undefined" {
+		c.JSON(400, gin.H{"error": "Task ID is required"})
+		return
+	}
+	// Note: You'll need to implement GetTaskById in models
+	// For now, returning a placeholder response
+	c.JSON(200, gin.H{"message": "GetTaskUsers endpoint - implement GetTaskById in models"})
 }
 
 func GetUserTasks(c *gin.Context) {
@@ -65,5 +90,4 @@ func GetUserTasks(c *gin.Context) {
 		return
 	}
 	c.JSON(200, tasks)
-
 }

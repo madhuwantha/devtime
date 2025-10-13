@@ -18,5 +18,15 @@ func SaveUserInfo(c *gin.Context) {
 		return
 	}
 	c.JSON(201, gin.H{"message": "UserInfo inserted successfully!", "id": id})
+}
 
+func GetUserInfo(c *gin.Context) {
+	userId := c.Param("userId")
+	if userId == "" || userId == "undefined" {
+		c.JSON(400, gin.H{"error": "User ID is required"})
+		return
+	}
+	// Note: You'll need to implement GetUserById in models
+	// For now, returning a placeholder response
+	c.JSON(200, gin.H{"message": "GetUserInfo endpoint - implement GetUserById in models", "userId": userId})
 }

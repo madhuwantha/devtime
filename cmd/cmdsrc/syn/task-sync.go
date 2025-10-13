@@ -13,7 +13,8 @@ import (
 )
 
 func GetServerTasks(userId string) []models.Task {
-	urlPars := []string{API_URL, "/tasks/users/", userId}
+	// Using new RESTful endpoint: GET /api/users/:userId/tasks
+	urlPars := []string{API_URL, "/users/", userId, "/tasks"}
 	url := strings.Join(urlPars, "")
 	resp, err := http.Get(url)
 	if err != nil {

@@ -15,7 +15,8 @@ import (
 const API_URL = "http://localhost:8080/api"
 
 func GetServerProjects() []models.Project {
-	urlPars := []string{API_URL, "/projects/users/", "6887baccee48cf2c844dee92"}
+	// Using new RESTful endpoint: GET /api/users/:userId/projects
+	urlPars := []string{API_URL, "/users/", "6887baccee48cf2c844dee92", "/projects"}
 	url := strings.Join(urlPars, "")
 	resp, err := http.Get(url)
 	if err != nil {

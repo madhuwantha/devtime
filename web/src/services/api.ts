@@ -23,6 +23,11 @@ export const userApi = {
     const response = await api.post('/api/users/', userInfo);
     return response.data;
   },
+
+  getUser: async (userId: string): Promise<UserInfo> => {
+    const response = await api.get(`/api/users/${userId}`);
+    return response.data;
+  },
 };
 
 // Project API
@@ -32,20 +37,30 @@ export const projectApi = {
     return response.data;
   },
 
+  getProject: async (projectId: string): Promise<Project> => {
+    const response = await api.get(`/api/projects/${projectId}`);
+    return response.data;
+  },
+
   addUserToProject: async (
     projectId: string, 
     userId: string, 
     role?: string
   ): Promise<ApiResponse> => {
-    const url = role 
-      ? `/api/projects/${projectId}/users/${userId}/role/${role}/add-user`
-      : `/api/projects/${projectId}/users/${userId}/add-user`;
-    const response = await api.post(url);
+    const response = await api.post(`/api/projects/${projectId}/users`, {
+      userId,
+      role: role || 'MEMBER'
+    });
+    return response.data;
+  },
+
+  getProjectUsers: async (projectId: string): Promise<any[]> => {
+    const response = await api.get(`/api/projects/${projectId}/users`);
     return response.data;
   },
 
   getUserProjects: async (userId: string): Promise<Project[]> => {
-    const response = await api.get(`/api/projects/users/${userId}`);
+    const response = await api.get(`/api/users/${userId}/projects`);
     return response.data;
   },
 };
@@ -53,7 +68,15 @@ export const projectApi = {
 // Task API
 export const taskApi = {
   createTask: async (task: Task, projectId: string): Promise<ApiResponse> => {
-    const response = await api.post(`/api/projects/${projectId}/tasks/`, task);
+    const response = await api.post('/api/tasks/', {
+      name: task.name,
+      projectId: projectId
+    });
+    return response.data;
+  },
+
+  getTask: async (taskId: string): Promise<Task> => {
+    const response = await api.get(`/api/tasks/${taskId}`);
     return response.data;
   },
 
@@ -62,15 +85,20 @@ export const taskApi = {
     userId: string, 
     role?: string
   ): Promise<ApiResponse> => {
-    const url = role 
-      ? `/api/tasks/${taskId}/users/${userId}/role/${role}/add-user`
-      : `/api/tasks/${taskId}/users/${userId}/add-user`;
-    const response = await api.post(url);
+    const response = await api.post(`/api/tasks/${taskId}/users`, {
+      userId,
+      role: role || 'ASSIGNEE'
+    });
+    return response.data;
+  },
+
+  getTaskUsers: async (taskId: string): Promise<any[]> => {
+    const response = await api.get(`/api/tasks/${taskId}/users`);
     return response.data;
   },
 
   getUserTasks: async (userId: string): Promise<Task[]> => {
-    const response = await api.get(`/api/tasks/users/${userId}`);
+    const response = await api.get(`/api/users/${userId}/tasks`);
     return response.data;
   },
 };

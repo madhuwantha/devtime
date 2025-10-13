@@ -39,3 +39,9 @@ func StopTask(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{"message": "Task stop log inserted successfully!"})
 }
+
+func GetLogs(c *gin.Context) {
+	// Note: You'll need to implement GetLogs in models
+	// For now, returning a placeholder response
+	c.JSON(http.StatusOK, gin.H{"message": "GetLogs endpoint - implement GetLogs in models"})
+}
