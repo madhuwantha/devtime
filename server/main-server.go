@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -16,9 +19,21 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 	r := gin.Default()
-	r.Use(cors.Default()) // All origins allowed by default
+
+	// Configure CORS
+	configureCORS(r)
+
 	mongostorage.Connect()
 	mongostorage.SetupGracefulShutdown()
+
+	// Health check endpoint (outside /api group for testing)
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  "ok",
+			"message": "DevTime server is running",
+			"cors":    "enabled",
+		})
+	})
 
 	devtime := r.Group("/api")
 	{
@@ -28,18 +43,21 @@ func main() {
 		devtime.POST("/stop", api.StopTask)
 
 		// User endpoints
-		devtime.POST("/users", api.SaveUserInfo)
-		devtime.GET("/users/:userId", api.GetUserInfo)
-		devtime.GET("/users/:userId/projects", api.GetUserProjects)
-		devtime.GET("/users/:userId/tasks", api.GetUserTasks)
+		users := devtime.Group("/users")
+		{
+			users.POST("/", api.SaveUserInfo)
+			users.GET("/:userId", api.GetUserInfo)
+			users.GET("/:userId/projects", api.GetUserProjects)
+			users.GET("/:userId/tasks", api.GetUserTasks)
+		}
 
 		// Project endpoints
 		projects := devtime.Group("/projects")
 		{
 			projects.POST("/", api.SaveProject)
-			devtime.GET("/:projectId", api.GetProject)
-			devtime.POST("/:projectId/users", api.AddUserToProject)
-			devtime.GET("/:projectId/users", api.GetProjectUsers)
+			projects.GET("/:projectId", api.GetProject)
+			projects.POST("/:projectId/users", api.AddUserToProject)
+			projects.GET("/:projectId/users", api.GetProjectUsers)
 		}
 
 		// Task endpoints
@@ -53,5 +71,66 @@ func main() {
 	}
 
 	r.Run()
+}
 
+// configureCORS sets up CORS middleware with appropriate settings
+func configureCORS(r *gin.Engine) {
+	// Get allowed origins from environment variable or use defaults
+	allowedOriginsStr := os.Getenv("CORS_ALLOWED_ORIGINS")
+	if allowedOriginsStr == "" {
+		// Default origins for development
+		allowedOriginsStr = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173"
+	}
+
+	// Parse comma-separated origins
+	allowedOrigins := strings.Split(allowedOriginsStr, ",")
+	// Trim whitespace from each origin
+	for i, origin := range allowedOrigins {
+		allowedOrigins[i] = strings.TrimSpace(origin)
+	}
+
+	// Get environment (development/production)
+	env := os.Getenv("GIN_MODE")
+	if env == "" {
+		env = "debug" // Default to development
+	}
+
+	var corsConfig cors.Config
+
+	if env == "release" {
+		// Production CORS configuration - more restrictive
+		corsConfig = cors.Config{
+			AllowOrigins:     allowedOrigins,
+			AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+			AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization", "X-Requested-With"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			MaxAge:           12 * time.Hour,
+		}
+	} else {
+		// Development CORS configuration - more permissive
+		corsConfig = cors.Config{
+			AllowAllOrigins:  true,
+			AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+			AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization", "X-Requested-With", "Accept", "Cache-Control"},
+			ExposeHeaders:    []string{"Content-Length", "Content-Type"},
+			AllowCredentials: true,
+			MaxAge:           12 * time.Hour,
+		}
+	}
+
+	r.Use(cors.New(corsConfig))
+
+	// Add a simple middleware to log all requests for debugging
+	r.Use(func(c *gin.Context) {
+		log.Printf("Request: %s %s from origin: %s", c.Request.Method, c.Request.URL.Path, c.Request.Header.Get("Origin"))
+		c.Next()
+	})
+
+	log.Printf("CORS configured for environment: %s", env)
+	if env == "release" {
+		log.Printf("Allowed origins: %v", allowedOrigins)
+	} else {
+		log.Println("CORS: All origins allowed (development mode)")
+	}
 }
