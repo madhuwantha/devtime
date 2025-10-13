@@ -3,21 +3,34 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/madhuwantha/devtime/server/models"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func SaveProject(c *gin.Context) {
-	var project models.Project
-	if err := c.ShouldBindJSON(&project); err != nil {
+	var request struct {
+		Name   string `json:"name" binding:"required"`
+		Code   string `json:"code" binding:"required"`
+		UserId string `json:"userId" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	id, err := models.InsertProject(project)
+
+	project := models.Project{
+		Name:  request.Name,
+		Code:  request.Code,
+		Tasks: []bson.ObjectID{},
+		Users: []models.ProjectUser{},
+	}
+
+	id, err := models.InsertProject(project, request.UserId)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to insert project", "details": err})
 		return
 	}
 	c.JSON(201, gin.H{"message": "Project inserted successfully!", "id": id})
-
 }
 
 func AddUserToProject(c *gin.Context) {

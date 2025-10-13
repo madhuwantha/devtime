@@ -37,8 +37,12 @@ export const userApi = {
 
 // Project API
 export const projectApi = {
-  createProject: async (project: Project): Promise<ApiResponse> => {
-    const response = await api.post('/api/projects/', project);
+  createProject: async (project: Project, userId: string): Promise<ApiResponse> => {
+    const response = await api.post('/api/projects/', {
+      name: project.name,
+      code: project.code,
+      userId: userId
+    });
     return response.data;
   },
 

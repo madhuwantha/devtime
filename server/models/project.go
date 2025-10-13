@@ -23,22 +23,36 @@ type Project struct {
 	Users []ProjectUser   `json:"users" bson:"users"`
 }
 
-func InsertProject(project Project) (string, error) {
+func InsertProject(project Project, ownerUserId string) (string, error) {
 	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.PROJECT_COLLECTION)
+
+	// Convert ownerUserId to ObjectID
+	ownerObjectID, err := bson.ObjectIDFromHex(ownerUserId)
+	if err != nil {
+		log.Printf("Error converting user ID to ObjectID: %v", err)
+		return "", err
+	}
+
 	_project := Project{
 		Name:  project.Name,
 		Code:  project.Code,
 		Tasks: []bson.ObjectID{},
-		Users: []ProjectUser{},
+		Users: []ProjectUser{
+			{
+				UserId: ownerObjectID,
+				Role:   "OWNER",
+			},
+		},
 	}
 
 	res, err := collection.InsertOne(context.TODO(), _project)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error inserting project: %v", err)
+		return "", err
 	}
 	idStr := utils.GetIdStringFromInsertOneResult(res)
 
-	return idStr, err
+	return idStr, nil
 }
 
 func GetProjectByCode(code string) (Project, error) {

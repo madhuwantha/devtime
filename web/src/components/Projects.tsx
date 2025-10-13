@@ -44,8 +44,14 @@ const Projects: React.FC = () => {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!currentUser) {
+      setError('Please select a user before creating a project');
+      return;
+    }
+    
     try {
-      await projectApi.createProject({ ...newProject, tasks: [], users: [] });
+      await projectApi.createProject({ ...newProject, tasks: [], users: [] }, currentUser._id!);
       setNewProject({ name: '', code: '' });
       setShowCreateForm(false);
       fetchProjects();
@@ -115,7 +121,8 @@ const Projects: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowCreateForm(true)}
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
+            disabled={!currentUser}
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Add Project
           </button>
