@@ -6,6 +6,7 @@ import Projects from './components/Projects';
 import Tasks from './components/Tasks';
 import TimeTracking from './components/TimeTracking';
 import UserManagement from './components/UserManagement';
+import CreateUser from './components/CreateUser';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/time-tracking" element={<TimeTracking />} />
           <Route path="/users" element={<UserManagement />} />
+          <Route path="/users/create" element={<CreateUser />} />
         </Routes>
       </Layout>
     </Router>

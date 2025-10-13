@@ -1,32 +1,7 @@
-import React, { useState } from 'react';
-import { userApi } from '../services/api';
-import { UserInfo } from '../types';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const UserManagement: React.FC = () => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newUser, setNewUser] = useState<UserInfo>({ username: '', email: '' });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      setError(null);
-      setSuccess(null);
-      
-      await userApi.createUser(newUser);
-      setNewUser({ username: '', email: '' });
-      setShowCreateForm(false);
-      setSuccess('User created successfully!');
-    } catch (err) {
-      setError('Failed to create user');
-      console.error('Error creating user:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="px-4 py-6 sm:px-0">
@@ -38,106 +13,84 @@ const UserManagement: React.FC = () => {
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button
-            type="button"
-            onClick={() => setShowCreateForm(true)}
+          <Link
+            to="/users/create"
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
           >
-            Add User
-          </button>
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Create User
+          </Link>
         </div>
       </div>
 
-      {error && (
-        <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
+
+      {/* User Management Overview */}
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Quick Actions */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+          <div className="space-y-3">
+            <Link
+              to="/users/create"
+              className="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-900">Create New User</p>
+                <p className="text-sm text-gray-500">Add a new user to the system</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* User Information */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">User Management</h3>
+          <div className="bg-blue-50 rounded-md p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800">Information</h3>
+                <div className="mt-2 text-sm text-blue-700">
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Create users with unique usernames and email addresses</li>
+                    <li>Assign users to projects with different roles</li>
+                    <li>Assign users to tasks with specific responsibilities</li>
+                    <li>Track time and manage user activities</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {success && (
-        <div className="mt-4 bg-green-50 border border-green-200 rounded-md p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-green-800">Success</h3>
-              <div className="mt-2 text-sm text-green-700">
-                <p>{success}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Create User Form */}
-      {showCreateForm && (
-        <div className="mt-6 bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Create New User</h3>
-          <form onSubmit={handleCreateUser} className="space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                value={newUser.username}
-                onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              />
-            </div>
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={() => setShowCreateForm(false)}
-                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                {loading ? 'Creating...' : 'Create User'}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* User Information */}
+      {/* Future Features */}
       <div className="mt-8 bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">User Information</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Future Features</h3>
         <div className="bg-gray-50 rounded-md p-4">
-          <p className="text-sm text-gray-600">
-            This section would typically display a list of users and their information.
-            For now, you can create new users using the form above.
+          <p className="text-sm text-gray-600 mb-3">
+            The following features are planned for future releases:
           </p>
-          <p className="text-sm text-gray-600 mt-2">
-            <strong>Note:</strong> In a production application, you would implement user authentication,
-            user listing, editing, and deletion functionality here.
-          </p>
+          <ul className="text-sm text-gray-600 space-y-1">
+            <li>• User listing and search functionality</li>
+            <li>• User profile editing and management</li>
+            <li>• User authentication and authorization</li>
+            <li>• User activity logs and audit trails</li>
+            <li>• Bulk user operations and CSV import/export</li>
+          </ul>
         </div>
       </div>
     </div>
