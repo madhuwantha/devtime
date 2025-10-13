@@ -7,12 +7,13 @@ export interface UserInfo {
 
 // Project Types
 export interface ProjectUser {
+  _id?: string;
   userId: string;
   role: string;
 }
 
 export interface Project {
-  id?: string;
+  _id?: string;
   name: string;
   code: string;
   tasks: string[];
@@ -21,12 +22,13 @@ export interface Project {
 
 // Task Types
 export interface TaskUser {
+  _id?: string;
   userId: string;
   role: string;
 }
 
 export interface Task {
-  id?: string;
+  _id?: string;
   name: string;
   projectId: string;
   users: TaskUser[];

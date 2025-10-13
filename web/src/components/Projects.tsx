@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { projectApi } from '../services/api';
 import { Project, USER_ROLES } from '../types';
 import { useApp } from '../contexts/AppContext';
+import AddUserToProjectModal from './modals/AddUserToProjectModal';
 
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -9,8 +10,8 @@ const Projects: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newProject, setNewProject] = useState({ name: '', code: '' });
-  const [showAddUserForm, setShowAddUserForm] = useState<string | null>(null);
-  const [addUserData, setAddUserData] = useState({ userId: '', role: USER_ROLES.MEMBER });
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const { currentUser } = useApp();
 
@@ -45,17 +46,18 @@ const Projects: React.FC = () => {
     }
   };
 
-  const handleAddUserToProject = async (projectId: string, e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await projectApi.addUserToProject(projectId, addUserData.userId, addUserData.role);
-      setAddUserData({ userId: '', role: USER_ROLES.MEMBER });
-      setShowAddUserForm(null);
-      fetchProjects();
-    } catch (err) {
-      setError('Failed to add user to project');
-      console.error('Error adding user to project:', err);
-    }
+  const handleOpenAddUserModal = (project: Project) => {
+    setSelectedProject(project);
+    setShowAddUserModal(true);
+  };
+
+  const handleCloseAddUserModal = () => {
+    setShowAddUserModal(false);
+    setSelectedProject(null);
+  };
+
+  const handleUserAdded = () => {
+    fetchProjects(); // Refresh the projects list
   };
 
   if (loading) {
@@ -176,7 +178,7 @@ const Projects: React.FC = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {projects.map((project) => (
-                    <tr key={project.id}>
+                    <tr key={project._id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
@@ -202,7 +204,7 @@ const Projects: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
-                          onClick={() => setShowAddUserForm(project.id || null)}
+                          onClick={() => handleOpenAddUserModal(project)}
                           className="text-blue-600 hover:text-blue-900 mr-3"
                         >
                           Add User
@@ -217,58 +219,13 @@ const Projects: React.FC = () => {
         </div>
       </div>
 
-      {/* Add User to Project Form */}
-      {showAddUserForm && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Add User to Project</h3>
-            <form onSubmit={(e) => handleAddUserToProject(showAddUserForm, e)} className="space-y-4">
-              <div>
-                <label htmlFor="userId" className="block text-sm font-medium text-gray-700">
-                  User ID
-                </label>
-                <input
-                  type="text"
-                  id="userId"
-                  value={addUserData.userId}
-                  onChange={(e) => setAddUserData({ ...addUserData, userId: e.target.value })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                  Role
-                </label>
-                <select
-                  id="role"
-                  value={addUserData.role}
-                  onChange={(e) => setAddUserData({ ...addUserData, role: e.target.value as USER_ROLES })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  <option value={USER_ROLES.MEMBER}>Member</option>
-                  <option value={USER_ROLES.ADMIN}>Admin</option>
-                </select>
-              </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowAddUserForm(null)}
-                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Add User
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Add User to Project Modal */}
+      <AddUserToProjectModal
+        isOpen={showAddUserModal}
+        onClose={handleCloseAddUserModal}
+        project={selectedProject}
+        onUserAdded={handleUserAdded}
+      />
     </div>
   );
 };
