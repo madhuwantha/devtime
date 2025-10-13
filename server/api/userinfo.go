@@ -30,3 +30,18 @@ func GetUserInfo(c *gin.Context) {
 	// For now, returning a placeholder response
 	c.JSON(200, gin.H{"message": "GetUserInfo endpoint - implement GetUserById in models", "userId": userId})
 }
+
+func GetAllUsers(c *gin.Context) {
+	users, err := models.GetAllUsers()
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to get users", "details": err})
+		return
+	}
+
+	// Ensure we always return an array, even if empty
+	if users == nil {
+		users = []models.UserInfo{}
+	}
+
+	c.JSON(200, users)
+}

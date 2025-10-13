@@ -24,6 +24,11 @@ export const userApi = {
     return response.data;
   },
 
+  getAllUsers: async (): Promise<UserInfo[]> => {
+    const response = await api.get('/api/users/');
+    return response.data;
+  },
+
   getUser: async (userId: string): Promise<UserInfo> => {
     const response = await api.get(`/api/users/${userId}`);
     return response.data;

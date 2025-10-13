@@ -46,6 +46,7 @@ func main() {
 		users := devtime.Group("/users")
 		{
 			users.POST("/", api.SaveUserInfo)
+			users.GET("/", api.GetAllUsers)
 			users.GET("/:userId", api.GetUserInfo)
 			users.GET("/:userId/projects", api.GetUserProjects)
 			users.GET("/:userId/tasks", api.GetUserTasks)

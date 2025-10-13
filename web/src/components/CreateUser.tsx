@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { userApi } from '../services/api';
 import { UserInfo } from '../types';
 
-const CreateUser: React.FC = () => {
+interface CreateUserProps {
+  onUserCreated?: () => void;
+}
+
+const CreateUser: React.FC<CreateUserProps> = ({ onUserCreated }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<UserInfo>({
     username: '',
@@ -53,6 +57,11 @@ const CreateUser: React.FC = () => {
         setSuccess(`User created successfully! User ID: ${response.id}`);
         // Reset form
         setFormData({ username: '', email: '' });
+        
+        // Call the callback to refresh user list
+        if (onUserCreated) {
+          onUserCreated();
+        }
         
         // Redirect to users page after 2 seconds
         setTimeout(() => {

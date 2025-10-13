@@ -1,6 +1,6 @@
 // User Types
 export interface UserInfo {
-  id?: string;
+  _id?: string;
   username: string;
   email: string;
 }
