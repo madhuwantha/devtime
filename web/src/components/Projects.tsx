@@ -18,16 +18,25 @@ const Projects: React.FC = () => {
   
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [currentUser]); // Re-fetch when current user changes
 
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const data = await projectApi.getAllProjects();
-      setProjects(data);
+      setError(null);
+      
+      if (currentUser) {
+        // Fetch projects for the current user
+        const data = await projectApi.getUserProjects(currentUser._id!);
+        setProjects(data);
+      } else {
+        // No user selected, show empty list
+        setProjects([]);
+      }
     } catch (err) {
       setError('Failed to fetch projects');
       console.error('Error fetching projects:', err);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -68,13 +77,38 @@ const Projects: React.FC = () => {
     );
   }
 
+  // Show message when no user is selected
+  if (!currentUser) {
+    return (
+      <div className="px-4 py-6 sm:px-0">
+        <div className="text-center">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No User Selected</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            Please select a user from the dropdown in the top navigation bar to view their projects.
+          </p>
+          <div className="mt-6">
+            <div className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Select a user to continue
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-4 py-6 sm:px-0">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Manage your projects and team members.
+            {currentUser ? `Projects for ${currentUser.username}` : 'Manage your projects and team members.'}
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -152,11 +186,34 @@ const Projects: React.FC = () => {
       )}
 
       {/* Projects List */}
-      <div className="mt-8 flex flex-col">
-        <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300">
+      {projects.length === 0 ? (
+        <div className="mt-8 text-center">
+          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No projects found</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {currentUser ? `${currentUser.username} doesn't have any projects yet.` : 'No projects available.'}
+          </p>
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => setShowCreateForm(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Create Project
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-8 flex flex-col">
+          <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+              <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -217,7 +274,8 @@ const Projects: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div>  )}
+      
 
       {/* Add User to Project Modal */}
       <AddUserToProjectModal
