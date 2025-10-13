@@ -1,34 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { userApi } from '../services/api';
-import { UserInfo } from '../types';
+import { useApp } from '../contexts/AppContext';
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<UserInfo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { users, loadingUsers, fetchUsers } = useApp();
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUsers = async () => {
+  const handleRefresh = async () => {
     try {
-      setLoading(true);
       setError(null);
-      const userList = await userApi.getAllUsers();
-      console.log('API Response:', userList, 'Type:', typeof userList, 'Is Array:', Array.isArray(userList));
-      // Ensure we always have an array, even if API returns null/undefined
-      setUsers(Array.isArray(userList) ? userList : []);
+      await fetchUsers();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch users');
       console.error('Error fetching users:', err);
-      // Set empty array on error to prevent null reference
-      setUsers([]);
-    } finally {
-      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   return (
     <div className="px-4 py-6 sm:px-0">
@@ -77,19 +63,19 @@ const UserManagement: React.FC = () => {
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-medium text-gray-900">Users ({users?.length || 0})</h3>
             <button
-              onClick={fetchUsers}
-              disabled={loading}
+              onClick={handleRefresh}
+              disabled={loadingUsers}
               className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              <svg className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-4 h-4 mr-2 ${loadingUsers ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              {loading ? 'Loading...' : 'Refresh'}
+              {loadingUsers ? 'Loading...' : 'Refresh'}
             </button>
           </div>
         </div>
 
-        {loading ? (
+        {loadingUsers ? (
           <div className="px-6 py-8 text-center">
             <div className="inline-flex items-center">
               <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

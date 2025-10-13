@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userApi } from '../services/api';
 import { UserInfo } from '../types';
+import { useApp } from '../contexts/AppContext';
 
-interface CreateUserProps {
-  onUserCreated?: () => void;
-}
-
-const CreateUser: React.FC<CreateUserProps> = ({ onUserCreated }) => {
+const CreateUser: React.FC = () => {
   const navigate = useNavigate();
+  const { fetchUsers } = useApp();
   const [formData, setFormData] = useState<UserInfo>({
     username: '',
     email: ''
@@ -58,10 +56,8 @@ const CreateUser: React.FC<CreateUserProps> = ({ onUserCreated }) => {
         // Reset form
         setFormData({ username: '', email: '' });
         
-        // Call the callback to refresh user list
-        if (onUserCreated) {
-          onUserCreated();
-        }
+        // Refresh the global user list
+        await fetchUsers();
         
         // Redirect to users page after 2 seconds
         setTimeout(() => {
