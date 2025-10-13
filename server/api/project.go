@@ -86,3 +86,12 @@ func GetUserProjects(c *gin.Context) {
 	}
 	c.JSON(200, projects)
 }
+
+func GetAllProjects(c *gin.Context) {
+	projects, err := models.GetAllProjects()
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to get all projects", "details": err})
+		return
+	}
+	c.JSON(200, projects)
+}

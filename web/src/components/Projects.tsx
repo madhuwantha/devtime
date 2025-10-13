@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { projectApi } from '../services/api';
 import { Project, USER_ROLES } from '../types';
+import { useApp } from '../contexts/AppContext';
 
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -11,9 +12,9 @@ const Projects: React.FC = () => {
   const [showAddUserForm, setShowAddUserForm] = useState<string | null>(null);
   const [addUserData, setAddUserData] = useState({ userId: '', role: USER_ROLES.MEMBER });
 
-  // Mock user ID - in a real app, this would come from authentication
-  const userId = '507f1f77bcf86cd799439011';
+  const { currentUser } = useApp();
 
+  
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -21,7 +22,7 @@ const Projects: React.FC = () => {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const data = await projectApi.getUserProjects(userId);
+      const data = await projectApi.getAllProjects();
       setProjects(data);
     } catch (err) {
       setError('Failed to fetch projects');
@@ -34,7 +35,7 @@ const Projects: React.FC = () => {
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await projectApi.createProject(newProject);
+      await projectApi.createProject({ ...newProject, tasks: [], users: [] });
       setNewProject({ name: '', code: '' });
       setShowCreateForm(false);
       fetchProjects();
@@ -242,7 +243,7 @@ const Projects: React.FC = () => {
                 <select
                   id="role"
                   value={addUserData.role}
-                  onChange={(e) => setAddUserData({ ...addUserData, role: e.target.value })}
+                  onChange={(e) => setAddUserData({ ...addUserData, role: e.target.value as USER_ROLES })}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
                   <option value={USER_ROLES.MEMBER}>Member</option>

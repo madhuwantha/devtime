@@ -68,6 +68,11 @@ export const projectApi = {
     const response = await api.get(`/api/users/${userId}/projects`);
     return response.data;
   },
+
+  getAllProjects: async (): Promise<Project[]> => {
+    const response = await api.get('/api/projects/');
+    return response.data;
+  },
 };
 
 // Task API

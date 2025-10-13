@@ -165,3 +165,22 @@ func GetUserProjects(userId string) ([]Project, error) {
 	}
 	return projects, err
 }
+
+func GetAllProjects() ([]Project, error) {
+	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.PROJECT_COLLECTION)
+	filter := bson.M{}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var projects []Project
+	for cursor.Next(context.TODO()) {
+		var project Project
+		err := cursor.Decode(&project)
+		if err != nil {
+			log.Fatal(err)
+		}
+		projects = append(projects, project)
+	}
+	return projects, err
+}
