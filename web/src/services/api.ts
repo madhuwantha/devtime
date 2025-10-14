@@ -84,7 +84,8 @@ export const taskApi = {
   createTask: async (task: Task, projectId: string): Promise<ApiResponse> => {
     const response = await api.post('/api/tasks/', {
       name: task.name,
-      projectId: projectId
+      projectId: projectId,
+      userId: task.userId
     });
     return response.data;
   },

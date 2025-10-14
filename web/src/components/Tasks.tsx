@@ -49,10 +49,16 @@ const Tasks: React.FC = () => {
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentUser) {
+      setError('No user selected');
+      return;
+    }
+    
     try {
       const taskData = {
         name: newTask.name,
         projectId: newTask.projectId,
+        userId: currentUser._id!,
         users: []
       };
       await taskApi.createTask(taskData, newTask.projectId);

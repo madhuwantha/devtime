@@ -31,6 +31,7 @@ export interface Task {
   _id?: string;
   name: string;
   projectId: string;
+  userId?: string;
   users: TaskUser[];
 }
 

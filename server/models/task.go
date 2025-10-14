@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/madhuwantha/devtime/server/mongostorage"
@@ -11,7 +12,7 @@ import (
 )
 
 type TaskUser struct {
-	UserId bson.ObjectID `json:"userId,omitempty" bson:"userId,omitempty"`
+	UserId bson.ObjectID `json:"UserId,omitempty" bson:"UserId,omitempty"`
 	Role   string        `json:"role,omitempty" bson:"role,omitempty"`
 }
 
@@ -22,9 +23,24 @@ type Task struct {
 	Users     []TaskUser    `json:"users" bson:"users"`
 }
 
-func InsertTask(task Task, projectId string) (string, error) {
+func InsertTask(task Task, projectId string, ownerUserId string) (string, error) {
 	task.ProjectID, _ = bson.ObjectIDFromHex(projectId)
-	task.Users = []TaskUser{}
+
+	// Convert ownerUserId to ObjectID
+	ownerObjectID, err := bson.ObjectIDFromHex(ownerUserId)
+	if err != nil {
+		log.Printf("Error converting user ID to ObjectID: %v", err)
+		return "", err
+	}
+
+	// Add the owner as the first user with OWNER role
+	task.Users = []TaskUser{
+		{
+			UserId: ownerObjectID,
+			Role:   taskusertypes.OWNER,
+		},
+	}
+
 	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.TASK_COLLECTION)
 	saved, err := collection.InsertOne(context.TODO(), task)
 	if err != nil {
@@ -65,15 +81,26 @@ func AddUserToTask(taskId string, userId string, role string) error {
 func GetUserTasks(userId string) ([]Task, error) {
 	userObjID, err := bson.ObjectIDFromHex(userId)
 	if err != nil {
-		log.Fatal(err)
+		log.Print("Error converting user ID to ObjectID: ", err)
+		return []Task{}, err
 	}
 	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.TASK_COLLECTION)
 	filter := bson.M{"users.UserId": userObjID}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
-		log.Fatal(err)
+		log.Print("Error getting user tasks: ", err)
+		return []Task{}, err
 	}
 	var tasks []Task
-	err = cursor.All(context.TODO(), &tasks)
+	for cursor.Next(context.TODO()) {
+		var task Task
+		err := cursor.Decode(&task)
+		if err != nil {
+			log.Print("Error decoding task: ", err)
+			continue
+		}
+		fmt.Println(task)
+		tasks = append(tasks, task)
+	}
 	return tasks, err
 }

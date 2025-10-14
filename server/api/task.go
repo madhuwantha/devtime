@@ -9,6 +9,7 @@ func SaveTask(c *gin.Context) {
 	var request struct {
 		Name      string `json:"name" binding:"required"`
 		ProjectId string `json:"projectId" binding:"required"`
+		UserId    string `json:"userId" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -20,7 +21,7 @@ func SaveTask(c *gin.Context) {
 		Name: request.Name,
 	}
 
-	id, err := models.InsertTask(task, request.ProjectId)
+	id, err := models.InsertTask(task, request.ProjectId, request.UserId)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to insert task", "details": err})
 		return
