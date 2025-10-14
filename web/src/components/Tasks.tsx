@@ -10,7 +10,7 @@ const Tasks: React.FC = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTask, setNewTask] = useState({ name: '', projectId: '' });
   const [showAddUserForm, setShowAddUserForm] = useState<string | null>(null);
-  const [addUserData, setAddUserData] = useState({ userId: '', role: TASK_ROLES.ASSIGNEE });
+  const [addUserData, setAddUserData] = useState({ userId: '', role: TASK_ROLES.ASSIGNEE as string });
 
   // Mock user ID - in a real app, this would come from authentication
   const userId = '507f1f77bcf86cd799439011';
@@ -26,11 +26,14 @@ const Tasks: React.FC = () => {
         taskApi.getUserTasks(userId),
         projectApi.getUserProjects(userId)
       ]);
-      setTasks(tasksData);
-      setProjects(projectsData);
+      setTasks(tasksData || []);
+      setProjects(projectsData || []);
     } catch (err) {
       setError('Failed to fetch data');
       console.error('Error fetching data:', err);
+      // Set empty arrays on error to prevent null reference
+      setTasks([]);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -39,7 +42,12 @@ const Tasks: React.FC = () => {
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await taskApi.createTask(newTask, newTask.projectId);
+      const taskData = {
+        name: newTask.name,
+        projectId: newTask.projectId,
+        users: []
+      };
+      await taskApi.createTask(taskData, newTask.projectId);
       setNewTask({ name: '', projectId: '' });
       setShowCreateForm(false);
       fetchData();
@@ -52,8 +60,8 @@ const Tasks: React.FC = () => {
   const handleAddUserToTask = async (taskId: string, e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await taskApi.addUserToTask(taskId, addUserData.userId, addUserData.role);
-      setAddUserData({ userId: '', role: TASK_ROLES.ASSIGNEE });
+      await taskApi.addUserToTask(taskId, addUserData.userId, addUserData.role as any);
+      setAddUserData({ userId: '', role: TASK_ROLES.ASSIGNEE as string });
       setShowAddUserForm(null);
       fetchData();
     } catch (err) {
@@ -63,7 +71,7 @@ const Tasks: React.FC = () => {
   };
 
   const getProjectName = (projectId: string) => {
-    const project = projects.find(p => p.id === projectId);
+    const project = projects.find(p => p._id === projectId);
     return project ? project.name : 'Unknown Project';
   };
 
@@ -138,8 +146,8 @@ const Tasks: React.FC = () => {
                 required
               >
                 <option value="">Select a project</option>
-                {projects.map((project) => (
-                  <option key={project.id} value={project.id}>
+                {projects && projects.map((project) => (
+                  <option key={project._id} value={project._id}>
                     {project.name}
                   </option>
                 ))}
@@ -187,8 +195,8 @@ const Tasks: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {tasks.map((task) => (
-                    <tr key={task.id}>
+                  {tasks && tasks.length > 0 ? tasks.map((task) => (
+                    <tr key={task._id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
@@ -211,14 +219,20 @@ const Tasks: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
-                          onClick={() => setShowAddUserForm(task.id || null)}
+                          onClick={() => setShowAddUserForm(task._id || null)}
                           className="text-blue-600 hover:text-blue-900 mr-3"
                         >
                           Add User
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  )) : (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
+                        No tasks found
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
