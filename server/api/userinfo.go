@@ -45,3 +45,46 @@ func GetAllUsers(c *gin.Context) {
 
 	c.JSON(200, users)
 }
+
+func RegisterUser(c *gin.Context) {
+	var userInfo models.UserInfo
+	if err := c.ShouldBindJSON(&userInfo); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	exists, err := models.IsUserExists(userInfo.Email)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to check if user exists", "details": err})
+		return
+	}
+	if exists {
+		c.JSON(400, gin.H{"error": "User already exists", "email": userInfo.Email})
+		return
+	}
+
+	id, err := models.RegisterUser(userInfo)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to register user", "details": err})
+		return
+	}
+	c.JSON(201, gin.H{"message": "User registered successfully!", "id": id})
+}
+
+func LoginUser(c *gin.Context) {
+	var loginInfo struct {
+		Email    string `json:"email" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&loginInfo); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, err := models.LoginUser(loginInfo.Email, loginInfo.Password)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to login user", "details": err})
+		return
+	}
+	c.JSON(200, gin.H{"message": "User logged in successfully!", "token": token})
+}

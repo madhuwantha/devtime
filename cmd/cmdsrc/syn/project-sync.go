@@ -2,6 +2,7 @@ package syn
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -55,7 +56,9 @@ func InsertLocalProject(project models.Project) {
 
 func SynLocalProjects() {
 	serverProjects := GetServerProjects()
+	fmt.Print("serverProjects: ", serverProjects)
 	localProjects := GetLocalProject()
+	fmt.Print("localProjects: ", localProjects)
 
 	for _, serverProject := range serverProjects {
 		found := false

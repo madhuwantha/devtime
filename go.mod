@@ -11,6 +11,7 @@ require (
 
 require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 )
 

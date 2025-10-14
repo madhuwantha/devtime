@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/madhuwantha/devtime/server/mongostorage"
@@ -14,6 +15,7 @@ type UserInfo struct {
 	ID       bson.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"` // Both JSON and BSON tags
 	Username string        `json:"username"`                           // Proper field mapping
 	Email    string        `json:"email"`                              // Consistent naming
+	Password string        `json:"password"`                           // Consistent naming
 }
 
 func InsertUserInfo(userInfo UserInfo) (string, error) {
@@ -58,4 +60,45 @@ func GetAllUsers() ([]UserInfo, error) {
 
 	log.Printf("GetAllUsers: Found %d users", len(users))
 	return users, nil
+}
+
+func RegisterUser(userInfo UserInfo) (string, error) {
+	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.USER_COLLECTION)
+	userInfo.Password = utils.HashPassword(userInfo.Password)
+	res, err := collection.InsertOne(context.TODO(), userInfo)
+	if err != nil {
+		log.Print("Error registering user: ", err)
+		return "", err
+	}
+	return utils.GetIdStringFromInsertOneResult(res), nil
+}
+
+func IsUserExists(email string) (bool, error) {
+	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.USER_COLLECTION)
+	filter := bson.M{"email": email}
+	var user UserInfo
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+	return user != UserInfo{}, nil
+}
+
+func LoginUser(email string, password string) (string, error) {
+	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.USER_COLLECTION)
+	filter := bson.M{"email": email}
+	var user UserInfo
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	if err != nil {
+		log.Print("Error finding user: ", err)
+		return "", err
+	}
+	if !utils.VerifyPassword(password, user.Password) {
+		return "", errors.New("invalid password")
+	}
+	return utils.GenerateJWT(utils.TokenPayload{
+		ID:    user.ID,
+		Email: user.Email,
+	})
 }
