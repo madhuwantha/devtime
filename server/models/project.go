@@ -163,7 +163,7 @@ func GetUserProjects(userId string) ([]Project, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	filter := bson.M{"users.UserId": objID}
+	filter := bson.M{"users.userId": objID}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		log.Fatal(err)

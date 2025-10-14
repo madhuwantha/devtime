@@ -85,7 +85,7 @@ func GetUserTasks(userId string) ([]Task, error) {
 		return []Task{}, err
 	}
 	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.TASK_COLLECTION)
-	filter := bson.M{"users.UserId": userObjID}
+	filter := bson.M{"users.userId": userObjID}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		log.Print("Error getting user tasks: ", err)
