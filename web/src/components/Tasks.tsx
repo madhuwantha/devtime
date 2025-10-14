@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { taskApi, projectApi } from '../services/api';
 import { Task, Project, TASK_ROLES } from '../types';
+import { useApp } from '../contexts/AppContext';
 
 const Tasks: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -12,19 +13,26 @@ const Tasks: React.FC = () => {
   const [showAddUserForm, setShowAddUserForm] = useState<string | null>(null);
   const [addUserData, setAddUserData] = useState({ userId: '', role: TASK_ROLES.ASSIGNEE as string });
 
-  // Mock user ID - in a real app, this would come from authentication
-  const userId = '507f1f77bcf86cd799439011';
+  const { currentUser } = useApp();
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (currentUser) {
+      fetchData();
+    } else {
+      setTasks([]);
+      setProjects([]);
+      setLoading(false);
+    }
+  }, [currentUser]);
 
   const fetchData = async () => {
+    if (!currentUser) return;
+    
     try {
       setLoading(true);
       const [tasksData, projectsData] = await Promise.all([
-        taskApi.getUserTasks(userId),
-        projectApi.getUserProjects(userId)
+        taskApi.getUserTasks(currentUser._id!),
+        projectApi.getUserProjects(currentUser._id!)
       ]);
       setTasks(tasksData || []);
       setProjects(projectsData || []);
@@ -79,6 +87,17 @@ const Tasks: React.FC = () => {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="px-4 py-6 sm:px-0">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Tasks</h1>
+          <p className="text-gray-600">Please select a user to view and manage tasks.</p>
+        </div>
       </div>
     );
   }
