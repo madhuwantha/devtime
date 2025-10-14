@@ -11,7 +11,7 @@ import (
 )
 
 type ProjectUser struct {
-	UserId bson.ObjectID `json:"UserId,omitempty" bson:"UserId,omitempty"`
+	UserId bson.ObjectID `json:"userId,omitempty" bson:"userId,omitempty"`
 	Role   string        `json:"email"`
 }
 
