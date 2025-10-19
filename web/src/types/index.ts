@@ -5,6 +5,24 @@ export interface UserInfo {
   email: string;
 }
 
+// Authentication Types
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  message: string;
+  token?: string;
+  id?: string;
+}
+
 // Project Types
 export interface ProjectUser {
   _id?: string;

@@ -3,6 +3,10 @@ import { UserInfo } from '../types';
 import { userApi } from '../services/api';
 
 interface AppContextType {
+  // Authentication state
+  isAuthenticated: boolean;
+  authToken: string | null;
+  
   // User state
   currentUser: UserInfo | null;
   setCurrentUser: (user: UserInfo | null) => void;
@@ -16,6 +20,10 @@ interface AppContextType {
   selectUser: (userId: string) => void;
   clearUser: () => void;
   
+  // Authentication functions
+  login: (token: string) => void;
+  logout: () => void;
+  
   // App state
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
@@ -28,6 +36,10 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+  // Authentication state
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   // User state
   const [currentUser, setCurrentUser] = useState<UserInfo | null>(null);
   const [users, setUsers] = useState<UserInfo[]>([]);
@@ -66,9 +78,31 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     localStorage.removeItem('selectedUserId');
   };
 
-  // Load users and restore selected user on mount
+  // Authentication functions
+  const login = (token: string) => {
+    setAuthToken(token);
+    setIsAuthenticated(true);
+    localStorage.setItem('authToken', token);
+  };
+
+  const logout = () => {
+    setAuthToken(null);
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('selectedUserId');
+  };
+
+  // Load users and restore authentication state on mount
   useEffect(() => {
     const initializeApp = async () => {
+      // Check for existing auth token
+      const savedToken = localStorage.getItem('authToken');
+      if (savedToken) {
+        setAuthToken(savedToken);
+        setIsAuthenticated(true);
+      }
+      
       await fetchUsers();
       
       // Restore previously selected user
@@ -95,6 +129,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, [users, currentUser]);
 
   const contextValue: AppContextType = {
+    // Authentication state
+    isAuthenticated,
+    authToken,
+    
     // User state
     currentUser,
     setCurrentUser,
@@ -107,6 +145,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     fetchUsers,
     selectUser,
     clearUser,
+    
+    // Authentication functions
+    login,
+    logout,
     
     // App state
     isLoading,

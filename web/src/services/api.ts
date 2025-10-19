@@ -5,7 +5,10 @@ import {
   Task, 
   DevTimeStartLogRequest, 
   DevTimeStopLogRequest,
-  ApiResponse 
+  ApiResponse,
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -31,6 +34,16 @@ export const userApi = {
 
   getUser: async (userId: string): Promise<UserInfo> => {
     const response = await api.get(`/api/users/${userId}`);
+    return response.data;
+  },
+
+  register: async (registerData: RegisterRequest): Promise<AuthResponse> => {
+    const response = await api.post('/api/users/register', registerData);
+    return response.data;
+  },
+
+  login: async (loginData: LoginRequest): Promise<AuthResponse> => {
+    const response = await api.post('/api/users/login', loginData);
     return response.data;
   },
 };

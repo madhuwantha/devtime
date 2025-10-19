@@ -8,6 +8,7 @@ import (
 	"github.com/madhuwantha/devtime/server/mongostorage"
 	"github.com/madhuwantha/devtime/server/utils"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 // After (fixed):
@@ -77,9 +78,19 @@ func IsUserExists(email string) (bool, error) {
 	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.USER_COLLECTION)
 	filter := bson.M{"email": email}
 	var user UserInfo
-	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+	res := collection.FindOne(context.TODO(), filter)
+
+	if res.Err() == mongo.ErrNoDocuments {
+		return false, nil
+	}
+
+	if res.Err() != nil {
+		log.Println("Error finding user: ", res.Err())
+		return false, res.Err()
+	}
+	err := res.Decode(&user)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error finding user: ", err)
 		return false, err
 	}
 	return user != UserInfo{}, nil
