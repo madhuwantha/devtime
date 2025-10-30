@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { userApi } from '../../services/api';
-import { LoginRequest } from '../../types';
+import { LoginRequest, UserInfo } from '../../types';
+import { useApp } from '../../contexts/AppContext';
 
 interface LoginProps {
   onLoginSuccess: (token: string) => void;
@@ -12,6 +13,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onSwitchToRegister }) => 
     email: '',
     password: ''
   });
+  const { login } = useApp();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,8 +25,11 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onSwitchToRegister }) => 
     try {
       const response = await userApi.login(formData);
       if (response.token) {
-        // Store token in localStorage
+        // Store token and set current user in context without extra API calls
         localStorage.setItem('authToken', response.token);
+        const derivedUsername = formData.email.split('@')[0] || formData.email;
+        const user: UserInfo | null = response.user || null;
+        login(response.token, user??{username: derivedUsername, email: formData.email});
         onLoginSuccess(response.token);
       } else {
         setError('Login failed: No token received');

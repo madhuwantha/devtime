@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { userApi } from '../../services/api';
 import { RegisterRequest } from '../../types';
+import { useApp } from '../../contexts/AppContext';
 
 interface RegisterProps {
   onRegisterSuccess: (token: string) => void;
@@ -13,6 +14,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onSwitchToLogin 
     email: '',
     password: ''
   });
+  const { login } = useApp();
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,8 +41,9 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onSwitchToLogin 
     try {
       const response = await userApi.register(formData);
       if (response.token) {
-        // Store token in localStorage
+        // Store token and set current user in context
         localStorage.setItem('authToken', response.token);
+        login(response.token, { _id: response.id, username: formData.username, email: formData.email });
         onRegisterSuccess(response.token);
       } else {
         setError('Registration failed: No token received');

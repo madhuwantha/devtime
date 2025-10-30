@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserInfo } from '../types';
-import { userApi } from '../services/api';
 
 interface AppContextType {
   // Authentication state
@@ -10,18 +9,12 @@ interface AppContextType {
   // User state
   currentUser: UserInfo | null;
   setCurrentUser: (user: UserInfo | null) => void;
-  users: UserInfo[];
-  setUsers: (users: UserInfo[]) => void;
-  loadingUsers: boolean;
-  setLoadingUsers: (loading: boolean) => void;
   
-  // User management functions
-  fetchUsers: () => Promise<void>;
-  selectUser: (userId: string) => void;
+  // User management functions (reduced; no fetching all users)
   clearUser: () => void;
   
   // Authentication functions
-  login: (token: string) => void;
+  login: (token: string, user?: UserInfo) => void;
   logout: () => void;
   
   // App state
@@ -42,47 +35,25 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   
   // User state
   const [currentUser, setCurrentUser] = useState<UserInfo | null>(null);
-  const [users, setUsers] = useState<UserInfo[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
   
   // App state
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch all users from API
-  const fetchUsers = async () => {
-    try {
-      setLoadingUsers(true);
-      const userList = await userApi.getAllUsers();
-      setUsers(Array.isArray(userList) ? userList : []);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      setUsers([]);
-    } finally {
-      setLoadingUsers(false);
-    }
-  };
-
-  // Select a user by ID
-  const selectUser = (userId: string) => {
-    const user = users.find(u => u._id === userId);
-    if (user) {
-      setCurrentUser(user);
-      // Store selected user in localStorage for persistence
-      localStorage.setItem('selectedUserId', userId);
-    }
-  };
-
   // Clear current user selection
   const clearUser = () => {
     setCurrentUser(null);
-    localStorage.removeItem('selectedUserId');
+    localStorage.removeItem('currentUser');
   };
 
   // Authentication functions
-  const login = (token: string) => {
+  const login = (token: string, user?: UserInfo) => {
     setAuthToken(token);
     setIsAuthenticated(true);
     localStorage.setItem('authToken', token);
+    if (user) {
+      setCurrentUser(user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }
   };
 
   const logout = () => {
@@ -90,10 +61,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setIsAuthenticated(false);
     setCurrentUser(null);
     localStorage.removeItem('authToken');
-    localStorage.removeItem('selectedUserId');
+    localStorage.removeItem('currentUser');
   };
 
-  // Load users and restore authentication state on mount
+  // Restore authentication state and current user on mount
   useEffect(() => {
     const initializeApp = async () => {
       // Check for existing auth token
@@ -102,31 +73,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setAuthToken(savedToken);
         setIsAuthenticated(true);
       }
-      
-      await fetchUsers();
-      
-      // Restore previously selected user
-      const savedUserId = localStorage.getItem('selectedUserId');
-      if (savedUserId) {
-        // Wait a bit for users to be loaded, then select the saved user
-        setTimeout(() => {
-          selectUser(savedUserId);
-        }, 100);
+
+      const savedUserJson = localStorage.getItem('currentUser');
+      if (savedUserJson) {
+        try {
+          const savedUser = JSON.parse(savedUserJson) as UserInfo;
+          setCurrentUser(savedUser);
+        } catch {}
       }
     };
 
     initializeApp();
   }, []);
-
-  // Update current user when users list changes (in case the selected user was updated)
-  useEffect(() => {
-    if (currentUser && users.length > 0) {
-      const updatedUser = users.find(u => u._id === currentUser._id);
-      if (updatedUser) {
-        setCurrentUser(updatedUser);
-      }
-    }
-  }, [users, currentUser]);
 
   const contextValue: AppContextType = {
     // Authentication state
@@ -136,14 +94,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // User state
     currentUser,
     setCurrentUser,
-    users,
-    setUsers,
-    loadingUsers,
-    setLoadingUsers,
     
     // User management functions
-    fetchUsers,
-    selectUser,
     clearUser,
     
     // Authentication functions

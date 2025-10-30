@@ -96,20 +96,25 @@ func IsUserExists(email string) (bool, error) {
 	return user != UserInfo{}, nil
 }
 
-func LoginUser(email string, password string) (string, error) {
+func LoginUser(email string, password string) (string, UserInfo, error) {
 	collection := mongostorage.GetClient().Database(mongostorage.DB).Collection(mongostorage.USER_COLLECTION)
 	filter := bson.M{"email": email}
 	var user UserInfo
 	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		log.Print("Error finding user: ", err)
-		return "", err
+		return "", UserInfo{}, err
 	}
 	if !utils.VerifyPassword(password, user.Password) {
-		return "", errors.New("invalid password")
+		return "", UserInfo{}, errors.New("invalid password")
 	}
-	return utils.GenerateJWT(utils.TokenPayload{
+	jwtToken, err := utils.GenerateJWT(utils.TokenPayload{
 		ID:    user.ID,
 		Email: user.Email,
 	})
+	if err != nil {
+		return "", UserInfo{}, errors.New("error generating JWT")
+	}
+	user.Password = ""
+	return jwtToken, user, nil
 }

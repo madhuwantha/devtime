@@ -81,10 +81,10 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	token, err := models.LoginUser(loginInfo.Email, loginInfo.Password)
+	token, user, err := models.LoginUser(loginInfo.Email, loginInfo.Password)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to login user", "details": err})
 		return
 	}
-	c.JSON(200, gin.H{"message": "User logged in successfully!", "token": token})
+	c.JSON(200, gin.H{"message": "User logged in successfully!", "token": token, "user": user})
 }

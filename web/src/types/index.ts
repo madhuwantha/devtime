@@ -21,6 +21,7 @@ export interface AuthResponse {
   message: string;
   token?: string;
   id?: string;
+  user?: UserInfo | null;
 }
 
 // Project Types
