@@ -16,7 +16,7 @@ const Projects: React.FC = () => {
   const { currentUser } = useApp();
 
   
-  useEffect(() => {
+  useEffect(() => {    
     fetchProjects();
   }, [currentUser]); // Re-fetch when current user changes
 
@@ -26,8 +26,10 @@ const Projects: React.FC = () => {
       setError(null);
       
       if (currentUser) {
+        console.log('currentUser', currentUser);
         // Fetch projects for the current user
         const data = await projectApi.getUserProjects(currentUser._id!);
+        console.log('data', data);
         setProjects(data);
       } else {
         // No user selected, show empty list
@@ -267,12 +269,12 @@ const Projects: React.FC = () => {
                         {project.users.length}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
+                        {/* <button
                           onClick={() => handleOpenAddUserModal(project)}
                           className="text-blue-600 hover:text-blue-900 mr-3"
                         >
                           Add User
-                        </button>
+                        </button> */}
                       </td>
                     </tr>
                   ))}
@@ -285,12 +287,12 @@ const Projects: React.FC = () => {
       
 
       {/* Add User to Project Modal */}
-      <AddUserToProjectModal
+      {/* <AddUserToProjectModal
         isOpen={showAddUserModal}
         onClose={handleCloseAddUserModal}
         project={selectedProject}
         onUserAdded={handleUserAdded}
-      />
+      /> */}
     </div>
   );
 };

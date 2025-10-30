@@ -245,12 +245,12 @@ const Tasks: React.FC = () => {
                         {task.users.length}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
+                        {/* <button
                           onClick={() => handleOpenAddUserModal(task)}
                           className="text-blue-600 hover:text-blue-900 mr-3"
                         >
                           Add User
-                        </button>
+                        </button> */}
                       </td>
                     </tr>
                   )) : (
@@ -268,12 +268,12 @@ const Tasks: React.FC = () => {
       </div>
 
       {/* Add User to Task Modal */}
-      <AddUserToTaskModal
+      {/* <AddUserToTaskModal
         isOpen={showAddUserModal}
         onClose={handleCloseAddUserModal}
         task={selectedTask}
         onUserAdded={handleUserAdded}
-      />
+      /> */}
     </div>
   );
 };
