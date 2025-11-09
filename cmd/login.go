@@ -37,12 +37,22 @@ var loginCmd = &cobra.Command{
 		password = strings.TrimSpace(password)
 		fmt.Println("Logging in with email/username: ", email)
 
-		token, err := cliauth.LoginUser(email, password)
+		token, userInfo, err := cliauth.LoginUser(email, password)
 		if err != nil {
 			fmt.Println("Error logging in: ", err)
 			return
 		}
-		fmt.Println("Logged in successfully with token: ", token)
+		err = cliauth.SaveToken(token)
+		if err != nil {
+			fmt.Println("Error saving token: ", err)
+			return
+		}
+		err = cliauth.SaveUserInfo(userInfo)
+		if err != nil {
+			fmt.Println("Error saving user info: ", err)
+			return
+		}
+		fmt.Println("Logged in successfully as ", userInfo.Username)
 	},
 }
 
