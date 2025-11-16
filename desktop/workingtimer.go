@@ -83,9 +83,9 @@ func StartWorkingTimmer(a *App) {
 				elapsed := time.Since(startTime)
 				formatted := fmt.Sprintf(
 					"%02d:%02d:%02d",
-					int(elapsed.Hours()),
-					int(elapsed.Minutes()),
-					int(elapsed.Seconds()),
+					int(elapsed.Hours())%24,
+					int(elapsed.Minutes())%60,
+					int(elapsed.Seconds())%60,
 				)
 				runtime.EventsEmit(a.ctx, "workingTimer:update", formatted)
 			}

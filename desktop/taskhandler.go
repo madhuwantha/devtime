@@ -127,6 +127,7 @@ func StartTaskTimer(taskId string, projectId string, a *App) {
 				return
 			case <-time.After(1 * time.Second):
 				elapsed := time.Since(a.taskTimers[taskId].StartTime)
+				fmt.Printf("Elapsed: %v\n", elapsed)
 				formatted := fmt.Sprintf("%02d:%02d:%02d",
 					int(elapsed.Hours())%24,
 					int(elapsed.Minutes())%60,
