@@ -131,7 +131,7 @@ export default function MyProjects() {
 
       {/* Footer Stats */}
       <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div className="flex flex-row justify-around gap-6 text-center">
           <div>
             <div className="text-2xl font-bold text-cyan-400">{data.length}</div>
             <div className="text-slate-400 text-sm">Total Projects</div>

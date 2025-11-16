@@ -181,7 +181,7 @@ export default function MyTask() {
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 h-full">
       {/* Project Selection and Add Task Button */}
       <div className="flex items-center justify-between mb-1">
         <ProjectSelector
@@ -244,7 +244,7 @@ export default function MyTask() {
 
       {/* Footer Stats */}
       <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div className="flex flex-row justify-around gap-6 text-center">
           <div>
             <div className="text-2xl font-bold text-cyan-400">{tasks.length}</div>
             <div className="text-slate-400 text-sm">Total Tasks</div>

@@ -44,16 +44,16 @@ export const MainContent: React.FC<MainContentProps> = ({
   };
 
   return (
-    <main className={`relative z-10 px-3 pb-12 lg:px-12 main-content ${isTabSelected ? 'pt-1' : ''}`}>
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+    <main className={`relative z-10 px-3 pb-1 lg:px-12 main-content ${isTabSelected ? 'pt-1' : ''} flex-1 flex flex-col min-h-0 w-full`}>
+      <div className="w-full h-full flex flex-col">
+        <div className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex-1 flex flex-col min-h-0 w-full">
           <TabNavigation
             tabs={tabs}
             selectedTab={selectedTab}
             onTabSelect={onTabSelect}
           />
           
-          <div className="p-3">
+          <div className="p-3 flex-1 flex flex-col min-h-0 overflow-auto">
             {renderTabContent()}
           </div>
         </div>
