@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GetProjects } from "../../wailsjs/go/main/App";
+import { GetProject, GetProjects, UpdateProjectStatus } from "../../wailsjs/go/main/App";
 import { entity } from "../../wailsjs/go/models";
 import {
   ProjectItem,
@@ -7,6 +7,7 @@ import {
   ProjectCreationForm,
   Button
 } from "../components";
+import { ProjectStatusSelector } from "../components/forms/ProjectStatusSelector";
 
 // Direct call to Go function for CreateProject
 const CreateProject = (name: string, code: string): Promise<void> => {
@@ -23,10 +24,12 @@ export default function MyProjects() {
     code: ""
   });
   const [isCreating, setIsCreating] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('active');
+
 
   const fetchProjects = () => {
     setIsLoading(true);
-    GetProjects().then((projects) => {
+    GetProjects([selectedStatus]).then((projects) => {
       console.log("Projects fetched:", projects);
       setData(projects);
       setIsLoading(false);
@@ -36,9 +39,20 @@ export default function MyProjects() {
     });
   };
 
+  const updateProjectStatus = (projectId: string, status: string) => {
+    UpdateProjectStatus(projectId, status).then((response) => {
+      if (response) {        
+        GetProject(projectId).then((project) => {          
+          setData(prev => prev.map(p => p.ProjectId === projectId ? project : p));
+          setExpandedId(projectId);
+        });        
+      }
+    });
+  };
+
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [selectedStatus]);
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,32 +94,37 @@ export default function MyProjects() {
     );
   }
 
-  if (!data || data.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl mb-4">
-          <span className="text-3xl">📂</span>
-        </div>
-        <h3 className="text-2xl font-semibold text-slate-200 mb-2">No Projects Found</h3>
-        <p className="text-slate-400 mb-6">Start by creating your first project</p>
-        <Button
-          variant="primary"
-          onClick={() => setShowCreateModal(true)}
-        >
-          Create Project
-        </Button>
-      </div>
-    );
-  }
+  // if (!data || data.length === 0) {
+  //   return (
+  //     <div className="text-center py-12">
+  //       <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl mb-4">
+  //         <span className="text-3xl">📂</span>
+  //       </div>
+  //       <h3 className="text-2xl font-semibold text-slate-200 mb-2">No Projects Found</h3>
+  //       <p className="text-slate-400 mb-6">Start by creating your first project</p>
+  //       <Button
+  //         variant="primary"
+  //         onClick={() => setShowCreateModal(true)}
+  //       >
+  //         Create Project
+  //       </Button>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-100 mb-1">My Projects</h2>
-          <p className="text-slate-400">Manage and track your development projects</p>
+          <h2 className="text-2xl font-bold text-slate-100 mb-1">My Projects</h2>          
         </div>
+
+        <ProjectStatusSelector
+          selectedStatus={selectedStatus}
+          onStatusChange={(status: string) => setSelectedStatus(status)}
+        />
+
         <Button
           variant="success"
           onClick={() => setShowCreateModal(true)}
@@ -115,9 +134,25 @@ export default function MyProjects() {
         </Button>
       </div>
 
+      {(!data || data.length === 0) && (
+        <div className="text-center py-12">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl mb-4">
+            <span className="text-3xl">📂</span>
+          </div>
+          <h3 className="text-2xl font-semibold text-slate-200 mb-2">No Projects Found</h3>
+          <p className="text-slate-400 mb-6">Start by creating your first project</p>
+          <Button
+            variant="primary"
+            onClick={() => setShowCreateModal(true)}
+          >
+            Create Project
+          </Button>
+        </div>
+      )}
+
       {/* Projects List */}
       <div className="space-y-3">
-        {data.map((project) => (
+        {data?.map((project) => (
           <ProjectItem
             key={project.ProjectId}
             project={project}
@@ -125,6 +160,7 @@ export default function MyProjects() {
             onToggleExpand={() =>
               setExpandedId(expandedId === project.ProjectId ? null : project.ProjectId)
             }
+            onUpdateProjectStatus={(projectId: string, status: string) => updateProjectStatus(projectId, status)}
           />
         ))}
       </div>
@@ -133,7 +169,7 @@ export default function MyProjects() {
       <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl">
         <div className="flex flex-row justify-around gap-6 text-center">
           <div>
-            <div className="text-2xl font-bold text-cyan-400">{data.length}</div>
+            <div className="text-2xl font-bold text-cyan-400">{data?.length || 0}</div>
             <div className="text-slate-400 text-sm">Total Projects</div>
           </div>
           <div>

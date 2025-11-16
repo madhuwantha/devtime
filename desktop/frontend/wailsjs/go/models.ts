@@ -47,6 +47,7 @@ export namespace entity {
 	    Name: string;
 	    Code: string;
 	    ProjectId: string;
+	    Status: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Project(source);
@@ -58,6 +59,7 @@ export namespace entity {
 	        this.Name = source["Name"];
 	        this.Code = source["Code"];
 	        this.ProjectId = source["ProjectId"];
+	        this.Status = source["Status"];
 	    }
 	}
 	export class ProjectSummary {

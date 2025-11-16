@@ -3,16 +3,33 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { entity } from '../../../wailsjs/go/models';
 
+const projectStatuses = [
+  {
+    value: 'active',
+    label: 'Active'
+  },
+  {
+    value: 'inactive',
+    label: 'Inactive'
+  },
+  {
+    value: 'completed',
+    label: 'Completed'
+  }
+]
+
 interface ProjectItemProps {
   project: entity.Project;
   isExpanded: boolean;
   onToggleExpand: () => void;
+  onUpdateProjectStatus: (projectId: string, status: string) => void
 }
 
 export const ProjectItem: React.FC<ProjectItemProps> = ({
   project,
   isExpanded,
   onToggleExpand,
+  onUpdateProjectStatus,
 }) => {
   return (
     <Card
@@ -80,19 +97,20 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
                     <span className="text-slate-200 font-mono text-sm">{project.ProjectId}</span>
                   </div>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Status:</span>
+                  <span className="text-slate-200 font-medium">{project.Status}</span>
+                </div>                
               </div>
               
-              {/* <div className="space-y-3">
+              <div className="space-y-3">
                 <h4 className="text-slate-300 font-medium text-sm uppercase tracking-wider">Quick Actions</h4>
                 <div className="flex gap-2">
-                  <Button variant="primary" size="sm">
-                    Edit
-                  </Button>
-                  <Button variant="secondary" size="sm">
-                    View Tasks
-                  </Button>
+                  {project.Status !== 'active' && <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => onUpdateProjectStatus(project.ProjectId, 'active')}>Active</Button>}
+                  {project.Status !== 'inactive' && <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => onUpdateProjectStatus(project.ProjectId, 'inactive')}>Inactive</Button>}
+                  {project.Status !== 'completed' && <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => onUpdateProjectStatus(project.ProjectId, 'completed')}>Completed</Button>}
                 </div>
-              </div> */}
+              </div>
             </div>
 
             {/* Action Buttons */}

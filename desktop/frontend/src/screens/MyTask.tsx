@@ -30,7 +30,7 @@ export default function MyTask() {
   const [taskTimeMap, setTaskTimeMap] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
-    GetProjects()
+    GetProjects(['active'])
       .then((projects) => setProjects(projects))
       .catch((error) => console.error("Error fetching projects:", error));
   }, []);

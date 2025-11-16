@@ -46,7 +46,7 @@ func GetServerProjects() []models.Project {
 }
 
 func GetLocalProject() []entity.Project {
-	projects, err := repo.GetProjects()
+	projects, err := repo.GetProjects(&[]string{})
 	if err != nil {
 		log.Printf("%v", err)
 		return []entity.Project{}

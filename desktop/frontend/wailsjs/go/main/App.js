@@ -26,12 +26,16 @@ export function GetProductivitySummary(arg1) {
   return window['go']['main']['App']['GetProductivitySummary'](arg1);
 }
 
+export function GetProject(arg1) {
+  return window['go']['main']['App']['GetProject'](arg1);
+}
+
 export function GetProjectTimeSummary(arg1) {
   return window['go']['main']['App']['GetProjectTimeSummary'](arg1);
 }
 
-export function GetProjects() {
-  return window['go']['main']['App']['GetProjects']();
+export function GetProjects(arg1) {
+  return window['go']['main']['App']['GetProjects'](arg1);
 }
 
 export function GetTaskTimeSummary(arg1) {
@@ -84,4 +88,8 @@ export function StopTask() {
 
 export function StopWork() {
   return window['go']['main']['App']['StopWork']();
+}
+
+export function UpdateProjectStatus(arg1, arg2) {
+  return window['go']['main']['App']['UpdateProjectStatus'](arg1, arg2);
 }

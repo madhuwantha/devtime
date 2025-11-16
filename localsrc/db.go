@@ -3,6 +3,7 @@ package localsrc
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -35,7 +36,8 @@ func InitDB() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		project_id TEXT,
 		name TEXT,
-		code TEXT
+		code TEXT,
+		status TEXT NOT NULL DEFAULT 'active'
 	);
 	CREATE TABLE IF NOT EXISTS task (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,10 +76,15 @@ func InitDB() {
 		ON project (project_id);
 	CREATE UNIQUE INDEX IF NOT EXISTS uidx_task_task_id
 		ON task (task_id);
+	`
 
-
+	alter := `
+	
+	
 
 	`
+
+	createTable = fmt.Sprintf("%s %s", createTable, alter)
 
 	_, err = DB.Exec(createTable)
 	if err != nil {
