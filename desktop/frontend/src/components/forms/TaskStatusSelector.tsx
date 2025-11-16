@@ -1,20 +1,21 @@
 import React from 'react';
 import { Select } from '../ui/Select';
 
-interface ProjectStatusSelectorProps {
+interface TaskStatusSelectorProps {
   selectedStatus: string;
   onStatusChange: (status: string) => void;
 }
 
-export const ProjectStatusSelector: React.FC<ProjectStatusSelectorProps> = ({
+export const TaskStatusSelector: React.FC<TaskStatusSelectorProps> = ({
   selectedStatus,
   onStatusChange,
 }) => {
   const statusOptions = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'in_progress', label: 'In Progress' },
+    { value: 'on_hold', label: 'On Hold' },
     { value: 'completed', label: 'Completed' },
-  ];
+  ];    
 
   return (
     <div className="flex items-center gap-3">

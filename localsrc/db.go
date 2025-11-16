@@ -44,6 +44,7 @@ func InitDB() {
 		name TEXT,		
 		task_id TEXT,
 		project_id TEXT,
+		status TEXT NOT NULL DEFAULT 'pending',
 
 		FOREIGN KEY (project_id) REFERENCES project(project_id)
 	);
@@ -79,7 +80,6 @@ func InitDB() {
 	`
 
 	alter := `
-	
 	
 
 	`

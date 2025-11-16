@@ -11,6 +11,7 @@ interface TaskItemProps {
   onToggleExpand: () => void;
   onStart: () => void;
   onStop: () => void;
+  onUpdateTaskStatus: (taskId: string, status: string) => void;
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({
@@ -21,6 +22,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onToggleExpand,
   onStart,
   onStop,
+  onUpdateTaskStatus,
 }) => {
   return (
     <Card
@@ -113,18 +115,20 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                     <span className="text-slate-400 text-sm">Project ID:</span>
                     <span className="text-slate-200 font-mono text-xs">{task.ProjectId}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Status:</span>
+                    <span className="text-slate-200 font-medium text-sm">{task.Status}</span>
+                  </div>
                 </div>
               </div>
               
               <div className="space-y-2">
                 <h4 className="text-slate-300 font-medium text-xs uppercase tracking-wider">Quick Actions</h4>
                 <div className="flex gap-2">
-                  <Button variant="primary" size="sm">
-                    Edit
-                  </Button>
-                  <Button variant="secondary" size="sm">
-                    View Project
-                  </Button>
+                  {task.Status !== 'completed' && <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => onUpdateTaskStatus(task.TaskId, 'completed')}>Completed</Button>}
+                  {task.Status !== 'in_progress' && <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => onUpdateTaskStatus(task.TaskId, 'in_progress')}>In Progress</Button>}
+                  {task.Status !== 'on_hold' && <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => onUpdateTaskStatus(task.TaskId, 'on_hold')}>On Hold</Button>}
+                  {task.Status !== 'pending' && <Button variant="primary" size="sm" className='cursor-pointer' onClick={() => onUpdateTaskStatus(task.TaskId, 'pending')}>Pending</Button>}
                 </div>
               </div>
             </div>

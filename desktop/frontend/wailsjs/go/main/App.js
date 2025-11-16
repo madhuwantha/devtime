@@ -38,12 +38,16 @@ export function GetProjects(arg1) {
   return window['go']['main']['App']['GetProjects'](arg1);
 }
 
+export function GetTask(arg1) {
+  return window['go']['main']['App']['GetTask'](arg1);
+}
+
 export function GetTaskTimeSummary(arg1) {
   return window['go']['main']['App']['GetTaskTimeSummary'](arg1);
 }
 
-export function GetTasks(arg1) {
-  return window['go']['main']['App']['GetTasks'](arg1);
+export function GetTasks(arg1, arg2) {
+  return window['go']['main']['App']['GetTasks'](arg1, arg2);
 }
 
 export function GetWorkTimeSummary(arg1) {
@@ -92,4 +96,8 @@ export function StopWork() {
 
 export function UpdateProjectStatus(arg1, arg2) {
   return window['go']['main']['App']['UpdateProjectStatus'](arg1, arg2);
+}
+
+export function UpdateTaskStatus(arg1, arg2) {
+  return window['go']['main']['App']['UpdateTaskStatus'](arg1, arg2);
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMyTaskList } from "../hooks";
-import { StartTask, StopTask, GetProjects } from "../../wailsjs/go/main/App";
+import { StartTask, StopTask, GetProjects, UpdateTaskStatus, GetTask } from "../../wailsjs/go/main/App";
 import { entity } from "../../wailsjs/go/models";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 import {
@@ -11,6 +11,7 @@ import {
   ConfirmationModal,
   Button
 } from "../components";
+import { TaskStatusSelector } from "../components/forms/TaskStatusSelector";
 
 // Direct call to Go function for CreateTask
 const CreateTask = (name: string, projectId: string): Promise<void> => {
@@ -20,7 +21,7 @@ const CreateTask = (name: string, projectId: string): Promise<void> => {
 export default function MyTask() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [startingTask, setStartingTask] = useState<entity.Task | null>(null);
-  const { tasks, activeTask, setActiveTask, getTasks } = useMyTaskList();
+  const { tasks, activeTask, setActiveTask, getTasks, setTasks } = useMyTaskList();
   const [confirmation, setConfirmation] = useState(false);
   const [projects, setProjects] = useState<entity.Project[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
@@ -28,6 +29,7 @@ export default function MyTask() {
   const [newTaskName, setNewTaskName] = useState("");
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [taskTimeMap, setTaskTimeMap] = useState<Map<string, string>>(new Map());
+  const [selectedStatus, setSelectedStatus] = useState<string>('pending');
 
   useEffect(() => {
     GetProjects(['active'])
@@ -36,10 +38,10 @@ export default function MyTask() {
   }, []);
 
   useEffect(() => {
-    if (selectedProjectId) {
-      getTasks(selectedProjectId);
+    if (selectedProjectId || selectedStatus) {
+      getTasks(selectedProjectId, []);
     }
-  }, [selectedProjectId]);
+  }, [selectedProjectId, selectedStatus]);
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,6 +119,25 @@ export default function MyTask() {
     });
   };
 
+  const updateTaskStatusHandle = (taskId: string, status: string) => {
+    UpdateTaskStatus(taskId, status).then((response) => {
+      if (response) {
+        GetTask(taskId).then((success) => {
+          setTasks((prev) => {
+            return prev.map((t) => t.TaskId === taskId ? success : t);
+          });
+          setExpandedId(taskId);
+        }).catch((error) => {
+          console.error("Error fetching task:", error);
+        });
+      } else {
+        console.error("Error updating task status:", response);
+      }
+    }).catch((error) => {
+      console.error("Error updating task status:", error);
+    });
+  }
+
   const displayedTasks = selectedProjectId
     ? tasks.filter((t) => t.ProjectId === selectedProjectId)
     : tasks;
@@ -189,6 +210,11 @@ export default function MyTask() {
           selectedProjectId={selectedProjectId}
           onProjectChange={setSelectedProjectId}
         />
+
+        <TaskStatusSelector
+          selectedStatus={selectedStatus}
+          onStatusChange={(status: string) => setSelectedStatus(status)}
+        />
         
         {selectedProjectId && (
           <Button
@@ -238,6 +264,7 @@ export default function MyTask() {
             }
             onStart={() => startTaskHandle(task)}
             onStop={stopTask}
+            onUpdateTaskStatus={(taskId: string, status: string) => updateTaskStatusHandle(taskId, status)}
           />
         ))}
       </div>

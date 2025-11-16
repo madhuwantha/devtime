@@ -13,7 +13,7 @@ export const useMyTaskList = () => {
     getTasks();
   }, [])
 
-  const getTasks = async (projectId?: string) => {
+  const getTasks = async (projectId?: string, statusList?: string[]) => {
     try{
       await getActiveTask();
     }catch (error) {
@@ -22,7 +22,7 @@ export const useMyTaskList = () => {
 
     
     setLoading(true);
-    GetTasks(projectId).then((tasks) => {
+    GetTasks(projectId, statusList).then((tasks) => {
       setTasks(tasks);
     }).catch((error) => {
       console.error("Error fetching projects:", error);
@@ -47,5 +47,5 @@ export const useMyTaskList = () => {
   }
 
 
-  return { tasks, activeTask, loading, setActiveTask, getTasks };
+  return { tasks, activeTask, loading, setActiveTask, getTasks, setTasks };
 }

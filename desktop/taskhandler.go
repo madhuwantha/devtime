@@ -54,13 +54,22 @@ func (a *App) StopTask() bool {
 	return status
 }
 
-func (a *App) GetTasks(projectId *string) []entity.Task {
-	tasks, err := repo.GetTasks(projectId)
+func (a *App) GetTasks(projectId *string, statusList *[]string) []entity.Task {
+	tasks, err := repo.GetTasks(projectId, statusList)
 	if err != nil {
 		fmt.Println("Error fetching tasks:", err)
 		return []entity.Task{}
 	}
 	return tasks
+}
+
+func (a *App) GetTask(taskId string) *entity.Task {
+	task, err := repo.GetTask(taskId)
+	if err != nil {
+		log.Printf("Error fetching task: %v", err)
+		return nil
+	}
+	return &task
 }
 
 func (a *App) PauseTask() bool {
@@ -206,4 +215,13 @@ func (a *App) CreateTask(name string, projectId string) error {
 
 	repo.InsertTask(task)
 	return nil
+}
+
+func (a *App) UpdateTaskStatus(taskId string, status string) bool {
+	_, err := repo.UpdateTaskStatus(taskId, status)
+	if err != nil {
+		log.Printf("Error updating task status: %v", err)
+		return false
+	}
+	return true
 }

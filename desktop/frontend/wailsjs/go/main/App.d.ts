@@ -21,9 +21,11 @@ export function GetProjectTimeSummary(arg1:string):Promise<Array<entity.ProjectS
 
 export function GetProjects(arg1:any):Promise<Array<entity.Project>>;
 
+export function GetTask(arg1:string):Promise<entity.Task>;
+
 export function GetTaskTimeSummary(arg1:string):Promise<Array<entity.TaskSummary>>;
 
-export function GetTasks(arg1:any):Promise<Array<entity.Task>>;
+export function GetTasks(arg1:any,arg2:any):Promise<Array<entity.Task>>;
 
 export function GetWorkTimeSummary(arg1:string):Promise<Array<entity.WorkSummary>>;
 
@@ -48,3 +50,5 @@ export function StopTask():Promise<boolean>;
 export function StopWork():Promise<boolean>;
 
 export function UpdateProjectStatus(arg1:string,arg2:string):Promise<boolean>;
+
+export function UpdateTaskStatus(arg1:string,arg2:string):Promise<boolean>;
