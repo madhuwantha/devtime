@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/madhuwantha/devtime/cmd/cmdsrc/cliauth"
 	"github.com/madhuwantha/devtime/localsrc/entity"
 	"github.com/madhuwantha/devtime/localsrc/repo"
 	"github.com/madhuwantha/devtime/server/models"
@@ -17,21 +18,29 @@ const API_URL = "http://localhost:8080/api"
 
 func GetServerProjects() []models.Project {
 	// Using new RESTful endpoint: GET /api/users/:userId/projects
-	urlPars := []string{API_URL, "/users/", "6887baccee48cf2c844dee92", "/projects"}
+	userInfo, err := cliauth.GetUserInfo()
+	if err != nil {
+		log.Printf("Error getting user info: %v", err)
+		return []models.Project{}
+	}
+	urlPars := []string{API_URL, "/users/", userInfo.ID, "/projects"}
 	url := strings.Join(urlPars, "")
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Error getting projects: %v", err)
+		return []models.Project{}
 	}
 
 	var projects []models.Project = make([]models.Project, 0)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Error unmarshalling projects: %v", err)
+		return []models.Project{}
 	}
 	err = json.Unmarshal(body, &projects)
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Error getting projects: %v", err)
+		return []models.Project{}
 	}
 	return projects
 }

@@ -15,7 +15,7 @@ import (
 const API_URL = "http://localhost:8080/api"
 
 type UserInfo struct {
-	ID       string `json:"id"`
+	ID       string `json:"_id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 }
@@ -49,7 +49,6 @@ func LoginUser(email string, password string) (string, UserInfo, error) {
 		log.Println("Error unmarshalling login response: ", err)
 		return "", UserInfo{}, errors.New("failed to unmarshal login response")
 	}
-
 	return loginResponse.Token, loginResponse.User, nil
 }
 
