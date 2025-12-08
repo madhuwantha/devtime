@@ -13,6 +13,8 @@ export function GetIdleTimeSummary(arg1:string):Promise<Array<entity.IdleSummary
 
 export function GetPeakProductivityHours():Promise<Array<entity.PeakHourSummary>>;
 
+export function GetPipWindowState():Promise<boolean>;
+
 export function GetProductivitySummary(arg1:string):Promise<Array<entity.ProductivitySummary>>;
 
 export function GetProject(arg1:string):Promise<entity.Project>;

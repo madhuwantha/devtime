@@ -8,6 +8,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
 //go:embed all:frontend/dist
@@ -24,9 +25,13 @@ func main() {
 		Title:             "Devtime",
 		Width:             568,
 		Height:            768,
+		MinWidth:          300,
+		MinHeight:         400,
 		BackgroundColour:  &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		StartHidden:       false, // Set to true if you want to start minimized
 		HideWindowOnClose: true,  // Hide instead of quit when window is closed
+		AlwaysOnTop:       false, // Main window should not always be on top
+		Frameless:         false, // Keep window frame for better UX
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
@@ -39,6 +44,12 @@ func main() {
 				Message: "© 2021 Me",
 				Icon:    icon,
 			},
+			// Picture-in-picture window level for macOS
+			WindowIsTranslucent: false,
+		},
+		Windows: &windows.Options{
+			// Windows-specific options for picture-in-picture
+			IsZoomControlEnabled: true,
 		},
 	})
 

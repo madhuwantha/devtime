@@ -88,6 +88,11 @@ func StartWorkingTimmer(a *App) {
 					int(elapsed.Seconds())%60,
 				)
 				runtime.EventsEmit(a.ctx, "workingTimer:update", formatted)
+				// Update PiP window if open
+				if a.pipWindowOpen {
+					htmlContent := a.generatePipHTML(formatted, a.isWorking, a.isPaused)
+					updateNativePipWindowContent(htmlContent)
+				}
 			}
 		}
 	}()
@@ -133,6 +138,11 @@ func ResumeWorkingTimmer(a *App) {
 				)
 
 				runtime.EventsEmit(a.ctx, "workingTimer:update", formatted)
+				// Update PiP window if open
+				if a.pipWindowOpen {
+					htmlContent := a.generatePipHTML(formatted, a.isWorking, a.isPaused)
+					updateNativePipWindowContent(htmlContent)
+				}
 			}
 		}
 	}()

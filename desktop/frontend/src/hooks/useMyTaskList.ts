@@ -14,6 +14,9 @@ export const useMyTaskList = () => {
   }, [])
 
   const getTasks = async (projectId?: string, statusList?: string[]) => {
+    if( projectId == "" || projectId == undefined ){
+      return;
+    }
     try{
       await getActiveTask();
     }catch (error) {
@@ -22,7 +25,7 @@ export const useMyTaskList = () => {
 
     
     setLoading(true);
-    GetTasks(projectId, statusList).then((tasks) => {
+    GetTasks(projectId, statusList??[]).then((tasks) => {
       setTasks(tasks);
     }).catch((error) => {
       console.error("Error fetching projects:", error);

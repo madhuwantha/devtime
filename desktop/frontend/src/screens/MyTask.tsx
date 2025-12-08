@@ -52,6 +52,7 @@ export default function MyTask() {
     setIsCreatingTask(true);
     try {
       await CreateTask(newTaskName.trim(), selectedProjectId);
+      console.log("Task created successfully:", newTaskName.trim(), selectedProjectId);
       setNewTaskName("");
       setShowAddTask(false);
       getTasks(selectedProjectId);

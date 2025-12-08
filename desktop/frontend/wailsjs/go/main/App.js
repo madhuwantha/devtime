@@ -22,6 +22,10 @@ export function GetPeakProductivityHours() {
   return window['go']['main']['App']['GetPeakProductivityHours']();
 }
 
+export function GetPipWindowState() {
+  return window['go']['main']['App']['GetPipWindowState']();
+}
+
 export function GetProductivitySummary(arg1) {
   return window['go']['main']['App']['GetProductivitySummary'](arg1);
 }
