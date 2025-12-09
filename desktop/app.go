@@ -131,6 +131,7 @@ func (a *App) hidePipWindow() {
 
 	hideNativePipWindow()
 	a.pipWindowOpen = false
+	runtime.WindowShow(a.ctx)
 	log.Println("PiP window hidden")
 }
 
