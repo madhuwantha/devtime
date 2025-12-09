@@ -86,8 +86,10 @@ func (a *App) monitorWindowState() {
 			// Show PiP window if minimized, hide if not
 			if isMinimized && !a.pipWindowOpen {
 				a.showPipWindow()
+				log.Println("PiP window shown--------------------------------")
 			} else if !isMinimized && a.pipWindowOpen {
 				a.hidePipWindow()
+				log.Println("PiP window hidden--------------------------------")
 			}
 		}
 	}
@@ -116,7 +118,7 @@ func (a *App) showPipWindow() {
 
 	// Create native PiP window (macOS only for now)
 	createNativePipWindow(htmlContent, 280, 120)
-	
+
 	a.pipWindowOpen = true
 	log.Println("PiP window shown")
 }
@@ -134,11 +136,16 @@ func (a *App) hidePipWindow() {
 
 // generatePipHTML creates the HTML content for the PiP window
 func (a *App) generatePipHTML(timerValue string, isWorking, isPaused bool) string {
-	status := "⏸ Paused"
+	var status string
+	if isPaused {
+		status = "⏸ Paused"
+	} else {
+		status = "▶ Working"
+	}
 	if isWorking {
 		status = "▶ Working"
 	}
-	
+
 	return fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
