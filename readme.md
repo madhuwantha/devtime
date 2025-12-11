@@ -1,176 +1,161 @@
+# DevTime - Developer Time Tracker
 
-#### Build
+A comprehensive time tracking system with CLI, Desktop, Web, and Server components for tracking project time, managing tasks, and synchronizing data.
+
+## Available Tools
+
+### 1. CLI Tool (`devtime`)
+Command-line interface for time tracking with local SQLite storage.
+
+### 2. Desktop App
+Cross-platform desktop application built with Wails (Go + React).
+
+### 3. Web Frontend
+React + TypeScript web application for project and task management.
+
+### 4. Server
+Go backend server with MongoDB for data synchronization and API services.
+
+---
+
+## CLI Tool Features
+
+### Commands
+
+| Command | Description | Usage |
+|---------|-------------|-------|
+| `start` | Start tracking time for a project/task | `devtime start` |
+| `stop` | Stop tracking time | `devtime stop` |
+| `report` | Show summary of time logs | `devtime report` |
+| `syn` | Sync data between local and server | `devtime syn` |
+| `login` | Authenticate with server | `devtime login` |
+| `startWork` | Start the work timer | `devtime startWork` |
+| `stopWork` | Stop the work timer | `devtime stopWork` |
+| `monitor` | Start background idle monitor | `devtime monitor --threshold 10` |
+| `stopMonitor` | Stop background monitor | `devtime stopMonitor` |
+
+### Features
+- Project and task time tracking
+- Local SQLite database storage
+- Server synchronization (Server → Local)
+- Idle time monitoring
+- Interactive prompts for project/task selection
+
+---
+
+## Desktop App Features
+
+### Features
+- **Time Tracking**: Start/stop work timers with pause/resume
+- **Project Management**: Create and manage projects
+- **Task Management**: Create and manage tasks
+- **Analytics**: View time tracking analytics and reports
+- **Picture-in-Picture**: Floating timer window (macOS)
+- **Real-time Updates**: Live timer updates and status indicators
+
+### Screens
+- My Projects - Project management interface
+- My Tasks - Task management interface
+- Analytics - Time tracking analytics and reports
+
+---
+
+## Web Frontend Features
+
+### Features
+- **Dashboard**: Overview of projects, tasks, and time tracking
+- **Project Management**: Create projects, add users with roles (ADMIN, MEMBER)
+- **Task Management**: Create tasks, assign users with roles (OWNER, ASSIGNEE, REVIEWER, WATCHER)
+- **Time Tracking**: Start/stop time tracking for projects and tasks
+- **User Management**: Create and manage user accounts
+
+---
+
+## Server Features
+
+### API Endpoints
+- **Projects**: Create, list, add users to projects
+- **Tasks**: Create, list, assign users to tasks
+- **Users**: User creation and management
+- **Time Tracking**: Start/stop timers, log tracking
+- **Authentication**: JWT-based authentication
+
+---
+
+## How to Run
+
+### Build CLI Tool
 ```bash
- go build -o devtime
+go build -o devtime
 ```
 
-#### Run server
-
+### Run Server
 ```bash
 go run server/main-server.go
 ```
-#### Run desktop server
+Server runs on `http://localhost:8080`
 
+### Run Desktop App
 ```bash
 cd desktop
-```
-
-```bash
 wails dev
 ```
 
+### Run Web Frontend
+```bash
+cd web
+npm install
+npm run dev
+```
+Web app runs on `http://localhost:3000`
+
+**Note**: Ensure the server is running before starting the web frontend.
 
 ---
 
+## Technology Stack
 
-
-# Overview
-
-The CLI tool is called `devtime`. It is a developer time tracker that allows you to track project time, manage logs, and synchronize data between local storage and a server. It uses the Cobra library for command-line parsing and local SQLite for log storage.
-
----
-
-## Main Features & Commands
-
-### 1. `start`
-- **Purpose:** Start tracking time for a project and task.
-- **How it works:**  
-  - Prompts the user to select a project and a task from local data.
-  - Records the current time as the start time for the selected project/task.
-  - Stores this information in local storage.
-- **Usage:**  
-  ```
-  devtime start
-  ```
-
-### 2. `stop`
-- **Purpose:** Stop tracking time for the currently running project/task.
-- **How it works:**  
-  - Records the current time as the stop time for the ongoing time tracking session.
-  - Updates the local log to mark the end of the session.
-- **Usage:**  
-  ```
-  devtime stop
-  ```
-
-### 3. `report`
-- **Purpose:** Show a summary of your time logs.
-- **How it works:**  
-  - Fetches all time logs from local storage.
-  - Displays each log with start time, project, task, and duration.
-  - Shows the total time tracked.
-  - Indicates if a session is still running.
-- **Usage:**  
-  ```
-  devtime report
-  ```
-
-### 4. `syn`
-
-#### Purpose
-The `syn` command is used to synchronize data between the local SQLite database and the remote server. It currently supports syncing projects and tasks from the server to the local database.
+- **CLI**: Go, Cobra, SQLite
+- **Desktop**: Wails v2, Go, React, TypeScript
+- **Web**: React 18, TypeScript, Vite, Tailwind CSS
+- **Server**: Go, MongoDB, JWT
+- **Storage**: SQLite (local), MongoDB (server)
 
 ---
 
-#### How It Works
+## Project Structure
 
-1. **User Prompts**
-   - The user is prompted to select the sync direction:
-     - `"Server -> Local"`
-     - `"Local -> Server"` (not yet implemented)
-   - The user is then prompted to select the data type to sync:
-     - `"Projects"`
-     - `"Tasks"`
-
-2. **Sync Strategy Selection**
-   - Based on the user's choices, a sync strategy is selected:
-     - If `"Server -> Local"` and `"Projects"`: syncs projects from server to local.
-     - If `"Server -> Local"` and `"Tasks"`: syncs tasks from server to local.
-     - Other combinations (e.g., `"Local -> Server"`) are not yet implemented.
-
-3. **Sync Execution**
-   - The selected strategy's `RunSync()` method is called, which performs the actual synchronization.
+```
+devtime/
+├── cmd/              # CLI commands
+├── desktop/          # Desktop application
+├── web/              # Web frontend
+├── server/            # Backend server
+├── localsrc/          # Local storage and utilities
+└── main.go           # CLI entry point
+```
 
 ---
 
-#### Implementation Details
+## Quick Start
 
-##### User Prompting (`prompt.go`)
-- Uses `promptui` to interactively ask the user for sync direction and data type.
+1. **Start Server**:
+   ```bash
+   go run server/main-server.go
+   ```
 
-##### Strategy Pattern (`factory.go`, `sync_strategy.go`, `server_to_local.go`)
-- The code uses a strategy pattern to select the appropriate sync logic.
-- `ServerToLocalProjects` and `ServerToLocalTasks` implement the `SyncStrategy` interface.
+2. **Run Desktop App** (in another terminal):
+   ```bash
+   cd desktop && wails dev
+   ```
 
-##### Project Sync (`project-sync.go`)
-- Fetches projects from the server for a hardcoded user.
-- Compares server projects with local projects.
-- Inserts any missing projects from the server into the local database.
+3. **Or Run Web Frontend** (in another terminal):
+   ```bash
+   cd web && npm install && npm run dev
+   ```
 
-##### Task Sync (`task-sync.go`)
-- Fetches tasks from the server for a hardcoded user.
-- Compares server tasks with local tasks.
-- Inserts any missing tasks from the server into the local database.
-
-##### Server-to-Local Strategy (`server_to_local.go`)
-- `ServerToLocalProjects.RunSync()` calls `SynLocalProjects()` and prints a completion message.
-- `ServerToLocalTasks.RunSync()` calls `SynLocalTasks()` and prints a completion message.
-
----
-
-#### Current Limitations
-
-- **Only "Server -> Local" is implemented.** The "Local -> Server" direction is present in code comments but not functional.
-- **User ID is hardcoded** for server requests.
-- **Only "Projects" and "Tasks"** are supported as data types.
-
----
-
-#### Example Flow
-
-1. User runs: `devtime syn`
-2. Prompt: "Select What you want to do?" → User selects "Server -> Local"
-3. Prompt: "Select What you want to sync?" → User selects "Projects"
-4. The tool fetches all projects from the server, compares with local, and inserts any missing ones.
-5. Prints: "Syncing Projects from Server to Local is completed"
-
----
-
-#### Summary Table
-
-| Step                | Description                                                                 |
-|---------------------|-----------------------------------------------------------------------------|
-| Prompt direction    | "Server -> Local" (only this is implemented)                                |
-| Prompt data type    | "Projects" or "Tasks"                                                       |
-| Fetch from server   | Gets all projects/tasks for a hardcoded user                                |
-| Compare & insert    | Adds missing projects/tasks to local DB                                     |
-| Output              | Prints completion message after sync                                        |
-
----
-
-
-
-## Additional Details
-
-- **Global Flags:**  
-  - `--toggle, -t` (currently a placeholder/help flag).
-
-- **Initialization:**  
-  - On startup, the CLI initializes the local database.
-
-- **Extensibility:**  
-  - The CLI is structured to allow easy addition of new commands and flags.
-
----
-
-## Summary Table
-
-| Command   | Description                                 | Key Actions/Prompts                |
-|-----------|---------------------------------------------|------------------------------------|
-| start     | Start tracking time for a project/task      | Project/task selection, start time |
-| stop      | Stop tracking time                          | Stop time, update log              |
-| report    | Show summary of time logs                   | List logs, show durations          |
-| syn       | Sync data between local and server          | Direction/data type prompts        |
-
----
-
+4. **Or Use CLI**:
+   ```bash
+   go build -o devtime
+   ./devtime start
+   ```
