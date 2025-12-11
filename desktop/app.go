@@ -85,11 +85,12 @@ func (a *App) monitorWindowState() {
 
 			// Show PiP window if minimized, hide if not
 			if isMinimized && !a.pipWindowOpen {
-				a.showPipWindow()
-				log.Println("PiP window shown--------------------------------")
+				// a.showPipWindow()
+				// log.Println("PiP window shown--------------------------------")
 			} else if !isMinimized && a.pipWindowOpen {
-				a.hidePipWindow()
-				log.Println("PiP window hidden--------------------------------")
+				// a.hidePipWindow()
+				// runtime.WindowShow(a.ctx)
+				// log.Println("PiP window hidden--------------------------------")
 			}
 		}
 	}
