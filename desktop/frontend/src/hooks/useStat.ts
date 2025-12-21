@@ -10,20 +10,26 @@ export type StatHandler = {
     todayTasks: repo.TodayTask[];
 }
 
-export const useStatHandler = (): StatHandler =>{
+export const useStatHandler = (): StatHandler => {
     const [isLoading, setIsLoading] = useState(true);
     const [todayTasks, setTodayTasks] = useState<repo.TodayTask[]>([]);
 
-    const getTodayTasks = ()=> {
+    const getTodayTasks = () => {
         setIsLoading(true);
-        GetTodayTasks().then((tasks) => {
-            console.log("Today tasks:", tasks);
-            setTodayTasks(tasks);
-        }).catch((error) => {
-            console.error("Error fetching today tasks:", error);
-        }).finally(() => {
-            setIsLoading(false);
-        });
+        GetTodayTasks()
+            .then((tasks) => {
+                console.log("Today tasks:", tasks);
+                if(tasks){
+                    setTodayTasks(tasks);
+                }else{
+                    setTodayTasks([]);
+                }
+            }).catch((error) => {
+                console.error("Error fetching today tasks:", error);
+                setTodayTasks([]);
+            }).finally(() => {
+                setIsLoading(false);
+            });
     }
 
     useEffect(() => {

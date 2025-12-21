@@ -12,5 +12,6 @@ func (a *App) GetTodayTasks() ([]repo.TodayTask, error) {
 		fmt.Println("Error fetching today tasks:", err)
 		return nil, err
 	}
+
 	return tasks, nil
 }

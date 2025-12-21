@@ -16,6 +16,7 @@ type TodayTask struct {
 	ProjectName string
 	StartTime   time.Time
 	EndTime     time.Time
+	IsIdle      bool
 }
 
 func GetTodayTasks() ([]TodayTask, error) {
@@ -24,21 +25,25 @@ func GetTodayTasks() ([]TodayTask, error) {
 		return nil, errors.New("DB is not initialized")
 	}
 
+	today := time.Now().Format("2006-01-02")
+
 	query := `
 	SELECT task.name as task_name, project.name as project_name, datetime(start_time) as start_time, datetime(end_time) as end_time
 	FROM timelog
-	INNER JOIN project on project.id = timelog.id
-	INNER JOIN task on task.id = timelog.id
+	INNER JOIN project on project.project_id = timelog.project_id
+	INNER JOIN task on task.task_id = timelog.task_id
 
-	WHERE date(timelog.start_time) = date('2025-08-03') ORDER BY timelog.id DESC
+	WHERE date(timelog.start_time) = date('%s') ORDER BY timelog.id DESC
 	`
+
+	query = fmt.Sprintf(query, today)
+	log.Printf("Query: %s", query)
 	rows, err := localsrc.DB.Query(query)
 	if err != nil {
 		log.Printf("Query failed: %v", err)
-		return nil, err
 	}
 	defer rows.Close()
-	var tasks []TodayTask
+	var tasks []TodayTask = []TodayTask{}
 	for rows.Next() {
 		var task TodayTask
 		var startTimeStr, endTimeStr string
@@ -53,9 +58,39 @@ func GetTodayTasks() ([]TodayTask, error) {
 			log.Printf("Scan failed: %v", err)
 			continue
 		}
+		task.IsIdle = false
 		tasks = append(tasks, task)
 	}
-	return tasks, nil
+
+	queryIdle := `
+	SELECT datetime(start_time) as start_time, datetime(end_time) as end_time
+	FROM idlelog
+	WHERE date(start_time) = date('%s') ORDER BY id DESC
+	`
+	queryIdle = fmt.Sprintf(queryIdle, today)
+	rowsIdle, err := localsrc.DB.Query(queryIdle)
+	if err != nil {
+		log.Printf("Query failed: %v", err)
+	}
+	defer rowsIdle.Close()
+	for rowsIdle.Next() {
+		var idleLog TodayTask
+		var startTimeStr, endTimeStr string
+		err := rowsIdle.Scan(&startTimeStr, &endTimeStr)
+		if err == nil {
+			idleLog.StartTime, err = time.Parse("2006-01-02 15:04:05", startTimeStr)
+			if err == nil {
+				idleLog.EndTime, err = time.Parse("2006-01-02 15:04:05", endTimeStr)
+			}
+		}
+		if err != nil {
+			log.Printf("Scan failed: %v", err)
+			continue
+		}
+		idleLog.IsIdle = true
+		tasks = append(tasks, idleLog)
+	}
+	return tasks, err
 }
 
 func GetTasks(projectId *string, statusList *[]string) ([]entity.Task, error) {

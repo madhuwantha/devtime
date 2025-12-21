@@ -161,6 +161,7 @@ export namespace repo {
 	    StartTime: any;
 	    // Go type: time
 	    EndTime: any;
+	    IsIdle: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new TodayTask(source);
@@ -172,6 +173,7 @@ export namespace repo {
 	        this.ProjectName = source["ProjectName"];
 	        this.StartTime = this.convertValues(source["StartTime"], null);
 	        this.EndTime = this.convertValues(source["EndTime"], null);
+	        this.IsIdle = source["IsIdle"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
