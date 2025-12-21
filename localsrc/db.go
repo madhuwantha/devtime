@@ -19,11 +19,19 @@ func InitDB() {
 	if dbPath == "" {
 		dbPath = "/Volumes/dIsk_1/PROJECTS/devtime/devtime.db"
 	}
-	DB, err = sql.Open("sqlite3", dbPath)
+	// Configure SQLite connection string with WAL mode and other optimizations for concurrent access
+	// WAL mode allows multiple readers and one writer simultaneously
+	// _busy_timeout sets how long SQLite will wait for locks (in milliseconds)
+	DB, err = sql.Open("sqlite3", dbPath+"?_journal_mode=WAL&_busy_timeout=5000")
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Set connection pool settings for better concurrent access
+	DB.SetMaxOpenConns(1) // SQLite only supports one writer at a time
+	DB.SetMaxIdleConns(1)
+	DB.SetConnMaxLifetime(0) // Connections don't expire
 
 	if err = DB.Ping(); err != nil {
 		log.Fatal(err)

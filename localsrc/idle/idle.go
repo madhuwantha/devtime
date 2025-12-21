@@ -1,11 +1,12 @@
 package idle
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/madhuwantha/devtime/localsrc/repo"
 )
 
 type IdleChecker interface {
@@ -16,14 +17,24 @@ func GetIdleTime() (time.Duration, error) {
 	return getIdleTime()
 }
 
+func IdleStopHandler() {
+	err := repo.UpdateLastIdle()
+	if err != nil {
+		log.Printf("Error updating last idle: %v", err)
+	}
+}
 func IdleHandler() {
 	logMsg := fmt.Sprintf("%s - Inactivity detected. Take action.\n", time.Now().Format(time.RFC3339))
+
+	err := repo.GoIdle(time.Now())
+	if err != nil {
+		log.Printf("Error going idle: %v", err)
+	}
 
 	// Append to log file (create if not exists)
 	f, err := os.OpenFile("/tmp/idle.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Printf("Error opening log file: %v", err)
-		return
 	}
 	defer f.Close()
 
@@ -53,46 +64,5 @@ func WatchIdle(threshold time.Duration, ticker *time.Ticker, onInactivity func()
 		if idle >= threshold {
 			onInactivity()
 		}
-	}
-}
-
-var cancelIdleWatcher context.CancelFunc
-
-func StartIdleWatcher(thresholdSeconds int) {
-	// Stop any existing watcher first
-	StopIdleWatcher()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	cancelIdleWatcher = cancel
-
-	ticker := time.NewTicker(1 * time.Second)
-	go func() {
-		defer ticker.Stop()
-		fmt.Println("Idle watcher started")
-		threshold := time.Duration(thresholdSeconds) * time.Second
-
-		for {
-			select {
-			case <-ctx.Done():
-				fmt.Println("Idle watcher stopped")
-				return
-			case <-ticker.C:
-				idle, err := GetIdleTime()
-				if err != nil {
-					fmt.Println("Error:", err)
-					continue
-				}
-				if idle >= threshold {
-					IdleHandler()
-				}
-			}
-		}
-	}()
-}
-
-func StopIdleWatcher() {
-	if cancelIdleWatcher != nil {
-		cancelIdleWatcher()
-		cancelIdleWatcher = nil
 	}
 }

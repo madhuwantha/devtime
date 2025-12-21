@@ -9,7 +9,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/madhuwantha/devtime/localsrc"
-	"github.com/madhuwantha/devtime/localsrc/idle"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -26,6 +25,7 @@ type App struct {
 	taskMutex     sync.Mutex
 	pipWindowOpen bool
 	monitorChan   chan bool
+	isIdle        bool
 }
 
 // NewApp creates a new App application struct
@@ -34,6 +34,7 @@ func NewApp() *App {
 		timerChan:  make(chan bool),
 		totalBreak: time.Duration(0),
 		taskTimers: make(map[string]*TaskTimer),
+		isIdle:     false,
 	}
 }
 
@@ -53,12 +54,8 @@ func (a *App) startup(ctx context.Context) {
 	go a.monitorWindowState()
 }
 
-func StartMonitor(threshold int) {
-	idle.StartIdleWatcher(threshold)
-}
-
 func StopMonitor() {
-	idle.StopIdleWatcher()
+	StopIdleWatcher()
 }
 
 // generateProjectId generates a simple project ID

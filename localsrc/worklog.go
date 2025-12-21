@@ -103,5 +103,16 @@ func IsWorking() (bool, error) {
 		log.Printf("Failed to find unclosed worklog: %v", err)
 		return false, err
 	}
+
+	// var logcount int
+	// err = DB.QueryRow("SELECT COUNT(1) as logcount FROM worklog").Scan(&logcount)
+	// if err != nil {
+	// 	log.Printf("Failed to find unclosed worklog: %v", err)
+	// 	return false, err
+	// }
+	// if logcount > 0 {
+	// 	return true, nil
+	// }
+
 	return true, nil
 }

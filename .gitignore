@@ -2,3 +2,5 @@ devtime.db
 .env
 devtime
 *bin
+devtime.db-wal
+devtime.db-shm

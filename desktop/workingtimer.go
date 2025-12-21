@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/madhuwantha/devtime/localsrc"
+	"github.com/madhuwantha/devtime/localsrc/idle"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -15,7 +17,7 @@ func (a *App) StartWork() bool {
 		log.Printf("Error starting work: %v", err)
 		return false
 	}
-	StartMonitor(10)
+	StartMonitor(10, a)
 	StartWorkingTimmer(a)
 	return status
 }
@@ -49,7 +51,7 @@ func (a *App) ResumeWork() bool {
 		log.Printf("Error resuming work: %v", err)
 		return false
 	}
-	StartMonitor(10)
+	StartMonitor(10, a)
 	ResumeWorkingTimmer(a)
 	return status
 }
@@ -160,4 +162,57 @@ func PauseWorkingTimmer(a *App) {
 	a.timerChan <- true
 	close(a.timerChan)
 	// runtime.EventsEmit(a.ctx, "workingTimer:update", "00:00:00")
+}
+
+func StartMonitor(threshold int, a *App) {
+	StartIdleWatcher(threshold, a)
+}
+
+var cancelIdleWatcher context.CancelFunc
+
+func StartIdleWatcher(thresholdSeconds int, a *App) {
+	// Stop any existing watcher first
+	StopIdleWatcher()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancelIdleWatcher = cancel
+
+	ticker := time.NewTicker(1 * time.Second)
+	go func() {
+		defer ticker.Stop()
+		fmt.Println("Idle watcher started")
+		threshold := time.Duration(thresholdSeconds) * time.Second
+
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("Idle watcher stopped")
+				return
+			case <-ticker.C:
+				idleTime, err := idle.GetIdleTime()
+				if err != nil {
+					fmt.Println("Error:", err)
+					continue
+				}
+				if idleTime >= threshold {
+					if !a.isIdle {
+						a.isIdle = true
+						idle.IdleHandler()
+					}
+				} else {
+					if a.isIdle {
+						a.isIdle = false
+						idle.IdleStopHandler()
+					}
+				}
+			}
+		}
+	}()
+}
+
+func StopIdleWatcher() {
+	if cancelIdleWatcher != nil {
+		cancelIdleWatcher()
+		cancelIdleWatcher = nil
+	}
 }
