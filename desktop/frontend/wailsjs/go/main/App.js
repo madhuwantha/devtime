@@ -54,6 +54,10 @@ export function GetTasks(arg1, arg2) {
   return window['go']['main']['App']['GetTasks'](arg1, arg2);
 }
 
+export function GetTodayTasks() {
+  return window['go']['main']['App']['GetTodayTasks']();
+}
+
 export function GetWorkTimeSummary(arg1) {
   return window['go']['main']['App']['GetWorkTimeSummary'](arg1);
 }

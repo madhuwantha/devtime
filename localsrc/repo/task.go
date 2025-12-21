@@ -5,10 +5,58 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/madhuwantha/devtime/localsrc"
 	"github.com/madhuwantha/devtime/localsrc/entity"
 )
+
+type TodayTask struct {
+	TaskName    string
+	ProjectName string
+	StartTime   time.Time
+	EndTime     time.Time
+}
+
+func GetTodayTasks() ([]TodayTask, error) {
+	if localsrc.DB == nil {
+		log.Println("DB is not initialized")
+		return nil, errors.New("DB is not initialized")
+	}
+
+	query := `
+	SELECT task.name as task_name, project.name as project_name, datetime(start_time) as start_time, datetime(end_time) as end_time
+	FROM timelog
+	INNER JOIN project on project.id = timelog.id
+	INNER JOIN task on task.id = timelog.id
+
+	WHERE date(timelog.start_time) = date('2025-08-03') ORDER BY timelog.id DESC
+	`
+	rows, err := localsrc.DB.Query(query)
+	if err != nil {
+		log.Printf("Query failed: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+	var tasks []TodayTask
+	for rows.Next() {
+		var task TodayTask
+		var startTimeStr, endTimeStr string
+		err := rows.Scan(&task.TaskName, &task.ProjectName, &startTimeStr, &endTimeStr)
+		if err == nil {
+			task.StartTime, err = time.Parse("2006-01-02 15:04:05", startTimeStr)
+			if err == nil {
+				task.EndTime, err = time.Parse("2006-01-02 15:04:05", endTimeStr)
+			}
+		}
+		if err != nil {
+			log.Printf("Scan failed: %v", err)
+			continue
+		}
+		tasks = append(tasks, task)
+	}
+	return tasks, nil
+}
 
 func GetTasks(projectId *string, statusList *[]string) ([]entity.Task, error) {
 	if localsrc.DB == nil {
