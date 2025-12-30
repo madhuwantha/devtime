@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useStatHandler } from '../hooks/useStat';
 import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
 
 export default function Analytics() {
 
@@ -130,6 +131,29 @@ export default function Analytics() {
     setSelectedDate(new Date());
   };
 
+  // Format milliseconds to readable time (hours and minutes)
+  const formatDuration = (milliseconds: number): string => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    
+    if (hours > 0 && minutes > 0) {
+      return `${hours}h ${minutes}m`;
+    } else if (hours > 0) {
+      return `${hours}h`;
+    } else if (minutes > 0) {
+      return `${minutes}m`;
+    } else {
+      return '< 1m';
+    }
+  };
+
+  // Convert Maps to arrays for rendering
+  const taskSummaryArray = Array.from(summary.taskSummary.entries())
+    .sort((a, b) => b[1] - a[1]); // Sort by duration descending
+  const projectSummaryArray = Array.from(summary.projectSummary.entries())
+    .sort((a, b) => b[1] - a[1]); // Sort by duration descending
+
   return (
     <div className="text-center">    
       <div className="flex flex-row items-center justify-center gap-3 mb-1"> 
@@ -239,6 +263,123 @@ export default function Analytics() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Summary Table */}
+      {!isLoading && summary.totalTime > 0 && (
+        <div className="max-w-5xl mx-auto mt-4 px-2">
+          <Card className="p-3 bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-slate-700/50">
+            <div className="overflow-x-auto">
+              {/* Tasks Table */}
+              {taskSummaryArray.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
+                    Tasks Summary
+                  </h3>
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-700/50">
+                        <th className="text-left py-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                          Task
+                        </th>
+                        <th className="text-right py-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                          Duration
+                        </th>
+                        <th className="text-right py-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                          Percentage
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {taskSummaryArray.map(([taskName, duration], index) => {
+                        const percentage = ((duration / summary.totalTime) * 100).toFixed(1);
+                        return (
+                          <tr 
+                            key={taskName} 
+                            className={`border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors ${
+                              index % 2 === 0 ? 'bg-slate-800/30' : ''
+                            }`}
+                          >
+                            <td className="py-2 px-3 text-sm text-slate-300 text-left">
+                              {taskName}
+                            </td>
+                            <td className="py-2 px-3 text-sm text-right font-medium text-cyan-400">
+                              {formatDuration(duration)}
+                            </td>
+                            <td className="py-2 px-3 text-sm text-right text-slate-400">
+                              {percentage}%
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      <tr className="border-t-2 border-cyan-500/50 bg-slate-800/50 font-semibold">
+                        <td className="py-2 px-3 text-sm text-slate-200 text-left">Total</td>
+                        <td className="py-2 px-3 text-sm text-right text-cyan-400">
+                          {formatDuration(summary.totalTime)}
+                        </td>
+                        <td className="py-2 px-3 text-sm text-right text-slate-300">100%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Projects Table */}
+              {projectSummaryArray.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
+                    Projects Summary
+                  </h3>
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-700/50">
+                        <th className="text-left py-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                          Project
+                        </th>
+                        <th className="text-right py-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                          Duration
+                        </th>
+                        <th className="text-right py-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                          Percentage
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {projectSummaryArray.map(([projectName, duration], index) => {
+                        const percentage = ((duration / summary.totalTime) * 100).toFixed(1);
+                        return (
+                          <tr 
+                            key={projectName} 
+                            className={`border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors ${
+                              index % 2 === 0 ? 'bg-slate-800/30' : ''
+                            }`}
+                          >
+                            <td className="py-2 px-3 text-sm text-slate-300 text-left">
+                              {projectName}
+                            </td>
+                            <td className="py-2 px-3 text-sm text-right font-medium text-teal-400">
+                              {formatDuration(duration)}
+                            </td>
+                            <td className="py-2 px-3 text-sm text-right text-slate-400">
+                              {percentage}%
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      <tr className="border-t-2 border-teal-500/50 bg-slate-800/50 font-semibold">
+                        <td className="py-2 px-3 text-sm text-slate-200 text-left">Total</td>
+                        <td className="py-2 px-3 text-sm text-right text-teal-400">
+                          {formatDuration(summary.totalTime)}
+                        </td>
+                        <td className="py-2 px-3 text-sm text-right text-slate-300">100%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </Card>
         </div>
       )}
     </div>
