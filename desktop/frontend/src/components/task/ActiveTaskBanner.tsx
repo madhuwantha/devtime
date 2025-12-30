@@ -12,7 +12,7 @@ export const ActiveTaskBanner: React.FC<ActiveTaskBannerProps> = ({
   onStop,
 }) => {
   return (
-    <div className="p-6 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 rounded-2xl backdrop-blur-sm">
+    <div className="p-6 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 rounded-1xl backdrop-blur-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center text-white text-xl font-bold animate-pulse">

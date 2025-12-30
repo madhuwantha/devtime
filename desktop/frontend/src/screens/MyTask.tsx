@@ -181,7 +181,7 @@ export default function MyTask() {
 
       {/* No Tasks Message */}
       <div className="text-center py-12">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-slate-500 to-slate-600 rounded-2xl mb-4">
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-slate-500 to-slate-600 rounded-1xl mb-4">
           <span className="text-3xl">✅</span>
         </div>
         <h3 className="text-2xl font-semibold text-slate-200 mb-2">No Tasks Found</h3>
@@ -271,7 +271,7 @@ export default function MyTask() {
       </div>
 
       {/* Footer Stats */}
-      <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl">
+      <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-1xl">
         <div className="flex flex-row justify-around gap-6 text-center">
           <div>
             <div className="text-2xl font-bold text-cyan-400">{tasks.length}</div>

@@ -13,7 +13,7 @@ export const Card: React.FC<CardProps> = ({
   onClick,
   hover = true,
 }) => {
-  const baseClasses = 'bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden transition-all duration-300';
+  const baseClasses = 'bg-white/5 backdrop-blur-sm border border-white/10 rounded-1xl overflow-hidden transition-all duration-300';
   const hoverClasses = hover ? 'hover:bg-white/10 hover:border-white/20 hover:shadow-lg' : '';
   const clickableClasses = onClick ? 'cursor-pointer' : '';
 
