@@ -5,8 +5,7 @@ import { Button } from '../components/ui/Button';
 export default function Analytics() {
 
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { isLoading, todayTasks, onDateChange } = useStatHandler();
-
+  const { isLoading, todayTasks, onDateChange, summary } = useStatHandler();
 
   useEffect(() => {
     onDateChange(selectedDate);
