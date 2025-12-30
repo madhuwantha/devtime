@@ -19,13 +19,17 @@ type TodayTask struct {
 	IsIdle      bool
 }
 
-func GetTodayTasks() ([]TodayTask, error) {
+func GetTodayTasks(date *time.Time) ([]TodayTask, error) {
 	if localsrc.DB == nil {
 		log.Println("DB is not initialized")
 		return nil, errors.New("DB is not initialized")
 	}
 
-	today := time.Now().Format("2006-01-02")
+	if date == nil {
+		now := time.Now()
+		date = &now
+	}
+	today := date.Format("2006-01-02")
 
 	query := `
 	SELECT task.name as task_name, project.name as project_name, datetime(start_time) as start_time, datetime(end_time) as end_time

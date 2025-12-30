@@ -3,24 +3,23 @@ import { repo } from "../../wailsjs/go/models";
 import { GetTodayTasks } from "../../wailsjs/go/main/App";
 
 
-
 export type StatHandler = {
     isLoading: boolean;
-    getTodayTasks: () => void;
+    getTodayTasks: (date: Date) => void;
     todayTasks: repo.TodayTask[];
+    onDateChange: (date: Date) => void;
 }
 
 export const useStatHandler = (): StatHandler => {
     const [isLoading, setIsLoading] = useState(true);
     const [todayTasks, setTodayTasks] = useState<repo.TodayTask[]>([]);
-
-    const getTodayTasks = () => {
+    const getTodayTasks = (date: Date) => {
         setIsLoading(true);
-        GetTodayTasks()
+        GetTodayTasks(date)
             .then((tasks) => {
                 console.log("Today tasks:", tasks);
                 if(tasks){
-                    setTodayTasks(tasks);
+                    setTodayTasks(() => [...tasks]);
                 }else{
                     setTodayTasks([]);
                 }
@@ -33,8 +32,13 @@ export const useStatHandler = (): StatHandler => {
     }
 
     useEffect(() => {
-        getTodayTasks();
+        getTodayTasks(new Date());
     }, []);
 
-    return { isLoading, getTodayTasks, todayTasks }
+
+    const onDateChange = (date: Date) => {        
+        getTodayTasks(date);
+    }
+
+    return { isLoading, getTodayTasks, todayTasks, onDateChange }
 }

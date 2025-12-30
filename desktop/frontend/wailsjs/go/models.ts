@@ -157,10 +157,8 @@ export namespace repo {
 	export class TodayTask {
 	    TaskName: string;
 	    ProjectName: string;
-	    // Go type: time
-	    StartTime: any;
-	    // Go type: time
-	    EndTime: any;
+	    StartTime: time.Time;
+	    EndTime: time.Time;
 	    IsIdle: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -171,8 +169,8 @@ export namespace repo {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.TaskName = source["TaskName"];
 	        this.ProjectName = source["ProjectName"];
-	        this.StartTime = this.convertValues(source["StartTime"], null);
-	        this.EndTime = this.convertValues(source["EndTime"], null);
+	        this.StartTime = this.convertValues(source["StartTime"], time.Time);
+	        this.EndTime = this.convertValues(source["EndTime"], time.Time);
 	        this.IsIdle = source["IsIdle"];
 	    }
 	
@@ -193,6 +191,23 @@ export namespace repo {
 		    }
 		    return a;
 		}
+	}
+
+}
+
+export namespace time {
+	
+	export class Time {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new Time(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
+	    }
 	}
 
 }
