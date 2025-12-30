@@ -35,7 +35,7 @@ function App() {
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">
       {/* Minimized Header - Shows when tabs are selected */}
       <Header
-        isVisible={isTabSelected}
+        isVisible={true}
         isWorking={isWorking}
         isPaused={isPaused}
         time={time}
@@ -48,7 +48,7 @@ function App() {
       />
 
       {/* Full Header - Shows when no tabs are selected */}
-      <Header
+      {/* <Header
         isVisible={!isTabSelected}
         isWorking={isWorking}
         isPaused={isPaused}
@@ -58,14 +58,14 @@ function App() {
         onPause={pauseWorking}
         onResume={resumeWorking}
         size="full"
-      />
+      /> */}
 
       {/* Main Content */}
       <MainContent
         tabs={tabs}
         selectedTab={selectedTab}
         onTabSelect={setSelectedTab}
-        isTabSelected={isTabSelected}
+        isTabSelected={true}
       />
 
       {/* Floating Elements */}

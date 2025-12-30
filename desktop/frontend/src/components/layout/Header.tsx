@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
             state === 'exiting' ? 'opacity-0 transform -translate-y-4' : 
             'opacity-100 transform translate-y-0'
           }`}>
-            <div className="px-6 py-4">
+            <div className="px-6 py-2">
               <div className="flex items-center justify-between">
                 <Logo size="sm" showTime={true} time={time} />
                 
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
                     size="sm"
                   />
                   
-                  {onExpand && (
+                  {/* {onExpand && (
                     <Button
                       variant="secondary"
                       size="sm"
@@ -66,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
                     </Button>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
