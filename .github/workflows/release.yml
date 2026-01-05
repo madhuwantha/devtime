@@ -16,16 +16,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [macos-latest]
         include:
-          - os: ubuntu-latest
-            platform: linux
-            arch: amd64
-            ext: ""
-          - os: windows-latest
-            platform: windows
-            arch: amd64
-            ext: ".exe"
+          # - os: ubuntu-latest
+          #   platform: linux
+          #   arch: amd64
+          #   ext: ""
+          # - os: windows-latest
+          #   platform: windows
+          #   arch: amd64
+          #   ext: ".exe"
           - os: macos-latest
             platform: darwin
             arch: amd64
@@ -63,17 +64,17 @@ jobs:
         working-directory: desktop/frontend
         run: npm run build
 
-      - name: Build application (Linux)
-        if: matrix.platform == 'linux'
-        working-directory: desktop
-        run: |
-          wails build -platform linux/amd64 -clean -o ../bin/devtime-linux-amd64
+      # - name: Build application (Linux)
+      #   if: matrix.platform == 'linux'
+      #   working-directory: desktop
+      #   run: |
+      #     wails build -platform linux/amd64 -clean -o ../bin/devtime-linux-amd64
 
-      - name: Build application (Windows)
-        if: matrix.platform == 'windows'
-        working-directory: desktop
-        run: |
-          wails build -platform windows/amd64 -clean -o ../bin/devtime-windows-amd64.exe
+      # - name: Build application (Windows)
+      #   if: matrix.platform == 'windows'
+      #   working-directory: desktop
+      #   run: |
+      #     wails build -platform windows/amd64 -clean -o ../bin/devtime-windows-amd64.exe
 
       - name: Build application (macOS Intel)
         if: matrix.platform == 'darwin' && matrix.arch == 'amd64'
@@ -133,15 +134,15 @@ jobs:
           mkdir -p release
           
           # Copy Linux build
-          if [ -f artifacts/linux-amd64/devtime-linux-amd64 ]; then
-            cp artifacts/linux-amd64/devtime-linux-amd64 release/devtime-linux-amd64
-            chmod +x release/devtime-linux-amd64
-          fi
+          # if [ -f artifacts/linux-amd64/devtime-linux-amd64 ]; then
+          #   cp artifacts/linux-amd64/devtime-linux-amd64 release/devtime-linux-amd64
+          #   chmod +x release/devtime-linux-amd64
+          # fi
           
           # Copy Windows build
-          if [ -f artifacts/windows-amd64/devtime-windows-amd64.exe ]; then
-            cp artifacts/windows-amd64/devtime-windows-amd64.exe release/devtime-windows-amd64.exe
-          fi
+          # if [ -f artifacts/windows-amd64/devtime-windows-amd64.exe ]; then
+          #   cp artifacts/windows-amd64/devtime-windows-amd64.exe release/devtime-windows-amd64.exe
+          # fi
           
           # Copy macOS builds
           if [ -f artifacts/darwin-amd64/devtime-macos-amd64 ]; then
@@ -171,15 +172,15 @@ jobs:
             
             ### Downloads
             
-            - **Linux (amd64)**: `devtime-linux-amd64`
-            - **Windows (amd64)**: `devtime-windows-amd64.exe`
+            <!-- - **Linux (amd64)**: `devtime-linux-amd64` -->
+            <!-- - **Windows (amd64)**: `devtime-windows-amd64.exe` -->
             - **macOS (Intel)**: `devtime-macos-amd64`
             - **macOS (Apple Silicon)**: `devtime-macos-arm64-arm64`
             
             ### Installation
             
-            - **Linux**: Make executable and run: `chmod +x devtime-linux-amd64 && ./devtime-linux-amd64`
-            - **Windows**: Double-click `devtime-windows-amd64.exe`
+            <!-- - **Linux**: Make executable and run: `chmod +x devtime-linux-amd64 && ./devtime-linux-amd64` -->
+            <!-- - **Windows**: Double-click `devtime-windows-amd64.exe` -->
             - **macOS**: May require allowing the app in Security & Privacy settings
           files: |
             release/*
