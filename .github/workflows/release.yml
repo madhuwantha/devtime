@@ -13,28 +13,17 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     strategy:
       matrix:
-        # os: [ubuntu-latest, windows-latest, macos-latest]
-        os: [macos-latest]
+        arch: [amd64, arm64]
         include:
-          # - os: ubuntu-latest
-          #   platform: linux
-          #   arch: amd64
-          #   ext: ""
-          # - os: windows-latest
-          #   platform: windows
-          #   arch: amd64
-          #   ext: ".exe"
-          - os: macos-latest
-            platform: darwin
-            arch: amd64
-            ext: ""
-          - os: macos-latest
-            platform: darwin
-            arch: arm64
-            ext: ""
+          - arch: amd64
+            platform: darwin/amd64
+            output_name: devtime-macos-amd64
+          - arch: arm64
+            platform: darwin/arm64
+            output_name: devtime-macos-arm64
 
     steps:
       - name: Checkout code
@@ -76,26 +65,27 @@ jobs:
       #   run: |
       #     wails build -platform windows/amd64 -clean -o ../bin/devtime-windows-amd64.exe
 
-      - name: Build application (macOS Intel)
-        if: matrix.platform == 'darwin' && matrix.arch == 'amd64'
+      - name: Build application (macOS)
         working-directory: desktop
         run: |
-          wails build -platform darwin/amd64 -clean -o ../bin/devtime-macos-amd64
+          echo "Building for platform: ${{ matrix.platform }}"
+          echo "Output file: ${{ matrix.output_name }}"
+          wails build -platform ${{ matrix.platform }} -clean -o ../bin/${{ matrix.output_name }}
+          ls -lh ../bin/${{ matrix.output_name }} || echo "Build file not found!"
 
-      - name: Build application (macOS Apple Silicon)
-        if: matrix.platform == 'darwin' && matrix.arch == 'arm64'
-        working-directory: desktop
+      - name: List build artifacts
         run: |
-          wails build -platform darwin/arm64 -clean -o ../bin/devtime-macos-arm64
+          echo "Build artifacts:"
+          ls -lh bin/ || echo "bin directory not found"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.platform }}-${{ matrix.arch }}
+          name: darwin-${{ matrix.arch }}
           path: |
-            bin/devtime-*
-            !bin/*.app
+            bin/${{ matrix.output_name }}
           retention-days: 30
+          if-no-files-found: error
 
   create-universal:
     needs: build
@@ -109,18 +99,33 @@ jobs:
           path: artifacts
           pattern: darwin-*
 
+      - name: List downloaded artifacts
+        run: |
+          echo "Downloaded artifacts structure:"
+          find artifacts -type f -name "*" 2>/dev/null || echo "No artifacts found"
+          ls -la artifacts/ || echo "artifacts directory not found"
+
       - name: Create macOS Universal Binary
         run: |
           mkdir -p bin
+          echo "Checking for Intel build..."
+          ls -lh artifacts/darwin-amd64/ || echo "Intel build directory not found"
+          echo "Checking for Apple Silicon build..."
+          ls -lh artifacts/darwin-arm64/ || echo "Apple Silicon build directory not found"
+          
           if [ -f artifacts/darwin-amd64/devtime-macos-amd64 ] && [ -f artifacts/darwin-arm64/devtime-macos-arm64 ]; then
+            echo "Creating universal binary..."
             lipo -create \
               artifacts/darwin-amd64/devtime-macos-amd64 \
               artifacts/darwin-arm64/devtime-macos-arm64 \
               -output bin/devtime-macos-universal
             chmod +x bin/devtime-macos-universal
-            echo "Universal binary created successfully"
+            file bin/devtime-macos-universal
+            echo "✓ Universal binary created successfully"
           else
-            echo "Warning: Could not find both amd64 and arm64 builds"
+            echo "⚠ Warning: Could not find both amd64 and arm64 builds"
+            echo "Intel build exists: $([ -f artifacts/darwin-amd64/devtime-macos-amd64 ] && echo 'YES' || echo 'NO')"
+            echo "Apple Silicon build exists: $([ -f artifacts/darwin-arm64/devtime-macos-arm64 ] && echo 'YES' || echo 'NO')"
           fi
 
       - name: Upload universal binary
@@ -174,11 +179,17 @@ jobs:
           if [ -f artifacts/darwin-amd64/devtime-macos-amd64 ]; then
             cp artifacts/darwin-amd64/devtime-macos-amd64 release/devtime-macos-amd64
             chmod +x release/devtime-macos-amd64
+            echo "✓ Copied Intel build"
+          else
+            echo "⚠ Intel build not found"
           fi
           
           if [ -f artifacts/darwin-arm64/devtime-macos-arm64 ]; then
             cp artifacts/darwin-arm64/devtime-macos-arm64 release/devtime-macos-arm64-arm64
             chmod +x release/devtime-macos-arm64-arm64
+            echo "✓ Copied Apple Silicon build"
+          else
+            echo "⚠ Apple Silicon build not found"
           fi
           
           # Copy universal binary if it exists
