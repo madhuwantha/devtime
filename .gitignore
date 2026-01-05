@@ -6,3 +6,4 @@ devtime.db-wal
 devtime.db-shm
 RELEASE.md
 macOS_INSTALL.md
+HOW_TO_RELEASE.md

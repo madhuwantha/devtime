@@ -8,21 +8,15 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     strategy:
       matrix:
-        os: [macos-latest]
-        # os: [ubuntu-latest, windows-latest, macos-latest]
+        arch: [amd64, arm64]
         include:
-          # - os: ubuntu-latest
-          #   platform: linux
-          #   arch: amd64
-          # - os: windows-latest
-          #   platform: windows
-          #   arch: amd64
-          - os: macos-latest
-            platform: darwin
-            arch: amd64
+          - arch: amd64
+            platform: darwin/amd64
+          - arch: arm64
+            platform: darwin/arm64
 
     steps:
       - name: Checkout code
@@ -55,18 +49,13 @@ jobs:
       - name: Build application
         working-directory: desktop
         run: |
-          if [ "${{ matrix.platform }}" == "linux" ]; then
-            wails build -platform linux/amd64 -clean
-          elif [ "${{ matrix.platform }}" == "windows" ]; then
-            wails build -platform windows/amd64 -clean
-          else
-            wails build -platform darwin/amd64 -clean
-          fi
+          echo "Building for platform: ${{ matrix.platform }}"
+          wails build -platform ${{ matrix.platform }} -clean
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.platform }}-${{ matrix.arch }}
+          name: build-darwin-${{ matrix.arch }}
           path: |
             desktop/build/bin/*
           retention-days: 7
