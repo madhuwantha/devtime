@@ -1,0 +1,72 @@
+name: Build (No Release)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: amd64
+          - os: windows-latest
+            platform: windows
+            arch: amd64
+          - os: macos-latest
+            platform: darwin
+            arch: amd64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: desktop/frontend/package-lock.json
+
+      - name: Install Wails CLI
+        run: |
+          go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install frontend dependencies
+        working-directory: desktop/frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: desktop/frontend
+        run: npm run build
+
+      - name: Build application
+        working-directory: desktop
+        run: |
+          if [ "${{ matrix.platform }}" == "linux" ]; then
+            wails build -platform linux/amd64 -clean
+          elif [ "${{ matrix.platform }}" == "windows" ]; then
+            wails build -platform windows/amd64 -clean
+          else
+            wails build -platform darwin/amd64 -clean
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            desktop/build/bin/*
+          retention-days: 7
+

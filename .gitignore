@@ -4,3 +4,4 @@ devtime
 *bin
 devtime.db-wal
 devtime.db-shm
+RELEASE.md
