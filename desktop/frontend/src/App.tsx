@@ -1,9 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import { Header, MainContent, FloatingElements } from './components';
 import { useWorkState } from './hooks';
+import Setup from './screens/Setup';
+import { IsDBInitialized } from './wailsjs/go/main/App';
 
 function App() {
+  const [isDBInitialized, setIsDBInitialized] = useState<boolean | null>(null);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    checkDBStatus();
+  }, []);
+
+  const checkDBStatus = async () => {
+    try {
+      const initialized = await IsDBInitialized();
+      setIsDBInitialized(initialized);
+    } catch (err) {
+      console.error('Failed to check DB status:', err);
+      setIsDBInitialized(false);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  // Show setup screen if DB is not initialized
+  if (isChecking || !isDBInitialized) {
+    return <Setup />;
+  }
   const [selectedTab, setSelectedTabState] = useState(0);
   const [isTabSelected, setIsTabSelected] = useState(false);
   

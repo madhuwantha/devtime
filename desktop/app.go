@@ -43,15 +43,25 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		// .env file is optional, just log the error
+		log.Printf("Warning: Could not load .env file: %v", err)
 	}
 	a.ctx = ctx
 	a.monitorChan = make(chan bool)
 
-	localsrc.InitDB()
-
+	// Don't initialize DB here - let the setup screen handle it
 	// Start monitoring window state for PiP window
 	go a.monitorWindowState()
+}
+
+// IsDBInitialized checks if the database is already initialized
+func (a *App) IsDBInitialized() bool {
+	return localsrc.IsDBInitialized()
+}
+
+// InitializeDB initializes the database
+func (a *App) InitializeDB() error {
+	return localsrc.InitDB()
 }
 
 func StopMonitor() {
