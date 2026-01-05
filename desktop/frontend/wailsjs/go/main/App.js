@@ -62,6 +62,14 @@ export function GetWorkTimeSummary(arg1) {
   return window['go']['main']['App']['GetWorkTimeSummary'](arg1);
 }
 
+export function InitializeDB() {
+  return window['go']['main']['App']['InitializeDB']();
+}
+
+export function IsDBInitialized() {
+  return window['go']['main']['App']['IsDBInitialized']();
+}
+
 export function IsPausedWorking() {
   return window['go']['main']['App']['IsPausedWorking']();
 }

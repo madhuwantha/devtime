@@ -38,6 +38,8 @@ func IsDBInitialized() bool {
 	}
 
 	_, err = os.Stat(dbPath)
+	log.Printf("Database path: %s", dbPath)
+	log.Printf("Database exists: %v", err == nil)
 	return err == nil
 }
 

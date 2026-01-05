@@ -3,7 +3,7 @@ import './App.css';
 import { Header, MainContent, FloatingElements } from './components';
 import { useWorkState } from './hooks';
 import Setup from './screens/Setup';
-import { IsDBInitialized } from './wailsjs/go/main/App';
+import { IsDBInitialized } from '../wailsjs/go/main/App';
 
 function App() {
   const [isDBInitialized, setIsDBInitialized] = useState<boolean | null>(null);

@@ -35,6 +35,10 @@ export function GetTodayTasks(arg1:time.Time):Promise<Array<repo.TodayTask>>;
 
 export function GetWorkTimeSummary(arg1:string):Promise<Array<entity.WorkSummary>>;
 
+export function InitializeDB():Promise<void>;
+
+export function IsDBInitialized():Promise<boolean>;
+
 export function IsPausedWorking():Promise<boolean>;
 
 export function IsWorking():Promise<boolean>;
