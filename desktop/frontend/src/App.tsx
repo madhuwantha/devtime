@@ -14,8 +14,10 @@ function App() {
   }, []);
 
   const checkDBStatus = async () => {
+    console.log('Checking DB status');
     try {
       const initialized = await IsDBInitialized();
+      console.log('DB status', initialized);
       setIsDBInitialized(initialized);
     } catch (err) {
       console.error('Failed to check DB status:', err);
@@ -25,13 +27,14 @@ function App() {
     }
   };
 
-  // Show setup screen if DB is not initialized
-  if (isChecking || !isDBInitialized) {
-    return <Setup />;
-  }
+  // // Show setup screen if DB is not initialized
+  // if (isChecking || !isDBInitialized) {
+  //   console.log('Showing setup screen', isChecking, isDBInitialized);
+  //   return <Setup />;
+  // }
   const [selectedTab, setSelectedTabState] = useState(0);
   const [isTabSelected, setIsTabSelected] = useState(false);
-  
+
   const {
     time,
     isWorking,
@@ -58,43 +61,35 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">
-      {/* Minimized Header - Shows when tabs are selected */}
-      <Header
-        isVisible={true}
-        isWorking={isWorking}
-        isPaused={isPaused}
-        time={time}
-        onStart={startWorking}
-        onStop={stopWorking}
-        onPause={pauseWorking}
-        onResume={resumeWorking}
-        onExpand={() => setIsTabSelected(false)}
-        size="minimized"
-      />
 
-      {/* Full Header - Shows when no tabs are selected */}
-      {/* <Header
-        isVisible={!isTabSelected}
-        isWorking={isWorking}
-        isPaused={isPaused}
-        time={time}
-        onStart={startWorking}
-        onStop={stopWorking}
-        onPause={pauseWorking}
-        onResume={resumeWorking}
-        size="full"
-      /> */}
+      {(isChecking || !isDBInitialized) && (
+        <Setup />
+      )}
 
-      {/* Main Content */}
-      <MainContent
-        tabs={tabs}
-        selectedTab={selectedTab}
-        onTabSelect={setSelectedTab}
-        isTabSelected={true}
-      />
+      {(!isChecking && isDBInitialized) && (
+        <>
+          <Header
+            isVisible={true}
+            isWorking={isWorking}
+            isPaused={isPaused}
+            time={time}
+            onStart={startWorking}
+            onStop={stopWorking}
+            onPause={pauseWorking}
+            onResume={resumeWorking}
+            onExpand={() => setIsTabSelected(false)}
+            size="minimized"
+          />
 
-      {/* Floating Elements */}
-      <FloatingElements />
+          <MainContent
+            tabs={tabs}
+            selectedTab={selectedTab}
+            onTabSelect={setSelectedTab}
+            isTabSelected={true}
+          />
+          <FloatingElements />
+        </>
+      )}
     </div>
   );
 }

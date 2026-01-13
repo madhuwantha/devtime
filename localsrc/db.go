@@ -16,10 +16,10 @@ var DB *sql.DB
 
 // GetDBPath returns the path to the database file in user's home directory
 func GetDBPath() (string, error) {
-	dbPath := os.Getenv("DB_PATH")
-	if dbPath != "" {
-		return dbPath, nil
-	}
+	// dbPath := os.Getenv("DB_PATH")
+	// if dbPath != "" {
+	// 	return dbPath, nil
+	// }
 
 	home, err := os.UserHomeDir()
 	if err != nil {
