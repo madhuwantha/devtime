@@ -70,20 +70,57 @@ jobs:
         run: |
           echo "Building for platform: ${{ matrix.platform }}"
           echo "Output file: ${{ matrix.output_name }}"
-          wails build -platform ${{ matrix.platform }} -clean -o ../bin/${{ matrix.output_name }}
-          ls -lh ../bin/${{ matrix.output_name }} || echo "Build file not found!"
+          wails build -platform ${{ matrix.platform }} -clean
+          
+          # Find the .app bundle
+          APP_BUNDLE=$(find build/bin -name "*.app" -type d | head -1)
+          if [ -z "$APP_BUNDLE" ]; then
+            echo "Error: .app bundle not found"
+            exit 1
+          fi
+          
+          echo "Found app bundle: $APP_BUNDLE"
+          
+          # Remove quarantine attribute from the app bundle
+          xattr -cr "$APP_BUNDLE"
+          
+          # Make executable
+          chmod +x "$APP_BUNDLE/Contents/MacOS/"*
+          
+          # Copy to bin directory with proper name
+          mkdir -p ../bin
+          cp -R "$APP_BUNDLE" "../bin/DevTime-${{ matrix.arch }}.app"
+          
+          echo "App bundle prepared: DevTime-${{ matrix.arch }}.app"
 
       - name: List build artifacts
         run: |
           echo "Build artifacts:"
           ls -lh bin/ || echo "bin directory not found"
 
+      - name: Create DMG installer
+        run: |
+          APP_NAME="DevTime-${{ matrix.arch }}.app"
+          DMG_NAME="DevTime-${{ matrix.arch }}.dmg"
+          
+          if [ ! -d "bin/$APP_NAME" ]; then
+            echo "Error: App bundle not found: bin/$APP_NAME"
+            exit 1
+          fi
+          
+          # Create DMG using hdiutil
+          hdiutil create -volname "DevTime" -srcfolder "bin/$APP_NAME" -ov -format UDZO "bin/$DMG_NAME"
+          
+          echo "Created DMG: $DMG_NAME"
+          ls -lh "bin/$DMG_NAME"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: darwin-${{ matrix.arch }}
           path: |
-            bin/${{ matrix.output_name }}
+            bin/DevTime-${{ matrix.arch }}.app
+            bin/DevTime-${{ matrix.arch }}.dmg
           retention-days: 30
           if-no-files-found: error
 
@@ -113,19 +150,28 @@ jobs:
           echo "Checking for Apple Silicon build..."
           ls -lh artifacts/darwin-arm64/ || echo "Apple Silicon build directory not found"
           
-          if [ -f artifacts/darwin-amd64/devtime-macos-amd64 ] && [ -f artifacts/darwin-arm64/devtime-macos-arm64 ]; then
+          # Extract executables from .app bundles if needed
+          INTEL_EXEC=""
+          ARM64_EXEC=""
+          
+          if [ -d artifacts/darwin-amd64/DevTime-amd64.app ]; then
+            INTEL_EXEC="artifacts/darwin-amd64/DevTime-amd64.app/Contents/MacOS/devtime"
+          fi
+          
+          if [ -d artifacts/darwin-arm64/DevTime-arm64.app ]; then
+            ARM64_EXEC="artifacts/darwin-arm64/DevTime-arm64.app/Contents/MacOS/devtime"
+          fi
+          
+          if [ -n "$INTEL_EXEC" ] && [ -n "$ARM64_EXEC" ] && [ -f "$INTEL_EXEC" ] && [ -f "$ARM64_EXEC" ]; then
             echo "Creating universal binary..."
-            lipo -create \
-              artifacts/darwin-amd64/devtime-macos-amd64 \
-              artifacts/darwin-arm64/devtime-macos-arm64 \
-              -output bin/devtime-macos-universal
+            lipo -create "$INTEL_EXEC" "$ARM64_EXEC" -output bin/devtime-macos-universal
             chmod +x bin/devtime-macos-universal
             file bin/devtime-macos-universal
             echo "✓ Universal binary created successfully"
           else
-            echo "⚠ Warning: Could not find both amd64 and arm64 builds"
-            echo "Intel build exists: $([ -f artifacts/darwin-amd64/devtime-macos-amd64 ] && echo 'YES' || echo 'NO')"
-            echo "Apple Silicon build exists: $([ -f artifacts/darwin-arm64/devtime-macos-arm64 ] && echo 'YES' || echo 'NO')"
+            echo "⚠ Warning: Could not find both executables for universal binary"
+            echo "Intel executable: $([ -f "$INTEL_EXEC" ] && echo 'YES' || echo 'NO')"
+            echo "Apple Silicon executable: $([ -f "$ARM64_EXEC" ] && echo 'YES' || echo 'NO')"
           fi
 
       - name: Upload universal binary
@@ -175,27 +221,40 @@ jobs:
           #   cp artifacts/windows-amd64/devtime-windows-amd64.exe release/devtime-windows-amd64.exe
           # fi
           
-          # Copy macOS builds
-          if [ -f artifacts/darwin-amd64/devtime-macos-amd64 ]; then
-            cp artifacts/darwin-amd64/devtime-macos-amd64 release/devtime-macos-amd64
-            chmod +x release/devtime-macos-amd64
-            echo "✓ Copied Intel build"
+          # Copy macOS builds (DMG files)
+          if [ -f artifacts/darwin-amd64/DevTime-amd64.dmg ]; then
+            cp artifacts/darwin-amd64/DevTime-amd64.dmg release/DevTime-macos-intel.dmg
+            echo "✓ Copied Intel DMG"
           else
-            echo "⚠ Intel build not found"
+            echo "⚠ Intel DMG not found"
           fi
           
-          if [ -f artifacts/darwin-arm64/devtime-macos-arm64 ]; then
-            cp artifacts/darwin-arm64/devtime-macos-arm64 release/devtime-macos-arm64-arm64
-            chmod +x release/devtime-macos-arm64-arm64
-            echo "✓ Copied Apple Silicon build"
+          if [ -f artifacts/darwin-arm64/DevTime-arm64.dmg ]; then
+            cp artifacts/darwin-arm64/DevTime-arm64.dmg release/DevTime-macos-apple-silicon.dmg
+            echo "✓ Copied Apple Silicon DMG"
           else
-            echo "⚠ Apple Silicon build not found"
+            echo "⚠ Apple Silicon DMG not found"
           fi
           
           # Copy universal binary if it exists
           if [ -f artifacts/darwin-universal/devtime-macos-universal ]; then
             cp artifacts/darwin-universal/devtime-macos-universal release/devtime-macos-universal
             chmod +x release/devtime-macos-universal
+          fi
+          
+          # Also copy .app bundles for users who prefer them
+          if [ -d artifacts/darwin-amd64/DevTime-amd64.app ]; then
+            cp -R artifacts/darwin-amd64/DevTime-amd64.app release/
+            xattr -cr release/DevTime-amd64.app
+            chmod +x release/DevTime-amd64.app/Contents/MacOS/*
+            echo "✓ Copied Intel .app bundle"
+          fi
+          
+          if [ -d artifacts/darwin-arm64/DevTime-arm64.app ]; then
+            cp -R artifacts/darwin-arm64/DevTime-arm64.app release/
+            xattr -cr release/DevTime-arm64.app
+            chmod +x release/DevTime-arm64.app/Contents/MacOS/*
+            echo "✓ Copied Apple Silicon .app bundle"
           fi
           
           # Create checksums
@@ -215,20 +274,24 @@ jobs:
             
             ### Downloads
             
-            <!-- - **Linux (amd64)**: `devtime-linux-amd64` -->
-            <!-- - **Windows (amd64)**: `devtime-windows-amd64.exe` -->
-            - **macOS (Intel)**: `devtime-macos-amd64`
-            - **macOS (Apple Silicon/M1/M2)**: `devtime-macos-arm64-arm64`
-            - **macOS (Universal)**: `devtime-macos-universal` (works on both Intel and Apple Silicon)
+            - **macOS (Intel)**: `DevTime-macos-intel.dmg` - Double-click to install
+            - **macOS (Apple Silicon/M1/M2/M3)**: `DevTime-macos-apple-silicon.dmg` - Double-click to install
+            - **macOS (Universal)**: `devtime-macos-universal` - Command-line executable
             
-            ### Installation
+            ### Installation (macOS)
             
-            <!-- - **Linux**: Make executable and run: `chmod +x devtime-linux-amd64 && ./devtime-linux-amd64` -->
-            <!-- - **Windows**: Double-click `devtime-windows-amd64.exe` -->
-            - **macOS**: 
-              - For M1/M2 Macs, use `devtime-macos-arm64-arm64` or the universal binary
-              - If you see a security warning, right-click the app → Open, then click "Open" in the dialog
-              - Or run: `xattr -cr devtime-macos-*` to remove quarantine attributes
+            **Recommended: Use the DMG installer**
+            1. Download the appropriate DMG file for your Mac
+            2. Double-click the DMG file to open it
+            3. Drag DevTime.app to your Applications folder
+            4. Open DevTime from Applications
+            
+            **Alternative: Use .app bundle directly**
+            - Download `DevTime-amd64.app` (Intel) or `DevTime-arm64.app` (Apple Silicon)
+            - Right-click → Open (first time only to bypass Gatekeeper)
+            - Or run: `xattr -cr DevTime-*.app && chmod +x DevTime-*.app`
+            
+            **Note**: The DMG installer automatically handles permissions, so no terminal commands needed!
           files: |
             release/*
           draft: false
