@@ -1,0 +1,26 @@
+#!/usr/bin/osascript
+
+on run
+    set appPath to choose file with prompt "Select DevTime.app to fix:" of type {"app"}
+    set appPathStr to POSIX path of appPath
+    
+    try
+        -- Remove quarantine
+        do shell script "xattr -cr " & quoted form of appPathStr
+        
+        -- Make executable
+        do shell script "chmod +x " & quoted form of appPathStr & "/Contents/MacOS/*"
+        
+        display dialog "DevTime.app has been fixed successfully!" & return & return & "You can now open it normally." buttons {"OK"} default button "OK" with icon note
+        
+        -- Offer to open the app
+        set openApp to button returned of (display dialog "Would you like to open DevTime now?" buttons {"Yes", "No"} default button "Yes")
+        if openApp is "Yes" then
+            tell application "Finder"
+                open appPath
+            end tell
+        end if
+    on error errMsg
+        display dialog "Error fixing app: " & errMsg buttons {"OK"} default button "OK" with icon stop
+    end try
+end run

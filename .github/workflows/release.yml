@@ -98,7 +98,7 @@ jobs:
           echo "Build artifacts:"
           ls -lh bin/ || echo "bin directory not found"
 
-      - name: Create DMG installer
+      - name: Create DMG installer with auto-fix
         run: |
           APP_NAME="DevTime-${{ matrix.arch }}.app"
           DMG_NAME="DevTime-${{ matrix.arch }}.dmg"
@@ -108,8 +108,83 @@ jobs:
             exit 1
           fi
           
-          # Create DMG using hdiutil
-          hdiutil create -volname "DevTime" -srcfolder "bin/$APP_NAME" -ov -format UDZO "bin/$DMG_NAME"
+          # Create a temporary directory for DMG contents
+          DMG_DIR="bin/dmg_contents"
+          rm -rf "$DMG_DIR"
+          mkdir -p "$DMG_DIR"
+          
+          # Copy app to DMG directory
+          cp -R "bin/$APP_NAME" "$DMG_DIR/"
+          
+          # Create a simple installer script that users can double-click
+          cat > "$DMG_DIR/Install DevTime.command" << EOF
+          #!/bin/bash
+          
+          # Get the directory where this script is located
+          SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+          APP_SOURCE="\${SCRIPT_DIR}/DevTime-${{ matrix.arch }}.app"
+          APP_DEST="\${HOME}/Applications/DevTime.app"
+          
+          # Check if app exists
+          if [ ! -d "\${APP_SOURCE}" ]; then
+              osascript -e 'display dialog "DevTime.app not found in this folder." buttons {"OK"} default button "OK" with icon stop'
+              exit 1
+          fi
+          
+          # Remove old installation
+          if [ -d "\${APP_DEST}" ]; then
+              rm -rf "\${APP_DEST}"
+          fi
+          
+          # Copy to Applications
+          cp -R "\${APP_SOURCE}" "\${APP_DEST}"
+          
+          # Remove quarantine and make executable
+          xattr -cr "\${APP_DEST}"
+          chmod +x "\${APP_DEST}/Contents/MacOS/"*
+          
+          # Success message
+          osascript <<APPLESCRIPT
+          tell application "System Events"
+              set userName to do shell script "whoami"
+              display dialog "DevTime has been installed successfully!" & return & return & "You can find it in your Applications folder." buttons {"Open Applications", "OK"} default button "Open Applications" with icon note
+              if button returned of result is "Open Applications" then
+                  tell application "Finder"
+                      activate
+                      open folder "Applications" of folder userName of folder "Users" of startup disk
+                  end tell
+              end if
+          end tell
+          APPLESCRIPT
+          
+          exit 0
+          EOF
+          
+          chmod +x "$DMG_DIR/Install DevTime.command"
+          
+          # Create a README
+          cat > "$DMG_DIR/README.txt" << EOF
+          DevTime Installation
+          ====================
+          
+          To install DevTime:
+          
+          Option 1 (Recommended):
+          - Double-click "Install DevTime.command"
+          - Follow the instructions
+          
+          Option 2 (Manual):
+          - Drag DevTime.app to your Applications folder
+          - Right-click the app in Applications → Open (first time only)
+          
+          No terminal commands needed!
+          EOF
+          
+          # Create DMG with proper layout
+          hdiutil create -volname "DevTime" -srcfolder "$DMG_DIR" -ov -format UDZO "bin/$DMG_NAME"
+          
+          # Clean up
+          rm -rf "$DMG_DIR"
           
           echo "Created DMG: $DMG_NAME"
           ls -lh "bin/$DMG_NAME"
@@ -278,20 +353,21 @@ jobs:
             - **macOS (Apple Silicon/M1/M2/M3)**: `DevTime-macos-apple-silicon.dmg` - Double-click to install
             - **macOS (Universal)**: `devtime-macos-universal` - Command-line executable
             
-            ### Installation (macOS)
+            ### Installation (macOS) - No Terminal Required!
             
-            **Recommended: Use the DMG installer**
+            **Easy Installation (Recommended):**
             1. Download the appropriate DMG file for your Mac
             2. Double-click the DMG file to open it
-            3. Drag DevTime.app to your Applications folder
-            4. Open DevTime from Applications
+            3. **Double-click "Install DevTime.command"** inside the DMG
+            4. Follow the on-screen instructions
+            5. Done! DevTime will be in your Applications folder
             
-            **Alternative: Use .app bundle directly**
-            - Download `DevTime-amd64.app` (Intel) or `DevTime-arm64.app` (Apple Silicon)
-            - Right-click → Open (first time only to bypass Gatekeeper)
-            - Or run: `xattr -cr DevTime-*.app && chmod +x DevTime-*.app`
+            **Alternative: Drag & Drop**
+            1. Download and open the DMG file
+            2. Drag DevTime.app to your Applications folder
+            3. Right-click DevTime in Applications → Open (first time only)
             
-            **Note**: The DMG installer automatically handles permissions, so no terminal commands needed!
+            **No terminal commands needed!** The installer handles everything automatically.
           files: |
             release/*
           draft: false
