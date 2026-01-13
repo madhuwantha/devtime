@@ -49,7 +49,10 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.monitorChan = make(chan bool)
 
-	// Don't initialize DB here - let the setup screen handle it
+	isInitialized := a.IsDBInitialized()
+	if isInitialized {
+		localsrc.SetDb()
+	}
 	// Start monitoring window state for PiP window
 	go a.monitorWindowState()
 }
@@ -61,6 +64,7 @@ func (a *App) IsDBInitialized() bool {
 
 // InitializeDB initializes the database
 func (a *App) InitializeDB() error {
+	log.Println("Initializing database")
 	return localsrc.InitDB()
 }
 

@@ -43,6 +43,27 @@ func IsDBInitialized() bool {
 	return err == nil
 }
 
+func SetDb() error {
+	var err error
+	dbPath, err := GetDBPath()
+	if err != nil {
+		return fmt.Errorf("failed to get DB path: %w", err)
+	}
+	DB, err = sql.Open("sqlite3", dbPath+"?_journal_mode=WAL&_busy_timeout=5000")
+	if err != nil {
+		return fmt.Errorf("failed to open database: %w", err)
+	}
+
+	DB.SetMaxOpenConns(1) // SQLite only supports one writer at a time
+	DB.SetMaxIdleConns(1)
+	DB.SetConnMaxLifetime(0) // Connections don't expire
+
+	if err = DB.Ping(); err != nil {
+		return fmt.Errorf("failed to ping database: %w", err)
+	}
+	return nil
+}
+
 // InitDB initializes the database at the proper location
 func InitDB() error {
 	var err error
