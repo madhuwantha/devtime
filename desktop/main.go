@@ -24,7 +24,7 @@ func main() {
 	err := wails.Run(&options.App{
 		Title:             "Devtime",
 		Width:             568,
-		Height:            768,
+		Height:            1268,
 		MinWidth:          300,
 		MinHeight:         400,
 		BackgroundColour:  &options.RGBA{R: 27, G: 38, B: 54, A: 1},
