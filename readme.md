@@ -1,163 +1,96 @@
 # DevTime - Developer Time Tracker
 
-A comprehensive time tracking system with CLI, Desktop, Web, and Server components for tracking project time, managing tasks, and synchronizing data.
+A cross-platform desktop application for tracking development time, managing projects and tasks, and viewing detailed analytics. Built with Wails (Go + React).
 
 <!-- ![Desktop App Preview](img/Screenshot1.png) -->
 
-## Available Tools
+## Desktop App
 
-### 1. CLI Tool (`devtime`)
-Command-line interface for time tracking with local SQLite storage.
-
-### 2. Desktop App
-Cross-platform desktop application built with Wails (Go + React).
-
-### 3. Web Frontend
-React + TypeScript web application for project and task management.
-
-### 4. Server
-Go backend server with MongoDB for data synchronization and API services.
-
----
-
-## CLI Tool Features
-
-### Commands
-
-| Command | Description | Usage |
-|---------|-------------|-------|
-| `start` | Start tracking time for a project/task | `devtime start` |
-| `stop` | Stop tracking time | `devtime stop` |
-| `report` | Show summary of time logs | `devtime report` |
-| `syn` | Sync data between local and server | `devtime syn` |
-| `login` | Authenticate with server | `devtime login` |
-| `startWork` | Start the work timer | `devtime startWork` |
-| `stopWork` | Stop the work timer | `devtime stopWork` |
-| `monitor` | Start background idle monitor | `devtime monitor --threshold 10` |
-| `stopMonitor` | Stop background monitor | `devtime stopMonitor` |
+Cross-platform desktop application built with Wails (Go + React) for tracking development time, managing projects and tasks, and viewing detailed analytics.
 
 ### Features
-- Project and task time tracking
-- Local SQLite database storage
-- Server synchronization (Server → Local)
-- Idle time monitoring
-- Interactive prompts for project/task selection
 
----
-
-## Desktop App Features
-
-### Features
-- **Time Tracking**: Start/stop work timers with pause/resume
-- **Project Management**: Create and manage projects
-- **Task Management**: Create and manage tasks
-- **Analytics**: View time tracking analytics and reports
+- **Time Tracking**: Start/stop work timers with pause/resume functionality
+- **Project Management**: Create and manage projects with status tracking
+- **Task Management**: Create and manage tasks linked to projects
+- **Analytics Dashboard**: 
+  - Visual timeline view of daily activities
+  - Time-based task positioning (1 minute = 1 unit)
+  - Project and task summary tables with duration and percentages
+  - Filter by date with date picker
+  - Idle time tracking (shown in different color)
 - **Picture-in-Picture**: Floating timer window (macOS)
 - **Real-time Updates**: Live timer updates and status indicators
+- **Local Storage**: SQLite database stored in `~/.devtime/devtime.db`
+- **Initial Setup**: First-run setup screen with progress indicator
 
 ### Screens
-- My Projects - Project management interface
-- My Tasks - Task management interface
-- Analytics - Time tracking analytics and reports
 
----
+- **My Projects**: Project management interface with create, update, and status management
+- **My Tasks**: Task management interface with project association
+- **Analytics**: 
+  - Interactive timeline showing tasks throughout the day
+  - Color-coded tasks (active vs idle)
+  - Summary tables for tasks and projects
+  - Date navigation with previous/next day controls
 
-## Web Frontend Features
+### Installation (macOS)
 
-### Features
-- **Dashboard**: Overview of projects, tasks, and time tracking
-- **Project Management**: Create projects, add users with roles (ADMIN, MEMBER)
-- **Task Management**: Create tasks, assign users with roles (OWNER, ASSIGNEE, REVIEWER, WATCHER)
-- **Time Tracking**: Start/stop time tracking for projects and tasks
-- **User Management**: Create and manage user accounts
+**Easy Installation - No Terminal Required:**
 
----
+1. **Download** the appropriate DMG file from [Releases](https://github.com/yourusername/devtime/releases):
+   - `DevTime-macos-intel.dmg` for Intel Macs
+   - `DevTime-macos-apple-silicon.dmg` for Apple Silicon (M1/M2/M3) Macs
 
-## Server Features
+2. **Double-click** the DMG file to open it
 
-### API Endpoints
-- **Projects**: Create, list, add users to projects
-- **Tasks**: Create, list, assign users to tasks
-- **Users**: User creation and management
-- **Time Tracking**: Start/stop timers, log tracking
-- **Authentication**: JWT-based authentication
+3. **Double-click "Install DevTime.command"** inside the DMG
 
----
+4. Follow the on-screen instructions - the installer will:
+   - Copy DevTime to your Applications folder
+   - Remove security restrictions automatically
+   - Set proper permissions
 
-## How to Run
+5. **Open DevTime** from your Applications folder
 
-### Build CLI Tool
-```bash
-go build -o devtime
-```
+**Alternative: Drag & Drop**
+- Open the DMG and drag `DevTime.app` to your Applications folder
+- Right-click DevTime in Applications → Open (first time only)
 
-### Run Server
-```bash
-go run server/main-server.go
-```
-Server runs on `http://localhost:8080`
+**Note**: The DMG installer handles all permissions automatically - no terminal commands needed!
 
-### Run Desktop App
+### Development
+
+To run the desktop app in development mode:
+
 ```bash
 cd desktop
 wails dev
 ```
 
-### Run Web Frontend
+To build for production:
+
 ```bash
-cd web
-npm install
-npm run dev
+cd desktop
+wails build
 ```
-Web app runs on `http://localhost:3000`
 
-**Note**: Ensure the server is running before starting the web frontend.
+The built app will be in `desktop/build/bin/`
 
----
+### Technology Stack
 
-## Technology Stack
+- **Framework**: Wails v2
+- **Backend**: Go
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS
+- **Storage**: SQLite (local database in `~/.devtime/devtime.db`)
 
-- **CLI**: Go, Cobra, SQLite
-- **Desktop**: Wails v2, Go, React, TypeScript
-- **Web**: React 18, TypeScript, Vite, Tailwind CSS
-- **Server**: Go, MongoDB, JWT
-- **Storage**: SQLite (local), MongoDB (server)
-
----
-
-## Project Structure
+### Project Structure
 
 ```
 devtime/
-├── cmd/              # CLI commands
 ├── desktop/          # Desktop application
-├── web/              # Web frontend
-├── server/            # Backend server
-├── localsrc/          # Local storage and utilities
-└── main.go           # CLI entry point
+│   ├── frontend/     # React frontend
+│   ├── build/        # Build artifacts
+│   └── main.go       # Application entry point
+└── localsrc/         # Local storage and utilities
 ```
-
----
-
-## Quick Start
-
-1. **Start Server**:
-   ```bash
-   go run server/main-server.go
-   ```
-
-2. **Run Desktop App** (in another terminal):
-   ```bash
-   cd desktop && wails dev
-   ```
-
-3. **Or Run Web Frontend** (in another terminal):
-   ```bash
-   cd web && npm install && npm run dev
-   ```
-
-4. **Or Use CLI**:
-   ```bash
-   go build -o devtime
-   ./devtime start
-   ```
