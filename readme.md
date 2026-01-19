@@ -2,7 +2,7 @@
 
 A cross-platform desktop application for tracking development time, managing projects and tasks, and viewing detailed analytics. Built with Wails (Go + React).
 
-<!-- ![Desktop App Preview](img/Screenshot1.png) -->
+![DevTime Desktop App](img/task-and-timer.png)
 
 ## Desktop App
 
@@ -26,13 +26,32 @@ Cross-platform desktop application built with Wails (Go + React) for tracking de
 
 ### Screens
 
-- **My Projects**: Project management interface with create, update, and status management
-- **My Tasks**: Task management interface with project association
-- **Analytics**: 
-  - Interactive timeline showing tasks throughout the day
-  - Color-coded tasks (active vs idle)
-  - Summary tables for tasks and projects
-  - Date navigation with previous/next day controls
+#### My Projects
+
+Project management interface with create, update, and status management.
+
+![Project List](img/project-list.png)
+
+![Create Project](img/project%20-create.png)
+
+#### My Tasks
+
+Task management interface with project association and time tracking.
+
+![Task List](img/task-list.png)
+
+#### Task and Timer
+
+Real-time task tracking with integrated timer controls.
+
+![Task and Timer](img/task-and-timer.png)
+
+#### Analytics
+
+- Interactive timeline showing tasks throughout the day
+- Color-coded tasks (active vs idle)
+- Summary tables for tasks and projects
+- Date navigation with previous/next day controls
 
 ### Installation (macOS)
 
