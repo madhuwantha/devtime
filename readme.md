@@ -2,7 +2,7 @@
 
 A comprehensive time tracking system with CLI, Desktop, Web, and Server components for tracking project time, managing tasks, and synchronizing data.
 
-![Desktop App Preview](img/Screenshot1.png)
+<!-- ![Desktop App Preview](img/Screenshot1.png) -->
 
 ## Available Tools
 
