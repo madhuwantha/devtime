@@ -1,377 +1,377 @@
-name: Build and Release
+# name: Build and Release
 
-on:
-  push:
-    tags:
-      - 'v*.*.*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version tag (e.g., v1.0.0)'
-        required: true
-        type: string
+# on:
+#   push:
+#     tags:
+#       - 'v*.*.*'
+#   workflow_dispatch:
+#     inputs:
+#       version:
+#         description: 'Version tag (e.g., v1.0.0)'
+#         required: true
+#         type: string
 
-jobs:
-  build:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        arch: [amd64, arm64]
-        include:
-          - arch: amd64
-            platform: darwin/amd64
-            output_name: devtime-macos-amd64
-          - arch: arm64
-            platform: darwin/arm64
-            output_name: devtime-macos-arm64
+# jobs:
+#   build:
+#     runs-on: macos-latest
+#     strategy:
+#       matrix:
+#         arch: [amd64, arm64]
+#         include:
+#           - arch: amd64
+#             platform: darwin/amd64
+#             output_name: devtime-macos-amd64
+#           - arch: arm64
+#             platform: darwin/arm64
+#             output_name: devtime-macos-arm64
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
+#       - name: Set up Go
+#         uses: actions/setup-go@v5
+#         with:
+#           go-version: '1.24'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: desktop/frontend/package-lock.json
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+#           cache: 'npm'
+#           cache-dependency-path: desktop/frontend/package-lock.json
 
-      - name: Install Wails CLI
-        run: |
-          go install github.com/wailsapp/wails/v2/cmd/wails@v2.11.0
+#       - name: Install Wails CLI
+#         run: |
+#           go install github.com/wailsapp/wails/v2/cmd/wails@v2.11.0
 
-      - name: Install frontend dependencies
-        working-directory: desktop/frontend
-        run: npm ci
+#       - name: Install frontend dependencies
+#         working-directory: desktop/frontend
+#         run: npm ci
 
-      - name: Build frontend
-        working-directory: desktop/frontend
-        run: npm run build
+#       - name: Build frontend
+#         working-directory: desktop/frontend
+#         run: npm run build
 
-      # - name: Build application (Linux)
-      #   if: matrix.platform == 'linux'
-      #   working-directory: desktop
-      #   run: |
-      #     wails build -platform linux/amd64 -clean -o ../bin/devtime-linux-amd64
+#       # - name: Build application (Linux)
+#       #   if: matrix.platform == 'linux'
+#       #   working-directory: desktop
+#       #   run: |
+#       #     wails build -platform linux/amd64 -clean -o ../bin/devtime-linux-amd64
 
-      # - name: Build application (Windows)
-      #   if: matrix.platform == 'windows'
-      #   working-directory: desktop
-      #   run: |
-      #     wails build -platform windows/amd64 -clean -o ../bin/devtime-windows-amd64.exe
+#       # - name: Build application (Windows)
+#       #   if: matrix.platform == 'windows'
+#       #   working-directory: desktop
+#       #   run: |
+#       #     wails build -platform windows/amd64 -clean -o ../bin/devtime-windows-amd64.exe
 
-      - name: Build application (macOS)
-        working-directory: desktop
-        run: |
-          echo "Building for platform: ${{ matrix.platform }}"
-          echo "Output file: ${{ matrix.output_name }}"
-          wails build -platform ${{ matrix.platform }} -clean
+#       - name: Build application (macOS)
+#         working-directory: desktop
+#         run: |
+#           echo "Building for platform: ${{ matrix.platform }}"
+#           echo "Output file: ${{ matrix.output_name }}"
+#           wails build -platform ${{ matrix.platform }} -clean
           
-          # Find the .app bundle
-          APP_BUNDLE=$(find build/bin -name "*.app" -type d | head -1)
-          if [ -z "$APP_BUNDLE" ]; then
-            echo "Error: .app bundle not found"
-            exit 1
-          fi
+#           # Find the .app bundle
+#           APP_BUNDLE=$(find build/bin -name "*.app" -type d | head -1)
+#           if [ -z "$APP_BUNDLE" ]; then
+#             echo "Error: .app bundle not found"
+#             exit 1
+#           fi
           
-          echo "Found app bundle: $APP_BUNDLE"
+#           echo "Found app bundle: $APP_BUNDLE"
           
-          # Remove quarantine attribute from the app bundle
-          xattr -cr "$APP_BUNDLE"
+#           # Remove quarantine attribute from the app bundle
+#           xattr -cr "$APP_BUNDLE"
           
-          # Make executable
-          chmod +x "$APP_BUNDLE/Contents/MacOS/"*
+#           # Make executable
+#           chmod +x "$APP_BUNDLE/Contents/MacOS/"*
           
-          # Copy to bin directory with proper name
-          mkdir -p ../bin
-          cp -R "$APP_BUNDLE" "../bin/DevTime-${{ matrix.arch }}.app"
+#           # Copy to bin directory with proper name
+#           mkdir -p ../bin
+#           cp -R "$APP_BUNDLE" "../bin/DevTime-${{ matrix.arch }}.app"
           
-          echo "App bundle prepared: DevTime-${{ matrix.arch }}.app"
+#           echo "App bundle prepared: DevTime-${{ matrix.arch }}.app"
 
-      - name: List build artifacts
-        run: |
-          echo "Build artifacts:"
-          ls -lh bin/ || echo "bin directory not found"
+#       - name: List build artifacts
+#         run: |
+#           echo "Build artifacts:"
+#           ls -lh bin/ || echo "bin directory not found"
 
-      - name: Create DMG installer with auto-fix
-        run: |
-          APP_NAME="DevTime-${{ matrix.arch }}.app"
-          DMG_NAME="DevTime-${{ matrix.arch }}.dmg"
+#       - name: Create DMG installer with auto-fix
+#         run: |
+#           APP_NAME="DevTime-${{ matrix.arch }}.app"
+#           DMG_NAME="DevTime-${{ matrix.arch }}.dmg"
           
-          if [ ! -d "bin/$APP_NAME" ]; then
-            echo "Error: App bundle not found: bin/$APP_NAME"
-            exit 1
-          fi
+#           if [ ! -d "bin/$APP_NAME" ]; then
+#             echo "Error: App bundle not found: bin/$APP_NAME"
+#             exit 1
+#           fi
           
-          # Create a temporary directory for DMG contents
-          DMG_DIR="bin/dmg_contents"
-          rm -rf "$DMG_DIR"
-          mkdir -p "$DMG_DIR"
+#           # Create a temporary directory for DMG contents
+#           DMG_DIR="bin/dmg_contents"
+#           rm -rf "$DMG_DIR"
+#           mkdir -p "$DMG_DIR"
           
-          # Copy app to DMG directory
-          cp -R "bin/$APP_NAME" "$DMG_DIR/"
+#           # Copy app to DMG directory
+#           cp -R "bin/$APP_NAME" "$DMG_DIR/"
           
-          # Create a simple installer script that users can double-click
-          cat > "$DMG_DIR/Install DevTime.command" << EOF
-          #!/bin/bash
+#           # Create a simple installer script that users can double-click
+#           cat > "$DMG_DIR/Install DevTime.command" << EOF
+#           #!/bin/bash
           
-          # Get the directory where this script is located
-          SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
-          APP_SOURCE="\${SCRIPT_DIR}/DevTime-${{ matrix.arch }}.app"
-          APP_DEST="\${HOME}/Applications/DevTime.app"
+#           # Get the directory where this script is located
+#           SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+#           APP_SOURCE="\${SCRIPT_DIR}/DevTime-${{ matrix.arch }}.app"
+#           APP_DEST="\${HOME}/Applications/DevTime.app"
           
-          # Check if app exists
-          if [ ! -d "\${APP_SOURCE}" ]; then
-              osascript -e 'display dialog "DevTime.app not found in this folder." buttons {"OK"} default button "OK" with icon stop'
-              exit 1
-          fi
+#           # Check if app exists
+#           if [ ! -d "\${APP_SOURCE}" ]; then
+#               osascript -e 'display dialog "DevTime.app not found in this folder." buttons {"OK"} default button "OK" with icon stop'
+#               exit 1
+#           fi
           
-          # Remove old installation
-          if [ -d "\${APP_DEST}" ]; then
-              rm -rf "\${APP_DEST}"
-          fi
+#           # Remove old installation
+#           if [ -d "\${APP_DEST}" ]; then
+#               rm -rf "\${APP_DEST}"
+#           fi
           
-          # Copy to Applications
-          cp -R "\${APP_SOURCE}" "\${APP_DEST}"
+#           # Copy to Applications
+#           cp -R "\${APP_SOURCE}" "\${APP_DEST}"
           
-          # Remove quarantine and make executable
-          xattr -cr "\${APP_DEST}"
-          chmod +x "\${APP_DEST}/Contents/MacOS/"*
+#           # Remove quarantine and make executable
+#           xattr -cr "\${APP_DEST}"
+#           chmod +x "\${APP_DEST}/Contents/MacOS/"*
           
-          # Success message
-          osascript <<APPLESCRIPT
-          tell application "System Events"
-              set userName to do shell script "whoami"
-              display dialog "DevTime has been installed successfully!" & return & return & "You can find it in your Applications folder." buttons {"Open Applications", "OK"} default button "Open Applications" with icon note
-              if button returned of result is "Open Applications" then
-                  tell application "Finder"
-                      activate
-                      open folder "Applications" of folder userName of folder "Users" of startup disk
-                  end tell
-              end if
-          end tell
-          APPLESCRIPT
+#           # Success message
+#           osascript <<APPLESCRIPT
+#           tell application "System Events"
+#               set userName to do shell script "whoami"
+#               display dialog "DevTime has been installed successfully!" & return & return & "You can find it in your Applications folder." buttons {"Open Applications", "OK"} default button "Open Applications" with icon note
+#               if button returned of result is "Open Applications" then
+#                   tell application "Finder"
+#                       activate
+#                       open folder "Applications" of folder userName of folder "Users" of startup disk
+#                   end tell
+#               end if
+#           end tell
+#           APPLESCRIPT
           
-          exit 0
-          EOF
+#           exit 0
+#           EOF
           
-          chmod +x "$DMG_DIR/Install DevTime.command"
+#           chmod +x "$DMG_DIR/Install DevTime.command"
           
-          # Create a README
-          cat > "$DMG_DIR/README.txt" << EOF
-          DevTime Installation
-          ====================
+#           # Create a README
+#           cat > "$DMG_DIR/README.txt" << EOF
+#           DevTime Installation
+#           ====================
           
-          To install DevTime:
+#           To install DevTime:
           
-          Option 1 (Recommended):
-          - Double-click "Install DevTime.command"
-          - Follow the instructions
+#           Option 1 (Recommended):
+#           - Double-click "Install DevTime.command"
+#           - Follow the instructions
           
-          Option 2 (Manual):
-          - Drag DevTime.app to your Applications folder
-          - Right-click the app in Applications → Open (first time only)
+#           Option 2 (Manual):
+#           - Drag DevTime.app to your Applications folder
+#           - Right-click the app in Applications → Open (first time only)
           
-          No terminal commands needed!
-          EOF
+#           No terminal commands needed!
+#           EOF
           
-          # Create DMG with proper layout
-          hdiutil create -volname "DevTime" -srcfolder "$DMG_DIR" -ov -format UDZO "bin/$DMG_NAME"
+#           # Create DMG with proper layout
+#           hdiutil create -volname "DevTime" -srcfolder "$DMG_DIR" -ov -format UDZO "bin/$DMG_NAME"
           
-          # Clean up
-          rm -rf "$DMG_DIR"
+#           # Clean up
+#           rm -rf "$DMG_DIR"
           
-          echo "Created DMG: $DMG_NAME"
-          ls -lh "bin/$DMG_NAME"
+#           echo "Created DMG: $DMG_NAME"
+#           ls -lh "bin/$DMG_NAME"
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: darwin-${{ matrix.arch }}
-          path: |
-            bin/DevTime-${{ matrix.arch }}.app
-            bin/DevTime-${{ matrix.arch }}.dmg
-          retention-days: 30
-          if-no-files-found: error
+#       - name: Upload artifacts
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: darwin-${{ matrix.arch }}
+#           path: |
+#             bin/DevTime-${{ matrix.arch }}.app
+#             bin/DevTime-${{ matrix.arch }}.dmg
+#           retention-days: 30
+#           if-no-files-found: error
 
-  create-universal:
-    needs: build
-    runs-on: macos-latest
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+#   create-universal:
+#     needs: build
+#     runs-on: macos-latest
+#     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-          pattern: darwin-*
+#     steps:
+#       - name: Download artifacts
+#         uses: actions/download-artifact@v4
+#         with:
+#           path: artifacts
+#           pattern: darwin-*
 
-      - name: List downloaded artifacts
-        run: |
-          echo "Downloaded artifacts structure:"
-          find artifacts -type f -name "*" 2>/dev/null || echo "No artifacts found"
-          ls -la artifacts/ || echo "artifacts directory not found"
+#       - name: List downloaded artifacts
+#         run: |
+#           echo "Downloaded artifacts structure:"
+#           find artifacts -type f -name "*" 2>/dev/null || echo "No artifacts found"
+#           ls -la artifacts/ || echo "artifacts directory not found"
 
-      - name: Create macOS Universal Binary
-        run: |
-          mkdir -p bin
-          echo "Checking for Intel build..."
-          ls -lh artifacts/darwin-amd64/ || echo "Intel build directory not found"
-          echo "Checking for Apple Silicon build..."
-          ls -lh artifacts/darwin-arm64/ || echo "Apple Silicon build directory not found"
+#       - name: Create macOS Universal Binary
+#         run: |
+#           mkdir -p bin
+#           echo "Checking for Intel build..."
+#           ls -lh artifacts/darwin-amd64/ || echo "Intel build directory not found"
+#           echo "Checking for Apple Silicon build..."
+#           ls -lh artifacts/darwin-arm64/ || echo "Apple Silicon build directory not found"
           
-          # Extract executables from .app bundles if needed
-          INTEL_EXEC=""
-          ARM64_EXEC=""
+#           # Extract executables from .app bundles if needed
+#           INTEL_EXEC=""
+#           ARM64_EXEC=""
           
-          if [ -d artifacts/darwin-amd64/DevTime-amd64.app ]; then
-            INTEL_EXEC="artifacts/darwin-amd64/DevTime-amd64.app/Contents/MacOS/devtime"
-          fi
+#           if [ -d artifacts/darwin-amd64/DevTime-amd64.app ]; then
+#             INTEL_EXEC="artifacts/darwin-amd64/DevTime-amd64.app/Contents/MacOS/devtime"
+#           fi
           
-          if [ -d artifacts/darwin-arm64/DevTime-arm64.app ]; then
-            ARM64_EXEC="artifacts/darwin-arm64/DevTime-arm64.app/Contents/MacOS/devtime"
-          fi
+#           if [ -d artifacts/darwin-arm64/DevTime-arm64.app ]; then
+#             ARM64_EXEC="artifacts/darwin-arm64/DevTime-arm64.app/Contents/MacOS/devtime"
+#           fi
           
-          if [ -n "$INTEL_EXEC" ] && [ -n "$ARM64_EXEC" ] && [ -f "$INTEL_EXEC" ] && [ -f "$ARM64_EXEC" ]; then
-            echo "Creating universal binary..."
-            lipo -create "$INTEL_EXEC" "$ARM64_EXEC" -output bin/devtime-macos-universal
-            chmod +x bin/devtime-macos-universal
-            file bin/devtime-macos-universal
-            echo "✓ Universal binary created successfully"
-          else
-            echo "⚠ Warning: Could not find both executables for universal binary"
-            echo "Intel executable: $([ -f "$INTEL_EXEC" ] && echo 'YES' || echo 'NO')"
-            echo "Apple Silicon executable: $([ -f "$ARM64_EXEC" ] && echo 'YES' || echo 'NO')"
-          fi
+#           if [ -n "$INTEL_EXEC" ] && [ -n "$ARM64_EXEC" ] && [ -f "$INTEL_EXEC" ] && [ -f "$ARM64_EXEC" ]; then
+#             echo "Creating universal binary..."
+#             lipo -create "$INTEL_EXEC" "$ARM64_EXEC" -output bin/devtime-macos-universal
+#             chmod +x bin/devtime-macos-universal
+#             file bin/devtime-macos-universal
+#             echo "✓ Universal binary created successfully"
+#           else
+#             echo "⚠ Warning: Could not find both executables for universal binary"
+#             echo "Intel executable: $([ -f "$INTEL_EXEC" ] && echo 'YES' || echo 'NO')"
+#             echo "Apple Silicon executable: $([ -f "$ARM64_EXEC" ] && echo 'YES' || echo 'NO')"
+#           fi
 
-      - name: Upload universal binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: darwin-universal
-          path: bin/devtime-macos-universal
-          retention-days: 30
+#       - name: Upload universal binary
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: darwin-universal
+#           path: bin/devtime-macos-universal
+#           retention-days: 30
 
-  release:
-    needs: [build, create-universal]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+#   release:
+#     needs: [build, create-universal]
+#     runs-on: ubuntu-latest
+#     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Determine version
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            VERSION=${GITHUB_REF#refs/tags/}
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
+#       - name: Determine version
+#         id: version
+#         run: |
+#           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+#             VERSION="${{ github.event.inputs.version }}"
+#           else
+#             VERSION=${GITHUB_REF#refs/tags/}
+#           fi
+#           echo "version=$VERSION" >> $GITHUB_OUTPUT
+#           echo "Version: $VERSION"
 
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
+#       - name: Download all artifacts
+#         uses: actions/download-artifact@v4
+#         with:
+#           path: artifacts
 
-      - name: Prepare release assets
-        run: |
-          mkdir -p release
+#       - name: Prepare release assets
+#         run: |
+#           mkdir -p release
           
-          # Copy Linux build
-          # if [ -f artifacts/linux-amd64/devtime-linux-amd64 ]; then
-          #   cp artifacts/linux-amd64/devtime-linux-amd64 release/devtime-linux-amd64
-          #   chmod +x release/devtime-linux-amd64
-          # fi
+#           # Copy Linux build
+#           # if [ -f artifacts/linux-amd64/devtime-linux-amd64 ]; then
+#           #   cp artifacts/linux-amd64/devtime-linux-amd64 release/devtime-linux-amd64
+#           #   chmod +x release/devtime-linux-amd64
+#           # fi
           
-          # Copy Windows build
-          # if [ -f artifacts/windows-amd64/devtime-windows-amd64.exe ]; then
-          #   cp artifacts/windows-amd64/devtime-windows-amd64.exe release/devtime-windows-amd64.exe
-          # fi
+#           # Copy Windows build
+#           # if [ -f artifacts/windows-amd64/devtime-windows-amd64.exe ]; then
+#           #   cp artifacts/windows-amd64/devtime-windows-amd64.exe release/devtime-windows-amd64.exe
+#           # fi
           
-          # Copy macOS builds (DMG files)
-          if [ -f artifacts/darwin-amd64/DevTime-amd64.dmg ]; then
-            cp artifacts/darwin-amd64/DevTime-amd64.dmg release/DevTime-macos-intel.dmg
-            echo "✓ Copied Intel DMG"
-          else
-            echo "⚠ Intel DMG not found"
-          fi
+#           # Copy macOS builds (DMG files)
+#           if [ -f artifacts/darwin-amd64/DevTime-amd64.dmg ]; then
+#             cp artifacts/darwin-amd64/DevTime-amd64.dmg release/DevTime-macos-intel.dmg
+#             echo "✓ Copied Intel DMG"
+#           else
+#             echo "⚠ Intel DMG not found"
+#           fi
           
-          if [ -f artifacts/darwin-arm64/DevTime-arm64.dmg ]; then
-            cp artifacts/darwin-arm64/DevTime-arm64.dmg release/DevTime-macos-apple-silicon.dmg
-            echo "✓ Copied Apple Silicon DMG"
-          else
-            echo "⚠ Apple Silicon DMG not found"
-          fi
+#           if [ -f artifacts/darwin-arm64/DevTime-arm64.dmg ]; then
+#             cp artifacts/darwin-arm64/DevTime-arm64.dmg release/DevTime-macos-apple-silicon.dmg
+#             echo "✓ Copied Apple Silicon DMG"
+#           else
+#             echo "⚠ Apple Silicon DMG not found"
+#           fi
           
-          # Copy universal binary if it exists
-          if [ -f artifacts/darwin-universal/devtime-macos-universal ]; then
-            cp artifacts/darwin-universal/devtime-macos-universal release/devtime-macos-universal
-            chmod +x release/devtime-macos-universal
-          fi
+#           # Copy universal binary if it exists
+#           if [ -f artifacts/darwin-universal/devtime-macos-universal ]; then
+#             cp artifacts/darwin-universal/devtime-macos-universal release/devtime-macos-universal
+#             chmod +x release/devtime-macos-universal
+#           fi
           
-          # Also copy .app bundles for users who prefer them
-          if [ -d artifacts/darwin-amd64/DevTime-amd64.app ]; then
-            cp -R artifacts/darwin-amd64/DevTime-amd64.app release/
-            xattr -cr release/DevTime-amd64.app
-            chmod +x release/DevTime-amd64.app/Contents/MacOS/*
-            echo "✓ Copied Intel .app bundle"
-          fi
+#           # Also copy .app bundles for users who prefer them
+#           if [ -d artifacts/darwin-amd64/DevTime-amd64.app ]; then
+#             cp -R artifacts/darwin-amd64/DevTime-amd64.app release/
+#             xattr -cr release/DevTime-amd64.app
+#             chmod +x release/DevTime-amd64.app/Contents/MacOS/*
+#             echo "✓ Copied Intel .app bundle"
+#           fi
           
-          if [ -d artifacts/darwin-arm64/DevTime-arm64.app ]; then
-            cp -R artifacts/darwin-arm64/DevTime-arm64.app release/
-            xattr -cr release/DevTime-arm64.app
-            chmod +x release/DevTime-arm64.app/Contents/MacOS/*
-            echo "✓ Copied Apple Silicon .app bundle"
-          fi
+#           if [ -d artifacts/darwin-arm64/DevTime-arm64.app ]; then
+#             cp -R artifacts/darwin-arm64/DevTime-arm64.app release/
+#             xattr -cr release/DevTime-arm64.app
+#             chmod +x release/DevTime-arm64.app/Contents/MacOS/*
+#             echo "✓ Copied Apple Silicon .app bundle"
+#           fi
           
-          # Create checksums
-          cd release
-          for file in *; do
-            sha256sum "$file" > "${file}.sha256"
-          done
-          ls -la
+#           # Create checksums
+#           cd release
+#           for file in *; do
+#             sha256sum "$file" > "${file}.sha256"
+#           done
+#           ls -la
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
-          body: |
-            ## DevTime Desktop Application
+#       - name: Create Release
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           tag_name: ${{ steps.version.outputs.version }}
+#           name: Release ${{ steps.version.outputs.version }}
+#           body: |
+#             ## DevTime Desktop Application
             
-            ### Downloads
+#             ### Downloads
             
-            - **macOS (Intel)**: `DevTime-macos-intel.dmg` - Double-click to install
-            - **macOS (Apple Silicon/M1/M2/M3)**: `DevTime-macos-apple-silicon.dmg` - Double-click to install
-            - **macOS (Universal)**: `devtime-macos-universal` - Command-line executable
+#             - **macOS (Intel)**: `DevTime-macos-intel.dmg` - Double-click to install
+#             - **macOS (Apple Silicon/M1/M2/M3)**: `DevTime-macos-apple-silicon.dmg` - Double-click to install
+#             - **macOS (Universal)**: `devtime-macos-universal` - Command-line executable
             
-            ### Installation (macOS) - No Terminal Required!
+#             ### Installation (macOS) - No Terminal Required!
             
-            **Easy Installation (Recommended):**
-            1. Download the appropriate DMG file for your Mac
-            2. Double-click the DMG file to open it
-            3. **Double-click "Install DevTime.command"** inside the DMG
-            4. Follow the on-screen instructions
-            5. Done! DevTime will be in your Applications folder
+#             **Easy Installation (Recommended):**
+#             1. Download the appropriate DMG file for your Mac
+#             2. Double-click the DMG file to open it
+#             3. **Double-click "Install DevTime.command"** inside the DMG
+#             4. Follow the on-screen instructions
+#             5. Done! DevTime will be in your Applications folder
             
-            **Alternative: Drag & Drop**
-            1. Download and open the DMG file
-            2. Drag DevTime.app to your Applications folder
-            3. Right-click DevTime in Applications → Open (first time only)
+#             **Alternative: Drag & Drop**
+#             1. Download and open the DMG file
+#             2. Drag DevTime.app to your Applications folder
+#             3. Right-click DevTime in Applications → Open (first time only)
             
-            **No terminal commands needed!** The installer handles everything automatically.
-          files: |
-            release/*
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#             **No terminal commands needed!** The installer handles everything automatically.
+#           files: |
+#             release/*
+#           draft: false
+#           prerelease: false
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
